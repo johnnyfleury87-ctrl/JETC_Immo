@@ -1,0 +1,35 @@
+# Fichiers de configuration locaux
+.env
+.env.local
+.env.*.local
+
+# Dépendances
+node_modules/
+package-lock.json
+yarn.lock
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Cache
+.cache/
+.parcel-cache/
+dist/
+build/
+
+# Éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Données sensibles
+*.pem
+*.key
