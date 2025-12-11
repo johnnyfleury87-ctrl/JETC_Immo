@@ -1,0 +1,27 @@
+/* Thème Jardin - Naturel & Organique */
+body[data-theme="jardin"] {
+  --primary: #7cb342;      /* Vert clair naturel */
+  --secondary: #8d6e63;    /* Marron doux */
+  --background: #fffef7;   /* Crème léger */
+  --text: #4e342e;         /* Brun foncé */
+  --accent: #aed581;       /* Vert pastel */
+  --shadow: 0 4px 12px rgba(124, 179, 66, 0.15);
+  
+  --blue: #2196F3;
+  --purple: #9C27B0;
+  --green: #4CAF50;
+  --orange: #FF9800;
+  --dark-green: #2E7D32;
+  --red: #F44336;
+}
+
+/* Hover organique avec scale */
+body[data-theme="jardin"] .btn:hover,
+body[data-theme="jardin"] .hover-glow:hover {
+  transform: scale(1.02);
+}
+
+body[data-theme="jardin"] .card {
+  background: linear-gradient(135deg, #ffffff 0%, #f1f8e9 100%);
+  border: 1px solid rgba(124, 179, 66, 0.2);
+}

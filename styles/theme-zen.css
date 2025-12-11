@@ -1,0 +1,32 @@
+/* Thème Zen - Minimaliste & Apaisant */
+body[data-theme="zen"] {
+  --primary: #607d8b;      /* Gris bleuté */
+  --secondary: #90a4ae;    /* Gris clair */
+  --background: #fafafa;   /* Blanc cassé */
+  --text: #455a64;         /* Gris foncé */
+  --accent: #b0bec5;       /* Bleu pastel */
+  --shadow: 0 4px 12px rgba(96, 125, 139, 0.1);
+  
+  --blue: #2196F3;
+  --purple: #9C27B0;
+  --green: #4CAF50;
+  --orange: #FF9800;
+  --dark-green: #2E7D32;
+  --red: #F44336;
+}
+
+/* Animations lentes et respirantes */
+body[data-theme="zen"] .fade-in {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+body[data-theme="zen"] .btn,
+body[data-theme="zen"] .hover-glow,
+body[data-theme="zen"] .hover-bounce {
+  transition: all 0.5s ease;
+}
+
+body[data-theme="zen"] .card {
+  background: white;
+  border: 1px solid rgba(96, 125, 139, 0.15);
+}
