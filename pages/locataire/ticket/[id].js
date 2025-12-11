@@ -98,37 +98,3 @@ export default function TicketDetail() {
     </Layout>
   );
 }
-
-  return (
-    <Layout>
-      <div className="card fade-in">
-        <h1 className="page-title">Détail du ticket</h1>
-        
-        {loading ? (
-          <p>Chargement...</p>
-        ) : ticket ? (
-          <div>
-            <h2>{ticket.titre}</h2>
-            <p><strong>Statut :</strong> {ticket.statut}</p>
-            <p><strong>Catégorie :</strong> {ticket.categorie}</p>
-            <p><strong>Description :</strong> {ticket.description}</p>
-            <p><strong>Date création :</strong> {new Date(ticket.date_creation).toLocaleDateString()}</p>
-            
-            {ticket.historique && ticket.historique.length > 0 && (
-              <div style={{ marginTop: "2rem" }}>
-                <h3>Historique</h3>
-                <ul>
-                  {ticket.historique.map((event, index) => (
-                    <li key={index}>{event}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        ) : (
-          <p>Ticket introuvable</p>
-        )}
-      </div>
-    </Layout>
-  );
-}
