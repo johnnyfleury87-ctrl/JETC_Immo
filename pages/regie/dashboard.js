@@ -29,18 +29,25 @@ export default function RegieDashboard() {
     // Vérifier mode DEMO
     const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
     setIsDemoMode(demoMode);
+    
+    console.log("🏢 REGIE DASHBOARD - Mode DEMO =", demoMode);
+    console.log("📦 localStorage.jetc_demo_role =", typeof window !== "undefined" ? localStorage.getItem("jetc_demo_role") : null);
 
     // EN MODE DEMO : charger profil local et données mockées
     if (demoMode) {
       const localProfile = getProfileLocal();
       setProfile(localProfile);
       
-      // Ne pas rediriger en mode DEMO, tolérant sur le rôle
+      console.log("👤 Profil chargé en mode DEMO:", localProfile);
+      
+      // EN MODE DEMO : JAMAIS de redirection, toujours afficher le dashboard
       if (localProfile?.role !== "regie") {
+        console.log("⚠️ Rôle temporairement désynchronisé, rechargement dans 100ms...");
         // Recharger le profil après un délai si pas encore le bon rôle
         const timer = setTimeout(() => {
           const updatedProfile = getProfileLocal();
           setProfile(updatedProfile);
+          console.log("✅ Profil rechargé:", updatedProfile);
         }, 100);
         
         // Cleanup

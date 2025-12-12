@@ -85,6 +85,8 @@ export default function DemoHub() {
     
     // Forcer la mise à jour synchrone du localStorage pour garantir la cohérence
     if (typeof window !== "undefined") {
+      // CRITIQUE : définir jetc_demo_mode = "true" pour que les dashboards détectent le mode DEMO
+      localStorage.setItem("jetc_demo_mode", "true");
       localStorage.setItem("jetc_demo_role", role.id);
       localStorage.setItem("role", role.id);
       
@@ -101,6 +103,11 @@ export default function DemoHub() {
           user: profile,
         })
       );
+      
+      // Console.log pour déboguer
+      console.log("🎯 DEMO MODE ACTIVÉ - Rôle sélectionné:", role.id);
+      console.log("📦 localStorage.jetc_demo_mode =", localStorage.getItem("jetc_demo_mode"));
+      console.log("👤 localStorage.jetc_demo_role =", localStorage.getItem("jetc_demo_role"));
     }
     
     // Navigation vers le dashboard (avec un léger délai pour garantir la mise à jour)

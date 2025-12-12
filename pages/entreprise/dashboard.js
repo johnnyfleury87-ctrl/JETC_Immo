@@ -15,23 +15,34 @@ export default function EntrepriseDashboard() {
     // Vérifier mode DEMO
     const demoMode = localStorage.getItem("jetc_demo_mode") === "true";
     setIsDemoMode(demoMode);
+    
+    console.log("🏗️ ENTREPRISE DASHBOARD - Mode DEMO =", demoMode);
+    console.log("📦 localStorage.jetc_demo_role =", localStorage.getItem("jetc_demo_role"));
 
     // Charger profil local
     const localProfile = getProfileLocal();
     setProfile(localProfile);
+    
+    console.log("👤 Profil chargé:", localProfile);
 
-    // Rediriger si pas entreprise (sauf en mode DEMO où on est plus tolérant)
-    if (!demoMode && localProfile?.role !== "entreprise") {
-      router.push("/");
+    // EN MODE DEMO : JAMAIS de redirection
+    if (demoMode) {
+      // En mode DEMO, si le profil n'a pas encore le bon rôle, le recharger après un délai
+      if (localProfile?.role !== "entreprise") {
+        console.log("⚠️ Rôle temporairement désynchronisé, rechargement dans 100ms...");
+        const timer = setTimeout(() => {
+          const updatedProfile = getProfileLocal();
+          setProfile(updatedProfile);
+          console.log("✅ Profil rechargé:", updatedProfile);
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+      return; // Ne pas continuer l'exécution en mode DEMO
     }
     
-    // En mode DEMO, si le profil n'a pas encore le bon rôle, le recharger après un délai
-    if (demoMode && localProfile?.role !== "entreprise") {
-      const timer = setTimeout(() => {
-        const updatedProfile = getProfileLocal();
-        setProfile(updatedProfile);
-      }, 100);
-      return () => clearTimeout(timer);
+    // EN MODE PRODUCTION : rediriger si pas entreprise
+    if (localProfile?.role !== "entreprise") {
+      router.push("/");
     }
   }, [router]);
 
