@@ -8,6 +8,16 @@ export default function UserBadge() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // MODE DEMO : Ne JAMAIS appeler l'API
+    const isDemoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+    
+    if (isDemoMode) {
+      console.log("🎭 UserBadge - MODE DEMO détecté, aucun appel API");
+      setSubscriptionStatus("demo");
+      setLoading(false);
+      return;
+    }
+
     const checkSubscription = async () => {
       // Vérifier uniquement pour les rôles régie et entreprise
       if (

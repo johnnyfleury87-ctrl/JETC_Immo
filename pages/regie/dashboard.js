@@ -71,12 +71,14 @@ export default function RegieDashboard() {
         const profile = await getProfile();
         saveProfile(profile);
         setProfile(profile);
+        
+        // Vérifier le rôle uniquement en PRODUCTION
+        requireRole(["regie"]);
       } catch (error) {
         console.error("Erreur chargement profil", error);
       }
     };
     loadProfile();
-    requireRole(["regie"]);
 
     const loadData = async () => {
       try {
