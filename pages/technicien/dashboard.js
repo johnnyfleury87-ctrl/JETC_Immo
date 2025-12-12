@@ -4,25 +4,25 @@ import Layout from "../../components/Layout";
 import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
 import StatusBadge from "../../components/UI/StatusBadge";
-import { getProfileLocal, isDemoMode } from "../../lib/session";
+import { getProfile, saveProfile } from "../../lib/session";
+import { requireRole } from "../../lib/roleGuard";
 
 export default function TechnicienDashboard() {
   const router = useRouter();
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    console.log("🔧 TECHNICIEN DASHBOARD - MODE DEMO =", isDemoMode());
-    
-    const localProfile = getProfileLocal();
-    setProfile(localProfile);
-
-    // MODE DEMO : Aucune vérification, aucun redirect
-    if (isDemoMode()) {
-      return;
-    }
-    
-    // MODE PRODUCTION : Charger les données réelles
-    // Note: Pas de redirection automatique, l'auth est gérée par requireRole si nécessaire
+    const loadProfile = async () => {
+      try {
+        const profile = await getProfile();
+        saveProfile(profile);
+        setProfile(profile);
+        requireRole(["technicien"]);
+      } catch (error) {
+        console.error("Erreur chargement profil", error);
+      }
+    };
+    loadProfile();
   }, [router]);
 
   // Données DEMO mockées
@@ -128,30 +128,7 @@ export default function TechnicienDashboard() {
   return (
     <Layout>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        {/* Badge MODE DEMO */}
-        {isDemoMode() && (
-          <div
-            style={{
-              background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-              color: "white",
-              padding: "1rem",
-              borderRadius: "12px",
-              marginBottom: "1.5rem",
-              textAlign: "center",
-              boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
-            }}
-          >
-            <div style={{ fontSize: "1.1rem", fontWeight: "600" }}>
-              🎭 MODE DÉMONSTRATION
-            </div>
-            <div style={{ fontSize: "0.9rem", marginTop: "0.3rem", opacity: 0.95 }}>
-              Vous explorez l'interface technicien avec des données fictives.
-              Aucune action réelle n'est effectuée.
-            </div>
-          </div>
-        )}
-
-        <Card>
+        <Card style={{ marginBottom: "2rem" }}>
           <div
             style={{
               display: "flex",

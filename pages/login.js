@@ -15,14 +15,6 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // BLOQUER /connexion en MODE DEMO
-  useEffect(() => {
-    if (isDemoMode()) {
-      console.log("⛔ MODE DEMO détecté - Accès /connexion bloqué");
-      router.push("/demo-hub");
-    }
-  }, [router]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");

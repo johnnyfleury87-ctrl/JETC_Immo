@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getProfileLocal, isDemoMode, getDemoRole } from "../lib/session";
+import { getProfileLocal } from "../lib/session";
 import { apiFetch } from "../lib/api";
 
 // Fonction helper pour afficher les rôles en français
@@ -17,18 +17,8 @@ export default function UserBadge() {
   const profile = getProfileLocal();
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [loading, setLoading] = useState(true);
-  const demoMode = isDemoMode();
 
-  useEffect(() => {
-    // MODE DEMO : Ne JAMAIS appeler l'API
-    if (demoMode) {
-      console.log("🎭 UserBadge - MODE DEMO détecté, aucun appel API");
-      setSubscriptionStatus("demo");
-      setLoading(false);
-      return;
-    }
-
-    const checkSubscription = async () => {
+  useEffect(() => {    const checkSubscription = async () => {
       // Vérifier uniquement pour les rôles régie et entreprise
       if (
         profile &&
@@ -57,13 +47,10 @@ export default function UserBadge() {
     return null;
   }
 
-  const isDemoActive = demoMode || subscriptionStatus === "demo";
+  const isDemoActive = subscriptionStatus === "demo";
   const isProMode = subscriptionStatus === "pro";
 
-  // Nom générique en MODE DEMO
-  const displayName = demoMode 
-    ? `Utilisateur DEMO – ${getRoleLabel(getDemoRole() || profile.role)}`
-    : `${profile.prenom} ${profile.nom}`;
+  const displayName = `${profile.prenom} ${profile.nom}`;
 
   return (
     <div
@@ -75,7 +62,6 @@ export default function UserBadge() {
       }}
     >
       <span style={{ fontWeight: "500" }}>
-        {demoMode && <span style={{ marginRight: "0.5rem" }}>🎭</span>}
         {displayName}
       </span>
 

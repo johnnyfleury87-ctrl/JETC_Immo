@@ -6,7 +6,7 @@ import HeatmapImmeubles from "../../components/charts/HeatmapImmeubles";
 import PieCategories from "../../components/charts/PieCategories";
 import { requireRole } from "../../lib/roleGuard";
 import { getProfile, apiFetch } from "../../lib/api";
-import { saveProfile, getProfileLocal, isDemoMode } from "../../lib/session";
+import { saveProfile } from "../../lib/session";
 
 export default function RegieDashboard() {
   const router = useRouter();
@@ -25,31 +25,11 @@ export default function RegieDashboard() {
   const [urgences, setUrgences] = useState([]);
 
   useEffect(() => {
-    // MODE DEMO : Charger uniquement les données mockées
-    if (isDemoMode()) {
-      console.log("🏢 RÉGIE DASHBOARD - MODE DEMO actif");
-      
-      const localProfile = getProfileLocal();
-      setProfile(localProfile);
-      
-      setOverview({
-        ticketsOuverts: 8,
-        ticketsAttenteDiffusion: 3,
-        missionsEnCours: 5,
-        logementsActifs: 24,
-      });
-      setLoading(false);
-      return;
-    }
-
-    // EN MODE PRODUCTION : comportement normal
     const loadProfile = async () => {
       try {
         const profile = await getProfile();
         saveProfile(profile);
         setProfile(profile);
-        
-        // Vérifier le rôle uniquement en PRODUCTION
         requireRole(["regie"]);
       } catch (error) {
         console.error("Erreur chargement profil", error);
@@ -112,25 +92,6 @@ export default function RegieDashboard() {
   return (
     <Layout>
       <Card>
-        {/* Badge MODE DEMO */}
-        {isDemoMode() && (
-          <div
-            style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "white",
-              padding: "0.8rem 1.2rem",
-              borderRadius: "8px",
-              marginBottom: "1.5rem",
-              textAlign: "center",
-              fontSize: "0.9rem",
-              fontWeight: "600",
-              boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
-            }}
-          >
-            🎭 MODE DÉMONSTRATION • Les données affichées peuvent être vides ou fictives en mode DEMO
-          </div>
-        )}
-
         <h1 className="page-title">🏢 Dashboard Régie</h1>
 
         {/* SECTION A - Vue globale */}

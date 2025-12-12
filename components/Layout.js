@@ -2,22 +2,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import UserBadge from "./UserBadge";
 import { useTheme } from "../context/ThemeContext";
-import DemoModeBanner from "./DemoModeBanner";
-import DemoRoleSwitcher from "./DemoRoleSwitcher";
 
 export default function Layout({ children }) {
   const { theme, setTheme } = useTheme();
-  const [isDemoMode, setIsDemoMode] = useState(false);
 
-  useEffect(() => {
-    // Détecter MODE DEMO
-    const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
-    setIsDemoMode(demoMode);
-  }, []);
   return (
     <div style={{ minHeight: "100vh", background: "var(--background)" }}>
-      <DemoModeBanner />
-      <DemoRoleSwitcher />
       <header
         style={{
           background: "var(--primary)",
@@ -146,37 +136,32 @@ export default function Layout({ children }) {
             flexWrap: "wrap",
           }}
         >
-          {/* MODE DEMO : masquer Connexion/Inscription */}
-          {!isDemoMode && (
-            <>
-              <Link
-                href="/login"
-                style={{
-                  color: "white",
-                  textDecoration: "none",
-                  padding: "0.5rem 1rem",
-                  borderRadius: "6px",
-                  transition: "all 0.2s ease",
-                }}
+          <Link
+            href="/login"
+            style={{
+              color: "white",
+              textDecoration: "none",
+              padding: "0.5rem 1rem",
+              borderRadius: "6px",
+              transition: "all 0.2s ease",
+            }}
                 className="hover-glow"
               >
                 Connexion
               </Link>
-              <Link
-                href="/register"
-                style={{
-                  color: "white",
-                  textDecoration: "none",
-                  padding: "0.5rem 1rem",
-                  borderRadius: "6px",
-                  transition: "all 0.2s ease",
-                }}
-                className="hover-glow"
-              >
-                Inscription
-              </Link>
-            </>
-          )}
+          <Link
+            href="/register"
+            style={{
+              color: "white",
+              textDecoration: "none",
+              padding: "0.5rem 1rem",
+              borderRadius: "6px",
+              transition: "all 0.2s ease",
+            }}
+            className="hover-glow"
+          >
+            📝 Inscription
+          </Link>
           <Link
             href="/locataire/tickets"
             style={{

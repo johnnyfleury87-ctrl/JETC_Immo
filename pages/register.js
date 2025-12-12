@@ -19,14 +19,6 @@ export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // BLOQUER /register en MODE DEMO
-  useEffect(() => {
-    if (isDemoMode()) {
-      console.log("⛔ MODE DEMO détecté - Accès /register bloqué");
-      router.push("/demo-hub");
-    }
-  }, [router]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");

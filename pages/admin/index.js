@@ -29,29 +29,12 @@ export default function AdminDashboard() {
   const [missionsParMois, setMissionsParMois] = useState([]);
 
   useEffect(() => {
-    // Vérifier mode DEMO
-    const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
-    setIsDemoMode(demoMode);
-
-    console.log("🎯 ADMIN DASHBOARD - Mode DEMO =", demoMode);
-
-    // EN MODE DEMO : charger données mockées, AUCUN appel API
-    if (demoMode) {
-      console.log("⚠️ MODE DEMO : Page admin non accessible (redirection vers /)");
-      router.push("/");
-      return; // STOP
-    }
-
-    // EN MODE PRODUCTION : comportement normal
     async function checkAdminAndLoadStats() {
       try {
         // Vérification du rôle admin
         const profileData = await apiFetch("/me");
         if (profileData.role !== "admin_jtec") {
-          const isDemo = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
-          if (!isDemo) {
-            router.push("/login");
-          }
+          router.push("/login");
           return;
         }
 
@@ -103,10 +86,7 @@ export default function AdminDashboard() {
         setMissionsParMois(missionsAnalyticsData.data || []);
       } catch (error) {
         console.error("Erreur chargement dashboard admin", error);
-        const isDemo = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
-        if (!isDemo) {
-          router.push("/login");
-        }
+        router.push("/login");
       } finally {
         setLoading(false);
       }
