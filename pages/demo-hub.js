@@ -39,7 +39,7 @@ export default function DemoHub() {
       icon: "🏗️",
       title: "Entreprise de maintenance",
       description: "Recevez et gérez les interventions, coordonnez vos techniciens",
-      path: "/entreprise/missions",
+      path: "/entreprise/dashboard",
       features: [
         "Réception tickets gratuite",
         "Gestion d'équipe",
@@ -53,7 +53,7 @@ export default function DemoHub() {
       icon: "🔧",
       title: "Technicien",
       description: "Consultez vos missions, mettez à jour les statuts et signez les interventions",
-      path: "/technicien/missions",
+      path: "/technicien/dashboard",
       features: [
         "Liste missions assignées",
         "Upload photos",
@@ -67,7 +67,7 @@ export default function DemoHub() {
       icon: "👤",
       title: "Locataire",
       description: "Déclarez vos problèmes et suivez l'avancement en temps réel",
-      path: "/locataire/tickets",
+      path: "/locataire/dashboard",
       features: [
         "Création tickets simplifiée",
         "Suivi temps réel",
