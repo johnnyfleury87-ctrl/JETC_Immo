@@ -2,12 +2,14 @@ import Link from "next/link";
 import UserBadge from "./UserBadge";
 import { useTheme } from "../context/ThemeContext";
 import DemoModeBanner from "./DemoModeBanner";
+import DemoRoleSwitcher from "./DemoRoleSwitcher";
 
 export default function Layout({ children }) {
   const { theme, setTheme } = useTheme();
   return (
     <div style={{ minHeight: "100vh", background: "var(--background)" }}>
       <DemoModeBanner />
+      <DemoRoleSwitcher />
       <header
         style={{
           background: "var(--primary)",
