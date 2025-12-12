@@ -6,6 +6,7 @@ import { login, redirectByRole } from "../lib/auth";
 import { saveSession, saveProfile, isDemoMode } from "../lib/session";
 import { getProfile } from "../lib/api";
 import { useDemoMode } from "../context/DemoModeContext";
+import { transitionDemoToProd } from "../lib/demoAccess";
 
 export default function Login() {
   const router = useRouter();
@@ -52,6 +53,9 @@ export default function Login() {
       // PRODUCTION : Récupération et sauvegarde du profil réel
       const profile = await getProfile();
       saveProfile(profile);
+
+      // TRANSITION DEMO → PROD : Nettoyer toutes les données DEMO
+      transitionDemoToProd(profile);
 
       // Redirection selon le rôle
       redirectByRole(session.role);

@@ -6,6 +6,7 @@ import { register } from "../lib/auth";
 import { saveSession, saveProfile, isDemoMode } from "../lib/session";
 import { getProfile } from "../lib/api";
 import { useDemoMode } from "../context/DemoModeContext";
+import { transitionDemoToProd } from "../lib/demoAccess";
 
 export default function Register() {
   const router = useRouter();
@@ -67,6 +68,9 @@ export default function Register() {
       // PRODUCTION : Récupération et sauvegarde du profil réel
       const profile = await getProfile();
       saveProfile(profile);
+
+      // TRANSITION DEMO → PROD : Nettoyer toutes les données DEMO
+      transitionDemoToProd(profile);
 
       // Redirection vers l'onboarding pour choisir le rôle
       router.push("/onboarding/role");
