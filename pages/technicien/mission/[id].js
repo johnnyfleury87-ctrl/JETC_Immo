@@ -13,8 +13,45 @@ export default function TechnicienMissionDetail() {
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
   const [files, setFiles] = useState([]);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
+    // Vérifier mode DEMO
+    const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+    setIsDemoMode(demoMode);
+
+    console.log("🔧 TECHNICIEN MISSION DETAIL - Mode DEMO =", demoMode, "ID =", id);
+
+    // EN MODE DEMO : charger données mockées, AUCUN appel API
+    if (demoMode && id) {
+      const demoMission = {
+        id: id,
+        titre: "Réparation fuite d'eau",
+        description: "Fuite sous le lavabo, urgence modérée. Matériel requis: Joint de lavabo, ruban téflon.",
+        categorie: "plomberie",
+        statut: "en_cours",
+        urgence: "modérée",
+        date_creation: "2025-12-10T14:30:00",
+        date_intervention: "2025-12-11T10:00:00",
+        adresse: "12 Rue de la Paix",
+        ville: "Paris 75008",
+        client_nom: "Régie Démo Perritie",
+        locataire_nom: "Mme. Dupuis",
+        temps_estime: "2h",
+        instructions: "Accès par code 1234A. Appartement 3B au 2ème étage.",
+      };
+      const demoFiles = [
+        { id: 1, name: "photo_avant.jpg", url: "/demo/photo1.jpg" },
+        { id: 2, name: "photo_travaux.jpg", url: "/demo/photo2.jpg" },
+      ];
+      setMission(demoMission);
+      setFiles(demoFiles);
+      setLoading(false);
+      console.log("✅ Données DEMO chargées:", demoMission);
+      return; // STOP : ne pas exécuter le code PRODUCTION
+    }
+
+    // EN MODE PRODUCTION : comportement normal
     const loadProfile = async () => {
       try {
         const profile = await getProfile();
@@ -58,6 +95,16 @@ export default function TechnicienMissionDetail() {
 
   const handleUploadPhoto = async () => {
     if (!selectedFile) return;
+
+    // EN MODE DEMO : simuler upload
+    if (isDemoMode) {
+      console.log("🎭 MODE DEMO : upload photo simulé", selectedFile.name);
+      alert("✅ Mode DEMO : Photo envoyée (simulation uniquement)");
+      setSelectedFile(null);
+      return;
+    }
+
+    // EN MODE PRODUCTION : upload réel
     try {
       await uploadFile("/technicien/mission/upload", selectedFile);
       alert("Photo envoyée");
@@ -70,6 +117,14 @@ export default function TechnicienMissionDetail() {
   };
 
   const handleSaveSignature = async (blob) => {
+    // EN MODE DEMO : simuler signature
+    if (isDemoMode) {
+      console.log("🎭 MODE DEMO : signature simulée");
+      alert("✅ Mode DEMO : Signature enregistrée (simulation uniquement)");
+      return;
+    }
+
+    // EN MODE PRODUCTION : signature réelle
     try {
       const file = new File([blob], "signature.png", { type: "image/png" });
       await uploadFile("/technicien/mission/signature", file);
@@ -82,6 +137,14 @@ export default function TechnicienMissionDetail() {
   };
 
   const handleStart = async () => {
+    // EN MODE DEMO : simuler démarrage
+    if (isDemoMode) {
+      console.log("🎭 MODE DEMO : démarrage mission simulé", id);
+      alert("✅ Mode DEMO : Mission commencée (simulation uniquement)");
+      return;
+    }
+
+    // EN MODE PRODUCTION : démarrage réel
     try {
       await apiFetch("/technicien/mission/start", {
         method: "POST",
@@ -96,6 +159,14 @@ export default function TechnicienMissionDetail() {
   };
 
   const handleEnd = async () => {
+    // EN MODE DEMO : simuler fin
+    if (isDemoMode) {
+      console.log("🎭 MODE DEMO : fin mission simulée", id);
+      alert("✅ Mode DEMO : Mission terminée (simulation uniquement)");
+      return;
+    }
+
+    // EN MODE PRODUCTION : fin réelle
     try {
       await apiFetch("/technicien/mission/end", {
         method: "POST",
@@ -110,6 +181,14 @@ export default function TechnicienMissionDetail() {
   };
 
   const handleCancel = async () => {
+    // EN MODE DEMO : simuler annulation
+    if (isDemoMode) {
+      console.log("🎭 MODE DEMO : annulation mission simulée", id);
+      alert("✅ Mode DEMO : Mission annulée (simulation uniquement)");
+      return;
+    }
+
+    // EN MODE PRODUCTION : annulation réelle
     try {
       await apiFetch("/technicien/mission/cancel", {
         method: "POST",

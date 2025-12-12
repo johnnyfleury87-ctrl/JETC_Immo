@@ -16,6 +16,52 @@ export default function EntrepriseMissions() {
     const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
     setIsDemoMode(demoMode);
 
+    console.log("🏗️ ENTREPRISE MISSIONS - Mode DEMO =", demoMode);
+
+    // EN MODE DEMO : charger données mockées, AUCUN appel API
+    if (demoMode) {
+      const demoMissions = [
+        {
+          id: "MISSION_DEMO_001",
+          titre: "Réparation fuite d'eau",
+          description: "Fuite sous lavabo - 12 Rue de la Paix",
+          categorie: "plomberie",
+          statut: "en_cours",
+          urgence: "modérée",
+          date_creation: "2025-12-10T14:30:00",
+          regie_nom: "Régie Démo Perritie",
+          adresse: "12 Rue de la Paix, Paris 75008",
+        },
+        {
+          id: "MISSION_DEMO_002",
+          titre: "Installation chauffage",
+          description: "Remplacement radiateur défectueux",
+          categorie: "chauffage",
+          statut: "en_cours",
+          urgence: "haute",
+          date_creation: "2025-12-08T09:15:00",
+          regie_nom: "Régie Démo Perritie",
+          adresse: "45 Avenue des Champs, Paris 75016",
+        },
+        {
+          id: "MISSION_DEMO_003",
+          titre: "Maintenance électrique",
+          description: "Vérification tableau électrique",
+          categorie: "electricite",
+          statut: "planifiee",
+          urgence: "basse",
+          date_creation: "2025-12-09T11:20:00",
+          regie_nom: "Régie Démo Perritie",
+          adresse: "23 Rue du Louvre, Paris 75001",
+        },
+      ];
+      setMissions(demoMissions);
+      setLoading(false);
+      console.log("✅ Données DEMO chargées:", demoMissions.length, "missions");
+      return; // STOP : ne pas exécuter le code PRODUCTION
+    }
+
+    // EN MODE PRODUCTION : comportement normal
     const loadProfile = async () => {
       try {
         const profile = await getProfile();

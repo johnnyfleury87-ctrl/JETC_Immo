@@ -9,6 +9,7 @@ import { apiFetch } from "../../lib/api";
 export default function AdminDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [stats, setStats] = useState({
     regies: 0,
     entreprises: 0,
@@ -28,7 +29,21 @@ export default function AdminDashboard() {
   const [missionsParMois, setMissionsParMois] = useState([]);
 
   useEffect(() => {
-    const checkAdminAndLoadStats = async () => {
+    // Vérifier mode DEMO
+    const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+    setIsDemoMode(demoMode);
+
+    console.log("🎯 ADMIN DASHBOARD - Mode DEMO =", demoMode);
+
+    // EN MODE DEMO : charger données mockées, AUCUN appel API
+    if (demoMode) {
+      console.log("⚠️ MODE DEMO : Page admin non accessible (redirection vers /)");
+      router.push("/");
+      return; // STOP
+    }
+
+    // EN MODE PRODUCTION : comportement normal
+    async function checkAdminAndLoadStats() {
       try {
         // Vérification du rôle admin
         const profileData = await apiFetch("/me");
@@ -89,7 +104,7 @@ export default function AdminDashboard() {
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     checkAdminAndLoadStats();
   }, []);

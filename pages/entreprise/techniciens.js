@@ -6,6 +6,16 @@ import { saveProfile } from "../../lib/session";
 
 export default function EntrepriseTechniciens() {
   useEffect(() => {
+    // Vérifier mode DEMO
+    const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+
+    // EN MODE DEMO : ne pas charger le profil ni faire d'appels API
+    if (demoMode) {
+      console.log("🎭 MODE DEMO : page techniciens (pas d'appels API)");
+      return; // STOP
+    }
+
+    // EN MODE PRODUCTION : comportement normal
     const loadProfile = async () => {
       try {
         const profile = await getProfile();

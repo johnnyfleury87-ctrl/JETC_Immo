@@ -13,6 +13,7 @@ export default function AbonnementPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview"); // overview, plans, invoices
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   // Plans statiques (même structure que pricing.js)
   const plans = [
@@ -93,9 +94,33 @@ export default function AbonnementPage() {
   ];
 
   useEffect(() => {
+    // Vérifier mode DEMO
+    const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+    setIsDemoMode(demoMode);
+
+    console.log("💳 ABONNEMENT - Mode DEMO =", demoMode);
+
+    // EN MODE DEMO : afficher abonnement fictif, AUCUN appel API
+    if (demoMode) {
+      const demoSubscription = {
+        id: "sub_demo_001",
+        plan: "pro",
+        statut: "active",
+        date_debut: "2025-01-01",
+        date_fin: "2026-01-01",
+        prix: 99,
+        stripe_customer_id: null,
+      };
+      setSubscription(demoSubscription);
+      setLoading(false);
+      console.log("✅ Abonnement DEMO chargé:", demoSubscription);
+      return; // STOP : ne pas exécuter le code PRODUCTION
+    }
+
+    // EN MODE PRODUCTION : comportement normal
     requireRole(["regie", "entreprise"]);
 
-    const loadData = async () => {
+    async function loadData() {
       try {
         await getProfile();
 
@@ -111,11 +136,19 @@ export default function AbonnementPage() {
       } finally {
         setLoading(false);
       }
-    };
+    }
     loadData();
   }, []);
 
   const handleManageBilling = async () => {
+    // EN MODE DEMO : bloquer accès portail billing
+    if (isDemoMode) {
+      console.log("🎭 MODE DEMO : portail billing bloqué");
+      alert("🎭 Mode DEMO : Le portail de facturation n'est pas accessible en mode démonstration.");
+      return;
+    }
+
+    // EN MODE PRODUCTION : accès réel
     setActionLoading(true);
     try {
       const res = await apiFetch("/billing/portal");
@@ -151,6 +184,15 @@ export default function AbonnementPage() {
   };
 
   const confirmCancelSubscription = async () => {
+    // EN MODE DEMO : bloquer annulation
+    if (isDemoMode) {
+      console.log("🎭 MODE DEMO : annulation abonnement bloquée");
+      alert("🎭 Mode DEMO : L'annulation d'abonnement n'est pas possible en mode démonstration.");
+      setShowCancelModal(false);
+      return;
+    }
+
+    // EN MODE PRODUCTION : annulation réelle
     setActionLoading(true);
     try {
       // API call pour annuler l'abonnement

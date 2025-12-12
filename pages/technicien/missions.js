@@ -17,6 +17,39 @@ export default function TechnicienMissions() {
     const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
     setIsDemoMode(demoMode);
 
+    console.log("🔧 TECHNICIEN MISSIONS - Mode DEMO =", demoMode);
+
+    // EN MODE DEMO : charger données mockées, AUCUN appel API
+    if (demoMode) {
+      const demoMissions = [
+        {
+          id: "MISSION_DEMO_001",
+          titre: "Réparation fuite d'eau",
+          description: "Fuite sous le lavabo, urgence modérée",
+          categorie: "plomberie",
+          statut: "en_cours",
+          urgence: "modérée",
+          adresse: "12 Rue de la Paix, Paris 75008",
+          date_creation: "2025-12-10T14:30:00",
+        },
+        {
+          id: "MISSION_DEMO_004",
+          titre: "Installation thermostat",
+          description: "Installation d'un thermostat programmable",
+          categorie: "chauffage",
+          statut: "planifiee",
+          urgence: "basse",
+          adresse: "89 Boulevard Saint-Germain, Paris 75006",
+          date_creation: "2025-12-09T11:20:00",
+        },
+      ];
+      setMissions(demoMissions);
+      setLoading(false);
+      console.log("✅ Données DEMO chargées:", demoMissions.length, "missions");
+      return; // STOP : ne pas exécuter le code PRODUCTION
+    }
+
+    // EN MODE PRODUCTION : comportement normal
     const loadProfile = async () => {
       try {
         const profile = await getProfile();

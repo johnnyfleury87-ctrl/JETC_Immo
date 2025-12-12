@@ -11,8 +11,42 @@ export default function MissionDetail() {
   const [mission, setMission] = useState(null);
   const [loading, setLoading] = useState(true);
   const [files, setFiles] = useState([]);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
+    // Vérifier mode DEMO
+    const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+    setIsDemoMode(demoMode);
+
+    console.log("🏗️ ENTREPRISE MISSION DETAIL - Mode DEMO =", demoMode, "ID =", id);
+
+    // EN MODE DEMO : charger données mockées, AUCUN appel API
+    if (demoMode && id) {
+      const demoMission = {
+        id: id,
+        titre: "Réparation fuite d'eau",
+        description: "Fuite sous lavabo - 12 Rue de la Paix. Intervention urgente requise.",
+        categorie: "plomberie",
+        statut: "en_cours",
+        urgence: "modérée",
+        date_creation: "2025-12-10T14:30:00",
+        date_souhaitee_intervention: "2025-12-11T10:00:00",
+        regie_nom: "Régie Démo Perritie",
+        adresse: "12 Rue de la Paix, Paris 75008",
+        locataire_nom: "Mme. Dupuis",
+        locataire_telephone: "+33 6 98 76 54 32",
+      };
+      const demoFiles = [
+        { id: 1, name: "photo_probleme.jpg", url: "/demo/photo1.jpg" },
+      ];
+      setMission(demoMission);
+      setFiles(demoFiles);
+      setLoading(false);
+      console.log("✅ Données DEMO chargées:", demoMission);
+      return; // STOP : ne pas exécuter le code PRODUCTION
+    }
+
+    // EN MODE PRODUCTION : comportement normal
     const loadProfile = async () => {
       try {
         const profile = await getProfile();
@@ -51,6 +85,14 @@ export default function MissionDetail() {
   };
 
   const handleAccept = async () => {
+    // EN MODE DEMO : simuler acceptation
+    if (isDemoMode) {
+      console.log("🎭 MODE DEMO : acceptation mission simulée", id);
+      alert("✅ Mode DEMO : Mission acceptée (simulation uniquement)");
+      return;
+    }
+
+    // EN MODE PRODUCTION : acceptation réelle
     try {
       await apiFetch("/entreprise/mission/accept", {
         method: "POST",

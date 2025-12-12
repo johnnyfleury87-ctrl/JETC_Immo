@@ -11,8 +11,41 @@ export default function TicketDetail() {
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [files, setFiles] = useState([]);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
+    // Vérifier mode DEMO
+    const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+    setIsDemoMode(demoMode);
+
+    console.log("🎫 LOCATAIRE TICKET DETAIL - Mode DEMO =", demoMode, "ID =", id);
+
+    // EN MODE DEMO : charger données mockées, AUCUN appel API
+    if (demoMode && id) {
+      const demoTicket = {
+        id: id,
+        titre: "Fuite d'eau salle de bain",
+        description: "Fuite sous le lavabo, urgence modérée. Le problème persiste depuis hier soir.",
+        categorie: "plomberie",
+        statut: "en_cours",
+        urgence: "modérée",
+        date_creation: "2025-12-10T14:30:00",
+        entreprise_assignee: "Maintenance Démo Pro",
+        technicien_nom: "Jean Dupont",
+        technicien_telephone: "+33 6 12 34 56 01",
+      };
+      const demoFiles = [
+        { id: 1, name: "photo1.jpg", url: "/demo/photo1.jpg" },
+        { id: 2, name: "photo2.jpg", url: "/demo/photo2.jpg" },
+      ];
+      setTicket(demoTicket);
+      setFiles(demoFiles);
+      setLoading(false);
+      console.log("✅ Données DEMO chargées:", demoTicket);
+      return; // STOP : ne pas exécuter le code PRODUCTION
+    }
+
+    // EN MODE PRODUCTION : comportement normal
     const loadProfile = async () => {
       try {
         const profile = await getProfile();

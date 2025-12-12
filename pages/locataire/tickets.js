@@ -23,6 +23,41 @@ export default function LocataireTickets() {
     const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
     setIsDemoMode(demoMode);
 
+    console.log("🎫 LOCATAIRE TICKETS - Mode DEMO =", demoMode);
+
+    // EN MODE DEMO : charger données mockées, AUCUN appel API
+    if (demoMode) {
+      const demoTickets = [
+        {
+          id: "TICKET_DEMO_001",
+          titre: "Fuite d'eau salle de bain",
+          description: "Fuite sous le lavabo, urgence modérée",
+          categorie: "plomberie",
+          statut: "en_cours",
+          urgence: "modérée",
+          date_creation: "2025-12-10T14:30:00",
+          entreprise_assignee: "Maintenance Démo Pro",
+          technicien_nom: "Jean Dupont",
+        },
+        {
+          id: "TICKET_DEMO_002",
+          titre: "Chauffage ne fonctionne plus",
+          description: "Radiateur froid depuis 2 jours",
+          categorie: "chauffage",
+          statut: "ouvert",
+          urgence: "haute",
+          date_creation: "2025-12-08T09:15:00",
+          entreprise_assignee: null,
+          technicien_nom: null,
+        },
+      ];
+      setTickets(demoTickets);
+      setLoading(false);
+      console.log("✅ Données DEMO chargées:", demoTickets.length, "tickets");
+      return; // STOP : ne pas exécuter le code PRODUCTION
+    }
+
+    // EN MODE PRODUCTION : comportement normal
     const loadProfile = async () => {
       try {
         const profile = await getProfile();
@@ -54,6 +89,21 @@ export default function LocataireTickets() {
 
   const handleCreateTicket = async (e) => {
     e.preventDefault();
+    
+    // EN MODE DEMO : simuler création sans appel API
+    if (isDemoMode) {
+      console.log("🎭 MODE DEMO : création ticket simulée", { titre, description, categorie });
+      alert("✅ Mode DEMO : Ticket créé (simulation uniquement)");
+      setTitre("");
+      setDescription("");
+      setCategorie("plomberie");
+      setSelectedFile(null);
+      setUploadedFileName("");
+      setShowForm(false);
+      return; // STOP : ne pas faire d'appel API
+    }
+
+    // EN MODE PRODUCTION : création réelle
     try {
       const ticketData = await apiFetch("/tickets/create", {
         method: "POST",
