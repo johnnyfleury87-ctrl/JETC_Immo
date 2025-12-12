@@ -1,22 +1,10 @@
 import { useRouter } from "next/router";
 import Card from "../components/UI/Card";
 import Button from "../components/UI/Button";
-import { useDemoMode } from "../context/DemoModeContext";
+import Hero from "../components/marketing/Hero";
 
 export default function HomePage() {
   const router = useRouter();
-  const { enableDemoMode } = useDemoMode();
-
-  const handleDemoStart = () => {
-    // Activer le mode DEMO
-    enableDemoMode();
-
-    // S'assurer que le localStorage est écrit immédiatement
-    localStorage.setItem("jetc_demo_mode", "true");
-
-    // Navigation vers l'inscription
-    router.push("/register");
-  };
 
   return (
     <div
@@ -56,49 +44,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section
-        style={{
-          textAlign: "center",
-          padding: "4rem 2rem",
-          background:
-            "linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)",
-          color: "white",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "3rem",
-            margin: "0 0 1rem 0",
-            fontWeight: "700",
-          }}
-        >
-          La plateforme collaborative pour la gestion immobilière
-        </h1>
-        <p
-          style={{
-            fontSize: "1.3rem",
-            margin: "0 auto 2rem auto",
-            maxWidth: "700px",
-            opacity: 0.95,
-          }}
-        >
-          Gérez vos immeubles, tickets et interventions en toute simplicité.
-          Connectez régies, entreprises et techniciens sur une seule plateforme.
-        </p>
-        <Button
-          onClick={handleDemoStart}
-          style={{
-            fontSize: "1.2rem",
-            padding: "1rem 2.5rem",
-            background: "white",
-            color: "var(--primary)",
-            fontWeight: "700",
-          }}
-          className="hover-bounce"
-        >
-          🚀 Commencer en mode DEMO
-        </Button>
-      </section>
+      <Hero />
 
       {/* 3 blocs : Régies, Entreprises, Techniciens */}
       <section
