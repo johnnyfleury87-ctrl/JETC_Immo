@@ -16,7 +16,10 @@ export default function OnboardingPlan() {
         setUserRole(profile.role);
       } catch (error) {
         console.error("Erreur chargement profil", error);
-        router.push("/login");
+        const isDemo = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+        if (!isDemo) {
+          router.push("/login");
+        }
       }
     };
     loadProfile();

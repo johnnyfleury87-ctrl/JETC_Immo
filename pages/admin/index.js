@@ -48,7 +48,10 @@ export default function AdminDashboard() {
         // Vérification du rôle admin
         const profileData = await apiFetch("/me");
         if (profileData.role !== "admin_jtec") {
-          router.push("/login");
+          const isDemo = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+          if (!isDemo) {
+            router.push("/login");
+          }
           return;
         }
 
@@ -100,7 +103,10 @@ export default function AdminDashboard() {
         setMissionsParMois(missionsAnalyticsData.data || []);
       } catch (error) {
         console.error("Erreur chargement dashboard admin", error);
-        router.push("/login");
+        const isDemo = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+        if (!isDemo) {
+          router.push("/login");
+        }
       } finally {
         setLoading(false);
       }
