@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDemoMode } from "../context/DemoModeContext";
-import { getDemoProfileByRole } from "../lib/session";
+import { enterDemoRole } from "../lib/session";
 import Card from "../components/UI/Card";
 import Button from "../components/UI/Button";
 
@@ -80,40 +80,23 @@ export default function DemoHub() {
   ];
 
   const handleRoleSelect = (role) => {
-    // Changer le rôle DEMO
+    // Changer le rôle DEMO via le contexte
     changeDemoRole(role.id);
     
-    // Forcer la mise à jour synchrone du localStorage pour garantir la cohérence
-    if (typeof window !== "undefined") {
-      // CRITIQUE : définir jetc_demo_mode = "true" pour que les dashboards détectent le mode DEMO
-      localStorage.setItem("jetc_demo_mode", "true");
-      localStorage.setItem("jetc_demo_role", role.id);
-      localStorage.setItem("role", role.id);
-      
-      // Mettre à jour le profil DEMO immédiatement
-      const profile = getDemoProfileByRole(role.id);
-      localStorage.setItem("profile", JSON.stringify(profile));
-      
-      // Créer/mettre à jour la session DEMO
-      localStorage.setItem(
-        "session",
-        JSON.stringify({
-          token: "demo_token_" + Date.now(),
-          role: role.id,
-          user: profile,
-        })
-      );
-      
-      // Console.log pour déboguer
-      console.log("🎯 DEMO MODE ACTIVÉ - Rôle sélectionné:", role.id);
-      console.log("📦 localStorage.jetc_demo_mode =", localStorage.getItem("jetc_demo_mode"));
-      console.log("👤 localStorage.jetc_demo_role =", localStorage.getItem("jetc_demo_role"));
+    // Initialiser COMPLÈTEMENT l'état DEMO de manière SYNCHRONE
+    const success = enterDemoRole(role.id, role.path);
+    
+    if (!success) {
+      console.error("❌ Échec de l'initialisation DEMO");
+      alert("Erreur lors de l'activation du mode DEMO. Veuillez réessayer.");
+      return;
     }
     
-    // Navigation vers le dashboard (avec un léger délai pour garantir la mise à jour)
+    // Navigation vers le dashboard après initialisation complète
+    console.log("🎯 Navigation vers:", role.path);
     setTimeout(() => {
       router.push(role.path);
-    }, 50);
+    }, 100); // 100ms pour garantir l'écriture localStorage
   };
 
   return (
