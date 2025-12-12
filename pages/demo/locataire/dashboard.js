@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Layout from "../../../components/Layout";
+import DemoLayout from "../../../components/demo/DemoLayout";
 import Card from "../../../components/UI/Card";
 
 export default function DemoLocataireDashboard() {
@@ -37,47 +37,39 @@ export default function DemoLocataireDashboard() {
   ]);
 
   return (
-    <Layout>
-      <Card>
-        {/* Badge MODE DÉMONSTRATION */}
-        <div
+    <DemoLayout role="locataire" activePage="/demo/locataire/dashboard">
+      <div style={{
+        backgroundColor: "#fff3cd",
+        padding: "1rem",
+        borderRadius: "5px",
+        marginBottom: "1.5rem",
+        borderLeft: "4px solid #ffc107"
+      }}>
+        <strong>ℹ️ Mode Démo :</strong> Toutes les données affichées sont fictives. Navigation complète disponible.
+      </div>
+
+      <h1 style={{ marginBottom: "1.5rem", color: "#2c3e50" }}>🏠 Dashboard Locataire</h1>
+
+      {/* KPIs */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "1rem",
+          marginBottom: "2rem",
+        }}
+      >
+        <Card
           style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "white",
-            padding: "1rem 1.5rem",
-            borderRadius: "8px",
-            marginBottom: "1.5rem",
             textAlign: "center",
-            fontSize: "1rem",
-            fontWeight: "700",
-            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
+            background: "linear-gradient(135deg, #F44336 0%, #D32F2F 100%)",
+            color: "white",
           }}
         >
-          🎭 MODE DÉMONSTRATION • Données fictives
-        </div>
-
-        <h1 className="page-title">🏠 Dashboard DEMO – Locataire</h1>
-
-        {/* KPIs */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "1rem",
-            marginBottom: "2rem",
-          }}
-        >
-          <Card
-            style={{
-              textAlign: "center",
-              background: "linear-gradient(135deg, #F44336 0%, #D32F2F 100%)",
-              color: "white",
-            }}
-          >
-            <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
-              {overview.ticketsOuverts}
-            </h2>
-            <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
+          <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
+            {overview.ticketsOuverts}
+          </h2>
+          <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
               🎫 Tickets ouverts
             </p>
           </Card>
@@ -243,6 +235,6 @@ export default function DemoLocataireDashboard() {
           </button>
         </div>
       </Card>
-    </Layout>
+    </DemoLayout>
   );
 }

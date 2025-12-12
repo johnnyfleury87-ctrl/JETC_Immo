@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Layout from "../../../components/Layout";
+import DemoLayout from "../../../components/demo/DemoLayout";
 import Card from "../../../components/UI/Card";
 import HeatmapImmeubles from "../../../components/charts/HeatmapImmeubles";
 import PieCategories from "../../../components/charts/PieCategories";
@@ -75,49 +75,33 @@ export default function DemoRegieDashboard() {
   ]);
 
   return (
-    <Layout>
-      <Card>
-        {/* Badge MODE DÉMONSTRATION */}
-        <div
+    <DemoLayout role="regie" activePage="/demo/regie/dashboard">
+      <div style={{
+        backgroundColor: "#fff3cd",
+        padding: "1rem",
+        borderRadius: "5px",
+        marginBottom: "1.5rem",
+        borderLeft: "4px solid #ffc107"
+      }}>
+        <strong>ℹ️ Mode Démo :</strong> Toutes les données affichées sont fictives. Navigation complète disponible.
+      </div>
+
+      <h1 style={{ marginBottom: "1.5rem", color: "#2c3e50" }}>🏢 Dashboard Régie</h1>
+
+      {/* SECTION A - Vue globale */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "1rem",
+          marginBottom: "2rem",
+        }}
+      >
+        <Card
+          className="hover-glow"
           style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "white",
-            padding: "1rem 1.5rem",
-            borderRadius: "8px",
-            marginBottom: "1.5rem",
             textAlign: "center",
-            fontSize: "1rem",
-            fontWeight: "700",
-            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "0.5rem",
-          }}
-        >
-          <span style={{ fontSize: "1.5rem" }}>🎭</span>
-          <span>MODE DÉMONSTRATION</span>
-          <span style={{ opacity: 0.8, fontSize: "0.9rem" }}>
-            • Toutes les données sont fictives
-          </span>
-        </div>
-
-        <h1 className="page-title">🏢 Dashboard Régie</h1>
-
-        {/* SECTION A - Vue globale */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "1rem",
-            marginBottom: "2rem",
-          }}
-        >
-          <Card
-            className="hover-glow"
-            style={{
-              textAlign: "center",
-              background: "linear-gradient(135deg, #F44336 0%, #D32F2F 100%)",
+            background: "linear-gradient(135deg, #F44336 0%, #D32F2F 100%)",
               color: "white",
             }}
           >
@@ -396,7 +380,6 @@ export default function DemoRegieDashboard() {
             ← Retour au hub DEMO
           </button>
         </div>
-      </Card>
-    </Layout>
+    </DemoLayout>
   );
 }
