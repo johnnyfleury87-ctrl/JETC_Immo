@@ -1,8 +1,9 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
 import Card from "../../../components/UI/Card";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoLocataireDashboard() {
+function DemoLocataireDashboard() {
   const [overview] = useState({
     ticketsOuverts: 2,
     ticketsEnCours: 1,
@@ -237,3 +238,5 @@ export default function DemoLocataireDashboard() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoLocataireDashboard);

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoEntreprisePlanning() {
+function DemoEntreprisePlanning() {
   const [missions] = useState([
     { id: 1, ref: "MIS-2401", type: "Plomberie", adresse: "12 Rue des Lilas, Apt A101", technicien: "Jean Dupont", date: "2025-12-15", heure: "10:00", statut: "planifiée", duree: "2h" },
     { id: 2, ref: "MIS-2402", type: "Électricité", adresse: "34 Avenue Victor Hugo, Apt B205", technicien: "Marc Legrand", date: "2025-12-12", heure: "14:30", statut: "en cours", duree: "3h" },
@@ -158,3 +159,5 @@ export default function DemoEntreprisePlanning() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoEntreprisePlanning);

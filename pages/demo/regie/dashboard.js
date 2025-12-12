@@ -3,8 +3,9 @@ import DemoLayout from "../../../components/demo/DemoLayout";
 import Card from "../../../components/UI/Card";
 import HeatmapImmeubles from "../../../components/charts/HeatmapImmeubles";
 import PieCategories from "../../../components/charts/PieCategories";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoRegieDashboard() {
+function DemoRegieDashboard() {
   // Données mockées LOCALES uniquement
   const [overview] = useState({
     ticketsOuverts: 12,
@@ -383,3 +384,5 @@ export default function DemoRegieDashboard() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoRegieDashboard);

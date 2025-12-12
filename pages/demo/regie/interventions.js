@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoRegieInterventions() {
+function DemoRegieInterventions() {
   const [interventions] = useState([
     { id: 1, mission: "MIS-2401", ticket: "TKT-001", entreprise: "PlombiTech Pro", technicien: "Jean Dupont", logement: "A101", statut: "planifiée", date: "2025-12-15", heure: "10:00" },
     { id: 2, mission: "MIS-2402", ticket: "TKT-002", entreprise: "Électric Services", technicien: "Marc Legrand", logement: "B205", statut: "en cours", date: "2025-12-12", heure: "14:30" },
@@ -196,3 +197,5 @@ export default function DemoRegieInterventions() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoRegieInterventions);

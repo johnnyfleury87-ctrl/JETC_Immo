@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoLocataireProfil() {
+function DemoLocataireProfil() {
   const [profil] = useState({
     nom: "Dupont",
     prenom: "Marie",
@@ -309,3 +310,5 @@ export default function DemoLocataireProfil() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoLocataireProfil);

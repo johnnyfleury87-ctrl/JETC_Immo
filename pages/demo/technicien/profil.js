@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoTechnicienProfil() {
+function DemoTechnicienProfil() {
   const [profil] = useState({
     nom: "Dupont",
     prenom: "Jean",
@@ -268,3 +269,5 @@ export default function DemoTechnicienProfil() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoTechnicienProfil);

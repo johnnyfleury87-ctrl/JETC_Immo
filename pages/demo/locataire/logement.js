@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoLocataireLogement() {
+function DemoLocataireLogement() {
   const [logement] = useState({
     reference: "A101",
     adresse: "12 Rue des Lilas, 75012 Paris",
@@ -197,3 +198,5 @@ export default function DemoLocataireLogement() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoLocataireLogement);

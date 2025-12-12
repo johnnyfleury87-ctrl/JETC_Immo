@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoEntrepriseTechniciens() {
+function DemoEntrepriseTechniciens() {
   const [techniciens] = useState([
     {
       id: 1,
@@ -271,3 +272,5 @@ export default function DemoEntrepriseTechniciens() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoEntrepriseTechniciens);

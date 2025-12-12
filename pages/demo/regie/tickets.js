@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoRegieTickets() {
+function DemoRegieTickets() {
   const [tickets] = useState([
     { id: 1, reference: "TKT-001", locataire: "Dupont Marie", logement: "A101", categorie: "Plomberie", urgence: "haute", statut: "ouvert", date: "2025-12-10", description: "Fuite sous l'évier" },
     { id: 2, reference: "TKT-002", locataire: "Martin Pierre", logement: "B205", categorie: "Électricité", urgence: "moyenne", statut: "en cours", date: "2025-12-09", description: "Panne électrique salon" },
@@ -202,3 +203,5 @@ export default function DemoRegieTickets() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoRegieTickets);

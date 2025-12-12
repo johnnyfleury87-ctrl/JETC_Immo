@@ -1,8 +1,9 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
 import Card from "../../../components/UI/Card";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoEntrepriseDashboard() {
+function DemoEntrepriseDashboard() {
   const [overview] = useState({
     missionsEnCours: 6,
     missionsCompletees: 42,
@@ -229,3 +230,5 @@ export default function DemoEntrepriseDashboard() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoEntrepriseDashboard);

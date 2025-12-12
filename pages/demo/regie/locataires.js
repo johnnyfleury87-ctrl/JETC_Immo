@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoRegieLocataires() {
+function DemoRegieLocataires() {
   const [locataires] = useState([
     { id: 1, nom: "Dupont", prenom: "Marie", logement: "A101 - 12 Rue des Lilas", telephone: "06 12 34 56 78", email: "marie.dupont@email.fr", statut: "actif" },
     { id: 2, nom: "Martin", prenom: "Pierre", logement: "B205 - 34 Avenue Victor Hugo", telephone: "06 23 45 67 89", email: "p.martin@email.fr", statut: "actif" },
@@ -144,3 +145,5 @@ export default function DemoRegieLocataires() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoRegieLocataires);

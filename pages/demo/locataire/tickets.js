@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoLocataireTickets() {
+function DemoLocataireTickets() {
   const [tickets] = useState([
     { id: 1, ref: "TKT-001", titre: "Fuite d eau salle de bain", categorie: "Plomberie", date: "2025-12-10", statut: "en_cours", priorite: "haute", description: "Fuite importante sous le lavabo" },
     { id: 2, ref: "TKT-002", titre: "Ampoule grillée couloir", categorie: "Électricité", date: "2025-12-11", statut: "ouvert", priorite: "basse", description: "Ampoule du couloir principal grillée" },
@@ -149,3 +150,5 @@ export default function DemoLocataireTickets() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoLocataireTickets);

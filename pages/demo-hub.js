@@ -1,8 +1,9 @@
 import { useDemoMode } from "../context/DemoModeContext";
 import Card from "../components/UI/Card";
 import Button from "../components/UI/Button";
+import withDemoAccess from "../lib/withDemoAccess";
 
-export default function DemoHub() {
+function DemoHub() {
   const { demoProfile } = useDemoMode();
 
   return (
@@ -491,3 +492,5 @@ export default function DemoHub() {
     </div>
   );
 }
+
+export default withDemoAccess(DemoHub);

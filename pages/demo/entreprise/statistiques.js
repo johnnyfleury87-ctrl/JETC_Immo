@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoEntrepriseStatistiques() {
+function DemoEntrepriseStatistiques() {
   const [stats] = useState({
     ca_mois: 12500,
     ca_mois_precedent: 11200,
@@ -243,3 +244,5 @@ export default function DemoEntrepriseStatistiques() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoEntrepriseStatistiques);

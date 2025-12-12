@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoRegieLogements() {
+function DemoRegieLogements() {
   const [logements] = useState([
     { id: 1, reference: "A101", adresse: "12 Rue des Lilas", type: "T2", surface: 45, loyer: 680, statut: "occupé", locataire: "Dupont Marie" },
     { id: 2, reference: "A204", adresse: "12 Rue des Lilas", type: "T3", surface: 62, loyer: 850, statut: "préavis", locataire: "Petit Lucas" },
@@ -157,3 +158,5 @@ export default function DemoRegieLogements() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoRegieLogements);

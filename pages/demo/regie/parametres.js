@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoRegieParametres() {
+function DemoRegieParametres() {
   const [settings] = useState({
     nomRegie: "Régie Immobilière Démo",
     email: "contact@regie-demo.fr",
@@ -278,3 +279,5 @@ export default function DemoRegieParametres() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoRegieParametres);

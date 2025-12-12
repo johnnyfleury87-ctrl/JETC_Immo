@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoLocataireMessages() {
+function DemoLocataireMessages() {
   const [messages] = useState([
     {
       id: 1,
@@ -157,3 +158,5 @@ export default function DemoLocataireMessages() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoLocataireMessages);

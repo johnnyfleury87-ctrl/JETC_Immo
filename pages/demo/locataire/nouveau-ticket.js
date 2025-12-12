@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoLocataireNouveauTicket() {
+function DemoLocataireNouveauTicket() {
   const [formData, setFormData] = useState({
     categorie: "",
     priorite: "moyenne",
@@ -183,3 +184,5 @@ export default function DemoLocataireNouveauTicket() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoLocataireNouveauTicket);

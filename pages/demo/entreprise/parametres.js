@@ -1,7 +1,8 @@
 import { useState } from "react";
 import DemoLayout from "../../../components/demo/DemoLayout";
+import withDemoAccess from "../../../lib/withDemoAccess";
 
-export default function DemoEntrepriseParametres() {
+function DemoEntrepriseParametres() {
   const [settings] = useState({
     nomEntreprise: "PlombiTech Pro - DEMO",
     email: "contact@plombitech-demo.fr",
@@ -328,3 +329,5 @@ export default function DemoEntrepriseParametres() {
     </DemoLayout>
   );
 }
+
+export default withDemoAccess(DemoEntrepriseParametres);
