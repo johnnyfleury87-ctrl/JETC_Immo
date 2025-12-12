@@ -6,65 +6,87 @@ import { apiFetch, getProfile } from "../../lib/api";
 
 export default function OnboardingPlan() {
   const router = useRouter();
-  const { planId } = router.query;
-  const [plans, setPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [userRole, setUserRole] = useState(null);
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadProfile = async () => {
       try {
         const profile = await getProfile();
         setUserRole(profile.role);
-
-        const plansData = await apiFetch("/billing/plans");
-        const allPlans = plansData.plans || [];
-
-        // Filtrer selon le rôle
-        let filteredPlans = allPlans;
-        if (profile.role === "regie") {
-          filteredPlans = allPlans.filter(
-            (p) =>
-              p.nom_plan.toLowerCase().includes("régie") ||
-              p.nom_plan.toLowerCase().includes("regie") ||
-              p.nom_plan.toLowerCase().includes("demo")
-          );
-        } else if (profile.role === "entreprise") {
-          filteredPlans = allPlans.filter(
-            (p) =>
-              p.nom_plan.toLowerCase().includes("entreprise") ||
-              p.nom_plan.toLowerCase().includes("demo")
-          );
-        }
-
-        setPlans(filteredPlans);
       } catch (error) {
-        console.error("Erreur chargement plans", error);
-      } finally {
-        setLoading(false);
+        console.error("Erreur chargement profil", error);
+        router.push("/login");
       }
     };
-    loadData();
-  }, []);
+    loadProfile();
+  }, [router]);
 
-  const handleChoosePlan = async (selectedPlanId) => {
-    const plan = plans.find((p) => p.id === selectedPlanId);
+  const plans = [
+    {
+      id: "essentiel",
+      name: "Essentiel",
+      icon: "🌱",
+      price: 49,
+      period: "/mois",
+      description: "Idéal pour démarrer",
+      features: [
+        { text: "Jusqu'à 50 logements", included: true },
+        { text: "Gestion des tickets", included: true },
+        { text: "5 entreprises partenaires", included: true },
+        { text: "Support email (48h)", included: true },
+        { text: "1 utilisateur", included: true },
+        { text: "Analytics avancés", included: false },
+      ],
+      color: "#10b981",
+      badge: null,
+    },
+    {
+      id: "pro",
+      name: "Pro",
+      icon: "⚡",
+      price: 99,
+      period: "/mois",
+      description: "Le plus populaire",
+      features: [
+        { text: "Jusqu'à 200 logements", included: true },
+        { text: "Gestion complète", included: true },
+        { text: "Entreprises illimitées", included: true },
+        { text: "Support prioritaire (24h)", included: true },
+        { text: "Jusqu'à 5 utilisateurs", included: true },
+        { text: "Analytics avancés", included: true },
+      ],
+      color: "#4f46e5",
+      badge: "RECOMMANDÉ",
+    },
+    {
+      id: "premium",
+      name: "Premium",
+      icon: "🚀",
+      price: 199,
+      period: "/mois",
+      description: "Pour les pros exigeants",
+      features: [
+        { text: "Logements illimités", included: true },
+        { text: "Multi-sites", included: true },
+        { text: "Intégrations personnalisées", included: true },
+        { text: "Manager dédié 7j/7", included: true },
+        { text: "Utilisateurs illimités", included: true },
+        { text: "API complète + formation", included: true },
+      ],
+      color: "#f59e0b",
+      badge: null,
+    },
+  ];
 
-    // Si plan DEMO, pas de checkout
-    if (plan && plan.prix_mensuel === 0) {
-      alert(
-        "Mode DEMO activé ! Vous pouvez maintenant accéder à votre tableau de bord."
-      );
-      router.push(`/${userRole}/dashboard`);
-      return;
-    }
-
-    setCheckoutLoading(true);
+  const handleChoosePlan = async (planId) => {
+    setLoading(true);
+    
     try {
+      // Simuler l'appel API pour créer une session Stripe
       const res = await apiFetch("/billing/create-checkout-session", {
         method: "POST",
-        body: JSON.stringify({ planId: selectedPlanId }),
+        body: JSON.stringify({ planId }),
       });
 
       if (res.url) {
@@ -72,273 +94,323 @@ export default function OnboardingPlan() {
         window.location.href = res.url;
       } else {
         alert("Erreur lors de la création de la session de paiement.");
-        setCheckoutLoading(false);
+        setLoading(false);
       }
     } catch (error) {
       console.error("Erreur création checkout", error);
       alert("Erreur lors de la création de la session de paiement.");
-      setCheckoutLoading(false);
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    // Si un planId est passé en query, on peut le présélectionner
-    if (planId && plans.length > 0) {
-      const targetPlan = plans.find((p) => p.id === parseInt(planId));
-      if (targetPlan) {
-        // Optionnel : scroll vers ce plan
-        console.log("Plan présélectionné:", targetPlan.nom_plan);
-      }
-    }
-  }, [planId, plans]);
-
-  if (loading) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "var(--background)",
-        }}
-      >
-        <Card>
-          <p style={{ padding: "2rem" }}>Chargement des plans...</p>
-        </Card>
-      </div>
-    );
-  }
+  const handleSkipForNow = () => {
+    // Accès au dashboard sans souscrire (mode gratuit limité)
+    router.push(`/${userRole}/dashboard`);
+  };
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "var(--background)",
+        background: "linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)",
         padding: "2rem",
       }}
     >
-      <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-        <Card style={{ padding: "2rem", marginBottom: "2rem" }}>
-          <h1
+      <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+        {/* Header avec bouton retour */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "2rem",
+          }}
+        >
+          <Button
+            onClick={() => router.back()}
             style={{
-              textAlign: "center",
-              fontSize: "2rem",
-              margin: "0 0 1rem 0",
+              background: "transparent",
               color: "var(--primary)",
+              border: "2px solid var(--primary)",
+            }}
+            className="hover-bounce"
+          >
+            ← Retour
+          </Button>
+
+          <Button
+            onClick={handleSkipForNow}
+            style={{
+              background: "transparent",
+              color: "var(--text)",
+              border: "none",
+              textDecoration: "underline",
+            }}
+          >
+            Passer cette étape →
+          </Button>
+        </div>
+
+        {/* Hero Section */}
+        <Card 
+          className="fade-in"
+          style={{ 
+            padding: "3rem 2rem", 
+            marginBottom: "3rem",
+            textAlign: "center",
+            background: "linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)",
+            color: "white",
+          }}
+        >
+          <h1
+            className="slide-up"
+            style={{
+              fontSize: "2.5rem",
+              margin: "0 0 1rem 0",
+              fontWeight: "800",
             }}
           >
             💳 Choisissez votre plan
           </h1>
           <p
+            className="slide-up stagger-1"
             style={{
-              textAlign: "center",
-              fontSize: "1.1rem",
-              opacity: 0.8,
-              marginBottom: 0,
+              fontSize: "1.2rem",
+              opacity: 0.95,
+              lineHeight: "1.6",
+              maxWidth: "700px",
+              margin: "0 auto 1.5rem auto",
             }}
           >
-            Vous pouvez commencer gratuitement en mode DEMO ou souscrire
-            directement à un plan PRO.
+            Commencez avec un essai de 14 jours gratuit. Sans engagement, résiliable à tout moment.
           </p>
+
+          <div
+            className="slide-up stagger-2"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              background: "rgba(255, 255, 255, 0.2)",
+              backdropFilter: "blur(10px)",
+              padding: "0.8rem 1.5rem",
+              borderRadius: "50px",
+              fontSize: "1rem",
+              fontWeight: "700",
+              border: "2px solid rgba(255, 255, 255, 0.3)",
+            }}
+          >
+            <span style={{ fontSize: "1.5rem" }}>🎁</span>
+            <span>14 jours d'essai gratuit inclus</span>
+          </div>
         </Card>
 
+        {/* Plans Grid */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
             gap: "2rem",
+            marginBottom: "3rem",
           }}
         >
-          {plans.map((plan) => {
-            const isDemo = plan.prix_mensuel === 0;
-            const isPro = plan.prix_mensuel > 0;
-            const isPreselected = planId && plan.id === parseInt(planId);
-
-            return (
-              <Card
-                key={plan.id}
-                className="hover-glow"
-                style={{
-                  padding: "2rem",
-                  textAlign: "center",
-                  border: isPreselected
-                    ? "3px solid var(--accent)"
-                    : isPro
-                      ? "2px solid var(--primary)"
-                      : "1px solid rgba(0,0,0,0.1)",
-                  position: "relative",
-                }}
-              >
-                {isPreselected && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "-15px",
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      background: "var(--accent)",
-                      color: "white",
-                      padding: "0.25rem 1rem",
-                      borderRadius: "20px",
-                      fontSize: "0.85rem",
-                      fontWeight: "700",
-                    }}
-                  >
-                    ⭐ RECOMMANDÉ
-                  </div>
-                )}
-
-                <h3
-                  style={{
-                    fontSize: "1.5rem",
-                    margin: "0 0 1rem 0",
-                    color: isDemo ? "var(--orange)" : "var(--primary)",
-                  }}
-                >
-                  {plan.nom_plan}
-                </h3>
-
-                <div style={{ margin: "1.5rem 0" }}>
-                  <span
-                    style={{
-                      fontSize: "2.5rem",
-                      fontWeight: "700",
-                      color: "var(--primary)",
-                    }}
-                  >
-                    {isDemo ? "Gratuit" : `${plan.prix_mensuel}€`}
-                  </span>
-                  {isPro && (
-                    <span style={{ fontSize: "1rem", opacity: 0.7 }}>
-                      {" "}
-                      / mois
-                    </span>
-                  )}
-                </div>
-
+          {plans.map((plan, index) => (
+            <Card
+              key={plan.id}
+              className={`hover-glow slide-up stagger-${index + 1}`}
+              style={{
+                padding: "2.5rem",
+                textAlign: "center",
+                position: "relative",
+                border: plan.badge
+                  ? `3px solid ${plan.color}`
+                  : "2px solid rgba(0, 0, 0, 0.1)",
+                transform: plan.badge ? "scale(1.05)" : "scale(1)",
+                boxShadow: plan.badge
+                  ? `0 12px 40px ${plan.color}30`
+                  : "0 4px 12px rgba(0, 0, 0, 0.08)",
+              }}
+            >
+              {plan.badge && (
                 <div
                   style={{
-                    textAlign: "left",
-                    margin: "2rem 0",
-                    minHeight: "150px",
-                  }}
-                >
-                  {isDemo && (
-                    <ul
-                      style={{
-                        listStyle: "none",
-                        padding: 0,
-                        fontSize: "0.9rem",
-                      }}
-                    >
-                      <li style={{ padding: "0.4rem 0" }}>✅ Accès limité</li>
-                      <li style={{ padding: "0.4rem 0" }}>
-                        ✅ Mode lecture seule
-                      </li>
-                      <li style={{ padding: "0.4rem 0" }}>
-                        ✅ Données de test
-                      </li>
-                      <li style={{ padding: "0.4rem 0" }}>✅ 1 utilisateur</li>
-                    </ul>
-                  )}
-
-                  {plan.nom_plan.toLowerCase().includes("régie") && isPro && (
-                    <ul
-                      style={{
-                        listStyle: "none",
-                        padding: 0,
-                        fontSize: "0.9rem",
-                      }}
-                    >
-                      <li style={{ padding: "0.4rem 0" }}>
-                        ✅ Gestion complète
-                      </li>
-                      <li style={{ padding: "0.4rem 0" }}>
-                        ✅ Diffusion illimitée
-                      </li>
-                      <li style={{ padding: "0.4rem 0" }}>
-                        ✅ Analytics avancés
-                      </li>
-                      <li style={{ padding: "0.4rem 0" }}>
-                        ✅ 10 utilisateurs
-                      </li>
-                      <li style={{ padding: "0.4rem 0" }}>
-                        ✅ Support prioritaire
-                      </li>
-                    </ul>
-                  )}
-
-                  {plan.nom_plan.toLowerCase().includes("entreprise") &&
-                    isPro && (
-                      <ul
-                        style={{
-                          listStyle: "none",
-                          padding: 0,
-                          fontSize: "0.9rem",
-                        }}
-                      >
-                        <li style={{ padding: "0.4rem 0" }}>✅ Multi-régies</li>
-                        <li style={{ padding: "0.4rem 0" }}>
-                          ✅ 20 techniciens
-                        </li>
-                        <li style={{ padding: "0.4rem 0" }}>
-                          ✅ Facturation auto
-                        </li>
-                        <li style={{ padding: "0.4rem 0" }}>
-                          ✅ Planning avancé
-                        </li>
-                        <li style={{ padding: "0.4rem 0" }}>
-                          ✅ Support prioritaire
-                        </li>
-                      </ul>
-                    )}
-                </div>
-
-                <Button
-                  onClick={() => handleChoosePlan(plan.id)}
-                  disabled={checkoutLoading}
-                  style={{
-                    width: "100%",
-                    padding: "1rem",
-                    fontSize: "1.1rem",
+                    position: "absolute",
+                    top: "-15px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: plan.color,
+                    color: "white",
+                    padding: "0.5rem 1.5rem",
+                    borderRadius: "50px",
+                    fontSize: "0.85rem",
                     fontWeight: "700",
-                    background: isDemo ? "var(--orange)" : "var(--accent)",
-                    opacity: checkoutLoading ? 0.6 : 1,
-                    cursor: checkoutLoading ? "not-allowed" : "pointer",
+                    boxShadow: `0 4px 12px ${plan.color}40`,
                   }}
-                  className="hover-bounce"
+                  className="pulse"
                 >
-                  {isDemo ? "🚀 Commencer en DEMO" : "⭐ Passer en PRO"}
-                </Button>
-              </Card>
-            );
-          })}
+                  ⭐ {plan.badge}
+                </div>
+              )}
+
+              <div
+                className="hover-rotate"
+                style={{
+                  fontSize: "4rem",
+                  marginBottom: "1rem",
+                  marginTop: plan.badge ? "1rem" : "0",
+                }}
+              >
+                {plan.icon}
+              </div>
+
+              <h3
+                style={{
+                  fontSize: "2rem",
+                  margin: "0 0 0.5rem 0",
+                  color: plan.color,
+                  fontWeight: "700",
+                }}
+              >
+                {plan.name}
+              </h3>
+
+              <p
+                style={{
+                  fontSize: "0.95rem",
+                  opacity: 0.7,
+                  marginBottom: "1.5rem",
+                }}
+              >
+                {plan.description}
+              </p>
+
+              <div style={{ marginBottom: "2rem" }}>
+                <span
+                  style={{
+                    fontSize: "3.5rem",
+                    fontWeight: "800",
+                    color: plan.color,
+                  }}
+                >
+                  {plan.price}€
+                </span>
+                <span
+                  style={{
+                    fontSize: "1.2rem",
+                    opacity: 0.7,
+                    marginLeft: "0.3rem",
+                  }}
+                >
+                  {plan.period}
+                </span>
+              </div>
+
+              <ul
+                style={{
+                  textAlign: "left",
+                  listStyle: "none",
+                  padding: 0,
+                  margin: "0 0 2rem 0",
+                  minHeight: "200px",
+                }}
+              >
+                {plan.features.map((feature, idx) => (
+                  <li
+                    key={idx}
+                    style={{
+                      padding: "0.8rem 0",
+                      borderBottom:
+                        idx < plan.features.length - 1
+                          ? "1px solid rgba(0, 0, 0, 0.05)"
+                          : "none",
+                      fontSize: "1rem",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.8rem",
+                      opacity: feature.included ? 1 : 0.4,
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: feature.included ? plan.color : "#94a3b8",
+                        fontWeight: "700",
+                        fontSize: "1.2rem",
+                      }}
+                    >
+                      {feature.included ? "✓" : "✗"}
+                    </span>
+                    <span>{feature.text}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button
+                onClick={() => handleChoosePlan(plan.id)}
+                disabled={loading}
+                style={{
+                  width: "100%",
+                  padding: "1rem",
+                  fontSize: "1.1rem",
+                  fontWeight: "700",
+                  background: plan.badge ? plan.color : "transparent",
+                  color: plan.badge ? "white" : plan.color,
+                  border: plan.badge ? "none" : `2px solid ${plan.color}`,
+                  opacity: loading ? 0.6 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
+                className="hover-bounce"
+              >
+                {loading ? "⏳ Chargement..." : `Essayer ${plan.name}`}
+              </Button>
+            </Card>
+          ))}
         </div>
 
-        {checkoutLoading && (
-          <Card
-            style={{ marginTop: "2rem", padding: "2rem", textAlign: "center" }}
-          >
-            <p
-              style={{ margin: 0, fontSize: "1.1rem", color: "var(--primary)" }}
-            >
-              ⏳ Redirection vers le paiement sécurisé...
+        {/* Info Section */}
+        <div
+          className="slide-up stagger-4"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "1.5rem",
+            marginTop: "3rem",
+          }}
+        >
+          <Card style={{ padding: "1.5rem", textAlign: "center" }}>
+            <div style={{ fontSize: "2.5rem", marginBottom: "0.5rem" }}>
+              🔒
+            </div>
+            <h4 style={{ margin: "0 0 0.5rem 0", color: "var(--primary)" }}>
+              Paiement sécurisé
+            </h4>
+            <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.8 }}>
+              Transactions protégées par Stripe
             </p>
           </Card>
-        )}
 
-        <div style={{ textAlign: "center", marginTop: "2rem" }}>
-          <Button
-            onClick={() => router.push(`/${userRole}/dashboard`)}
-            style={{
-              background: "transparent",
-              color: "var(--text)",
-              border: "1px solid rgba(0,0,0,0.2)",
-            }}
-          >
-            ⏭️ Passer cette étape (rester en DEMO)
-          </Button>
+          <Card style={{ padding: "1.5rem", textAlign: "center" }}>
+            <div style={{ fontSize: "2.5rem", marginBottom: "0.5rem" }}>
+              ↩️
+            </div>
+            <h4 style={{ margin: "0 0 0.5rem 0", color: "var(--primary)" }}>
+              Sans engagement
+            </h4>
+            <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.8 }}>
+              Résiliez à tout moment en 1 clic
+            </p>
+          </Card>
+
+          <Card style={{ padding: "1.5rem", textAlign: "center" }}>
+            <div style={{ fontSize: "2.5rem", marginBottom: "0.5rem" }}>
+              💬
+            </div>
+            <h4 style={{ margin: "0 0 0.5rem 0", color: "var(--primary)" }}>
+              Support dédié
+            </h4>
+            <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.8 }}>
+              Une équipe à votre écoute 7j/7
+            </p>
+          </Card>
         </div>
       </div>
     </div>
