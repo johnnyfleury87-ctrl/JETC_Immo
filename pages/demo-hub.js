@@ -5,75 +5,6 @@ import Button from "../components/UI/Button";
 export default function DemoHub() {
   const { demoProfile } = useDemoMode();
 
-  // Plus de redirection automatique - le hub est accessible directement
-  // Si l'utilisateur veut activer le MODE DEMO, il clique sur un rôle
-
-  const roles = [
-    {
-      id: "regie",
-      icon: "🏢",
-      title: "Régie immobilière",
-      description: "Gérez vos biens, locataires et diffusez des tickets aux entreprises partenaires",
-      path: "/regie/dashboard",
-      features: [
-        "Gestion des immeubles et logements",
-        "Création et suivi des tickets",
-        "Analytics et rapports",
-        "Gestion multi-utilisateurs",
-      ],
-      color: "var(--primary)",
-    },
-    {
-      id: "entreprise",
-      icon: "🏗️",
-      title: "Entreprise de maintenance",
-      description: "Recevez et gérez les interventions, coordonnez vos techniciens",
-      path: "/entreprise/dashboard",
-      features: [
-        "Réception tickets gratuite",
-        "Gestion d'équipe",
-        "Facturation intégrée",
-        "Suivi interventions",
-      ],
-      color: "var(--orange)",
-    },
-    {
-      id: "technicien",
-      icon: "🔧",
-      title: "Technicien",
-      description: "Consultez vos missions, mettez à jour les statuts et signez les interventions",
-      path: "/technicien/dashboard",
-      features: [
-        "Liste missions assignées",
-        "Upload photos",
-        "Signature électronique",
-        "Navigation optimisée",
-      ],
-      color: "var(--green)",
-    },
-    {
-      id: "locataire",
-      icon: "👤",
-      title: "Locataire",
-      description: "Déclarez vos problèmes et suivez l'avancement en temps réel",
-      path: "/locataire/dashboard",
-      features: [
-        "Création tickets simplifiée",
-        "Suivi temps réel",
-        "Notifications automatiques",
-        "Historique complet",
-      ],
-      color: "var(--accent)",
-    },
-  ];
-
-  const handleRoleSelect = (role) => {
-    console.log("🎯 Navigation DIRECTE vers /demo/" + role.id + "/dashboard");
-    
-    // Navigation BRUTALE vers dashboard DEMO autonome
-    window.location.href = "/demo/" + role.id + "/dashboard";
-  };
-
   return (
     <div
       style={{
@@ -249,96 +180,285 @@ export default function DemoHub() {
             marginBottom: "3rem",
           }}
         >
-          {roles.map((role) => (
-            <Card
-              key={role.id}
+          {/* RÉGIE */}
+          <Card
+            style={{
+              padding: "2rem",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              borderLeft: "4px solid var(--primary)",
+            }}
+            className="hover-glow"
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = "translateY(-8px)";
+              e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.2)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "var(--shadow)";
+            }}
+            onClick={() => window.location.href = "/demo/regie/dashboard"}
+          >
+            <div
               style={{
-                padding: "2rem",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                borderLeft: `4px solid ${role.color}`,
+                fontSize: "3rem",
+                marginBottom: "1rem",
+                textAlign: "center",
               }}
-              className="hover-glow"
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = "translateY(-8px)";
-                e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.2)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "var(--shadow)";
-              }}
-              onClick={() => handleRoleSelect(role)}
             >
-              <div
-                style={{
-                  fontSize: "3rem",
-                  marginBottom: "1rem",
-                  textAlign: "center",
-                }}
-              >
-                {role.icon}
-              </div>
-              <h3
-                style={{
-                  fontSize: "1.3rem",
-                  fontWeight: "700",
-                  margin: "0 0 0.5rem 0",
-                  color: role.color,
-                  textAlign: "center",
-                }}
-              >
-                {role.title}
-              </h3>
-              <p
-                style={{
-                  fontSize: "0.95rem",
-                  opacity: 0.8,
-                  margin: "0 0 1.5rem 0",
-                  textAlign: "center",
-                  lineHeight: "1.5",
-                }}
-              >
-                {role.description}
-              </p>
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: "0 0 1.5rem 0",
-                  fontSize: "0.9rem",
-                }}
-              >
-                {role.features.map((feature, idx) => (
-                  <li
-                    key={idx}
-                    style={{
-                      padding: "0.4rem 0",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                    }}
-                  >
-                    <span style={{ color: role.color, fontSize: "1.2rem" }}>
-                      ✓
-                    </span>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                style={{
-                  width: "100%",
-                  background: role.color,
-                  padding: "0.75rem",
-                  fontSize: "1rem",
-                  fontWeight: "600",
-                }}
-                className="hover-bounce"
-              >
-                Explorer ce rôle →
-              </Button>
-            </Card>
-          ))}
+              🏢
+            </div>
+            <h3
+              style={{
+                fontSize: "1.3rem",
+                fontWeight: "700",
+                margin: "0 0 0.5rem 0",
+                color: "var(--primary)",
+                textAlign: "center",
+              }}
+            >
+              Régie Immobilière
+            </h3>
+            <p
+              style={{
+                fontSize: "0.95rem",
+                opacity: 0.8,
+                margin: "0 0 1.5rem 0",
+                textAlign: "center",
+                lineHeight: "1.5",
+              }}
+            >
+              Gérez vos immeubles, logements et tickets de maintenance
+            </p>
+            <button
+              style={{
+                width: "100%",
+                background: "var(--primary)",
+                color: "white",
+                padding: "0.75rem",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = "/demo/regie/dashboard";
+              }}
+            >
+              Explorer ce rôle
+            </button>
+          </Card>
+
+          {/* ENTREPRISE */}
+          <Card
+            style={{
+              padding: "2rem",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              borderLeft: "4px solid var(--secondary)",
+            }}
+            className="hover-glow"
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = "translateY(-8px)";
+              e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.2)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "var(--shadow)";
+            }}
+            onClick={() => window.location.href = "/demo/entreprise/dashboard"}
+          >
+            <div
+              style={{
+                fontSize: "3rem",
+                marginBottom: "1rem",
+                textAlign: "center",
+              }}
+            >
+              🏭
+            </div>
+            <h3
+              style={{
+                fontSize: "1.3rem",
+                fontWeight: "700",
+                margin: "0 0 0.5rem 0",
+                color: "var(--secondary)",
+                textAlign: "center",
+              }}
+            >
+              Entreprise de Maintenance
+            </h3>
+            <p
+              style={{
+                fontSize: "0.95rem",
+                opacity: 0.8,
+                margin: "0 0 1.5rem 0",
+                textAlign: "center",
+                lineHeight: "1.5",
+              }}
+            >
+              Gérez vos techniciens et missions pour les régies
+            </p>
+            <button
+              style={{
+                width: "100%",
+                background: "var(--secondary)",
+                color: "white",
+                padding: "0.75rem",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = "/demo/entreprise/dashboard";
+              }}
+            >
+              Explorer ce rôle
+            </button>
+          </Card>
+
+          {/* TECHNICIEN */}
+          <Card
+            style={{
+              padding: "2rem",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              borderLeft: "4px solid var(--green)",
+            }}
+            className="hover-glow"
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = "translateY(-8px)";
+              e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.2)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "var(--shadow)";
+            }}
+            onClick={() => window.location.href = "/demo/technicien/dashboard"}
+          >
+            <div
+              style={{
+                fontSize: "3rem",
+                marginBottom: "1rem",
+                textAlign: "center",
+              }}
+            >
+              🔧
+            </div>
+            <h3
+              style={{
+                fontSize: "1.3rem",
+                fontWeight: "700",
+                margin: "0 0 0.5rem 0",
+                color: "var(--green)",
+                textAlign: "center",
+              }}
+            >
+              Technicien
+            </h3>
+            <p
+              style={{
+                fontSize: "0.95rem",
+                opacity: 0.8,
+                margin: "0 0 1.5rem 0",
+                textAlign: "center",
+                lineHeight: "1.5",
+              }}
+            >
+              Consultez et gérez vos interventions sur le terrain
+            </p>
+            <button
+              style={{
+                width: "100%",
+                background: "var(--green)",
+                color: "white",
+                padding: "0.75rem",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = "/demo/technicien/dashboard";
+              }}
+            >
+              Explorer ce rôle
+            </button>
+          </Card>
+
+          {/* LOCATAIRE */}
+          <Card
+            style={{
+              padding: "2rem",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              borderLeft: "4px solid var(--accent)",
+            }}
+            className="hover-glow"
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = "translateY(-8px)";
+              e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.2)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "var(--shadow)";
+            }}
+            onClick={() => window.location.href = "/demo/locataire/dashboard"}
+          >
+            <div
+              style={{
+                fontSize: "3rem",
+                marginBottom: "1rem",
+                textAlign: "center",
+              }}
+            >
+              🏠
+            </div>
+            <h3
+              style={{
+                fontSize: "1.3rem",
+                fontWeight: "700",
+                margin: "0 0 0.5rem 0",
+                color: "var(--accent)",
+                textAlign: "center",
+              }}
+            >
+              Locataire
+            </h3>
+            <p
+              style={{
+                fontSize: "0.95rem",
+                opacity: 0.8,
+                margin: "0 0 1.5rem 0",
+                textAlign: "center",
+                lineHeight: "1.5",
+              }}
+            >
+              Créez et suivez vos demandes d'intervention
+            </p>
+            <button
+              style={{
+                width: "100%",
+                background: "var(--accent)",
+                color: "white",
+                padding: "0.75rem",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = "/demo/locataire/dashboard";
+              }}
+            >
+              Explorer ce rôle
+            </button>
+          </Card>
         </div>
 
         {/* Footer actions */}
