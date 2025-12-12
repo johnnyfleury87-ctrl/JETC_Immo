@@ -4,6 +4,7 @@ import Hero from "../components/marketing/Hero";
 import ActorsSection from "../components/marketing/ActorsSection";
 import HowItWorks from "../components/marketing/HowItWorks";
 import PricingPreview from "../components/marketing/PricingPreview";
+import FAQ from "../components/marketing/FAQ";
 
 export default function HomePage() {
   const router = useRouter();
@@ -56,6 +57,9 @@ export default function HomePage() {
 
       {/* Aperçu des tarifs */}
       <PricingPreview />
+
+      {/* FAQ */}
+      <FAQ />
 
       {/* Footer simple */}
       <footer
