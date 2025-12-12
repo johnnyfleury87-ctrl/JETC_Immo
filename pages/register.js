@@ -5,9 +5,11 @@ import Layout from "../components/Layout";
 import { register } from "../lib/auth";
 import { saveSession, saveProfile } from "../lib/session";
 import { getProfile } from "../lib/api";
+import { useDemoMode } from "../context/DemoModeContext";
 
 export default function Register() {
   const router = useRouter();
+  const { demoMode } = useDemoMode();
   const [nom, setNom] = useState("");
   const [prenom, setPrenom] = useState("");
   const [email, setEmail] = useState("");
@@ -23,6 +25,41 @@ export default function Register() {
     setLoading(true);
 
     try {
+      // MODE DEMO : simuler l'inscription sans appel API
+      if (demoMode) {
+        console.log("🎭 MODE DEMO : Inscription simulée");
+
+        // Simuler une session avec les données du formulaire
+        const simulatedSession = {
+          token: "demo_token_" + Date.now(),
+          role: role,
+          user: {
+            id: "demo_user_" + Date.now(),
+            email: email,
+            nom: nom,
+            prenom: prenom,
+            telephone: telephone,
+          },
+        };
+
+        // Sauvegarde de la session simulée
+        saveSession(simulatedSession);
+
+        // Sauvegarde du profil simulé
+        saveProfile(simulatedSession.user);
+
+        // Afficher un message de confirmation
+        alert(
+          "🎭 Compte créé en mode DEMO\nAucune donnée réelle enregistrée\nRôle : " +
+            role
+        );
+
+        // Redirection vers l'onboarding
+        router.push("/onboarding/role");
+        return;
+      }
+
+      // PRODUCTION : Appel du register via API backend
       const payload = {
         nom,
         prenom,
@@ -32,7 +69,6 @@ export default function Register() {
         role,
       };
 
-      // Appel du register via API backend
       const session = await register(payload);
 
       // Sauvegarde du token et rôle dans localStorage

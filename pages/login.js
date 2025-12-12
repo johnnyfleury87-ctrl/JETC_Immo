@@ -4,8 +4,10 @@ import Layout from "../components/Layout";
 import { login, redirectByRole } from "../lib/auth";
 import { saveSession, saveProfile } from "../lib/session";
 import { getProfile } from "../lib/api";
+import { useDemoMode } from "../context/DemoModeContext";
 
 export default function Login() {
+  const { demoMode } = useDemoMode();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,7 +19,39 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // Appel du login réel via API backend
+      // MODE DEMO : simuler la connexion sans appel API
+      if (demoMode) {
+        console.log("🎭 MODE DEMO : Connexion simulée");
+
+        // Simuler une session avec un rôle par défaut (locataire)
+        const simulatedSession = {
+          token: "demo_token_" + Date.now(),
+          role: "locataire",
+          user: {
+            id: "demo_user",
+            email: email,
+            nom: "Demo",
+            prenom: "User",
+          },
+        };
+
+        // Sauvegarde de la session simulée
+        saveSession(simulatedSession);
+
+        // Sauvegarde du profil simulé
+        saveProfile(simulatedSession.user);
+
+        // Afficher un message de confirmation
+        alert(
+          "🎭 Connexion simulée en mode DEMO\nAucune donnée réelle utilisée"
+        );
+
+        // Redirection selon le rôle
+        redirectByRole(simulatedSession.role);
+        return;
+      }
+
+      // PRODUCTION : Appel du login réel via API backend
       const session = await login(email, password);
 
       // Sauvegarde du token et rôle dans localStorage
