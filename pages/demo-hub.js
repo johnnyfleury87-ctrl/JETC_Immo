@@ -68,15 +68,10 @@ export default function DemoHub() {
   ];
 
   const handleRoleSelect = (role) => {
-    console.log("🎯 Navigation DIRECTE vers:", role.path);
+    console.log("🎯 Navigation DIRECTE vers /demo/" + role.id + "/dashboard");
     
-    // Initialiser le MODE DEMO dans localStorage
-    localStorage.setItem("jetc_demo_mode", "true");
-    localStorage.setItem("jetc_demo_role", role.id);
-    localStorage.setItem("role", role.id);
-    
-    // Navigation DIRECTE - aucune logique complexe
-    window.location.href = role.path;
+    // Navigation BRUTALE vers dashboard DEMO autonome
+    window.location.href = "/demo/" + role.id + "/dashboard";
   };
 
   return (
