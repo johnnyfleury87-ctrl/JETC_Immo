@@ -25,28 +25,33 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // MODE DEMO : simuler l'inscription sans appel API
-      if (demoMode) {
-        console.log("🎭 MODE DEMO : Inscription simulée");
+      const payload = {
+        nom,
+        prenom,
+        email,
+        telephone,
+        password,
+        role,
+      };
 
-        // Simuler une session avec les données du formulaire
-        const simulatedSession = {
-          token: "demo_token_" + Date.now(),
-          role: role,
-          user: {
+      // Appel du register (géré automatiquement en mode DEMO dans lib/auth.js)
+      const session = await register(payload);
+
+      // Sauvegarde du token et rôle dans localStorage
+      saveSession(session);
+
+      // MODE DEMO : utiliser les données simulées
+      if (demoMode) {
+        // Sauvegarde du profil simulé (déjà dans session.user)
+        saveProfile(
+          session.user || {
             id: "demo_user_" + Date.now(),
             email: email,
             nom: nom,
             prenom: prenom,
             telephone: telephone,
-          },
-        };
-
-        // Sauvegarde de la session simulée
-        saveSession(simulatedSession);
-
-        // Sauvegarde du profil simulé
-        saveProfile(simulatedSession.user);
+          }
+        );
 
         // Afficher un message de confirmation
         alert(
@@ -59,22 +64,7 @@ export default function Register() {
         return;
       }
 
-      // PRODUCTION : Appel du register via API backend
-      const payload = {
-        nom,
-        prenom,
-        email,
-        telephone,
-        password,
-        role,
-      };
-
-      const session = await register(payload);
-
-      // Sauvegarde du token et rôle dans localStorage
-      saveSession(session);
-
-      // Récupération et sauvegarde du profil
+      // PRODUCTION : Récupération et sauvegarde du profil réel
       const profile = await getProfile();
       saveProfile(profile);
 

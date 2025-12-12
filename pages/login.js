@@ -19,27 +19,23 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // MODE DEMO : simuler la connexion sans appel API
-      if (demoMode) {
-        console.log("🎭 MODE DEMO : Connexion simulée");
+      // Appel du login (géré automatiquement en mode DEMO dans lib/auth.js)
+      const session = await login(email, password);
 
-        // Simuler une session avec un rôle par défaut (locataire)
-        const simulatedSession = {
-          token: "demo_token_" + Date.now(),
-          role: "locataire",
-          user: {
+      // Sauvegarde du token et rôle dans localStorage
+      saveSession(session);
+
+      // MODE DEMO : utiliser les données simulées
+      if (demoMode) {
+        // Sauvegarde du profil simulé (déjà dans session.user)
+        saveProfile(
+          session.user || {
             id: "demo_user",
             email: email,
             nom: "Demo",
             prenom: "User",
-          },
-        };
-
-        // Sauvegarde de la session simulée
-        saveSession(simulatedSession);
-
-        // Sauvegarde du profil simulé
-        saveProfile(simulatedSession.user);
+          }
+        );
 
         // Afficher un message de confirmation
         alert(
@@ -47,17 +43,11 @@ export default function Login() {
         );
 
         // Redirection selon le rôle
-        redirectByRole(simulatedSession.role);
+        redirectByRole(session.role);
         return;
       }
 
-      // PRODUCTION : Appel du login réel via API backend
-      const session = await login(email, password);
-
-      // Sauvegarde du token et rôle dans localStorage
-      saveSession(session);
-
-      // Récupération et sauvegarde du profil
+      // PRODUCTION : Récupération et sauvegarde du profil réel
       const profile = await getProfile();
       saveProfile(profile);
 
