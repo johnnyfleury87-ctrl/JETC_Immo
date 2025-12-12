@@ -27,9 +27,27 @@ export default function Layout({ children }) {
             alignItems: "center",
           }}
         >
-          <h1 style={{ margin: 0, fontSize: "1.5rem", color: "var(--accent)" }}>
-            🏢 JETC IMMO
-          </h1>
+          <Link href="/" style={{ textDecoration: "none" }}>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: "1.5rem",
+                color: "var(--accent)",
+                cursor: "pointer",
+                transition: "transform 0.2s ease, opacity 0.2s ease",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = "scale(1.05)";
+                e.currentTarget.style.opacity = "0.9";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.opacity = "1";
+              }}
+            >
+              🏢 JETC IMMO
+            </h1>
+          </Link>
 
           <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
             <div
