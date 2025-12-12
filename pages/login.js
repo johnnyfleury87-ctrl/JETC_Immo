@@ -1,17 +1,27 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import Layout from "../components/Layout";
 import { login, redirectByRole } from "../lib/auth";
-import { saveSession, saveProfile } from "../lib/session";
+import { saveSession, saveProfile, isDemoMode } from "../lib/session";
 import { getProfile } from "../lib/api";
 import { useDemoMode } from "../context/DemoModeContext";
 
 export default function Login() {
+  const router = useRouter();
   const { demoMode } = useDemoMode();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // BLOQUER /connexion en MODE DEMO
+  useEffect(() => {
+    if (isDemoMode()) {
+      console.log("⛔ MODE DEMO détecté - Accès /connexion bloqué");
+      router.push("/demo-hub");
+    }
+  }, [router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

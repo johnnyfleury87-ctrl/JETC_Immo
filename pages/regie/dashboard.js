@@ -6,12 +6,11 @@ import HeatmapImmeubles from "../../components/charts/HeatmapImmeubles";
 import PieCategories from "../../components/charts/PieCategories";
 import { requireRole } from "../../lib/roleGuard";
 import { getProfile, apiFetch } from "../../lib/api";
-import { saveProfile, getProfileLocal } from "../../lib/session";
+import { saveProfile, getProfileLocal, isDemoMode } from "../../lib/session";
 
 export default function RegieDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const [profile, setProfile] = useState(null);
   const [overview, setOverview] = useState({
     ticketsOuverts: 0,
@@ -26,35 +25,13 @@ export default function RegieDashboard() {
   const [urgences, setUrgences] = useState([]);
 
   useEffect(() => {
-    // Vérifier mode DEMO
-    const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
-    setIsDemoMode(demoMode);
-    
-    console.log("🏢 REGIE DASHBOARD - Mode DEMO =", demoMode);
-    console.log("📦 localStorage.jetc_demo_role =", typeof window !== "undefined" ? localStorage.getItem("jetc_demo_role") : null);
-
-    // EN MODE DEMO : charger profil local et données mockées
-    if (demoMode) {
+    // MODE DEMO : Charger uniquement les données mockées
+    if (isDemoMode()) {
+      console.log("🏢 RÉGIE DASHBOARD - MODE DEMO actif");
+      
       const localProfile = getProfileLocal();
       setProfile(localProfile);
       
-      console.log("👤 Profil chargé en mode DEMO:", localProfile);
-      
-      // EN MODE DEMO : JAMAIS de redirection, toujours afficher le dashboard
-      if (localProfile?.role !== "regie") {
-        console.log("⚠️ Rôle temporairement désynchronisé, rechargement dans 100ms...");
-        // Recharger le profil après un délai si pas encore le bon rôle
-        const timer = setTimeout(() => {
-          const updatedProfile = getProfileLocal();
-          setProfile(updatedProfile);
-          console.log("✅ Profil rechargé:", updatedProfile);
-        }, 100);
-        
-        // Cleanup
-        setTimeout(() => clearTimeout(timer), 200);
-      }
-      
-      // Charger données DEMO mockées
       setOverview({
         ticketsOuverts: 8,
         ticketsAttenteDiffusion: 3,
@@ -136,7 +113,7 @@ export default function RegieDashboard() {
     <Layout>
       <Card>
         {/* Badge MODE DEMO */}
-        {isDemoMode && (
+        {isDemoMode() && (
           <div
             style={{
               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",

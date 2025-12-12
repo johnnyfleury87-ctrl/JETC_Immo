@@ -1,17 +1,27 @@
 import { useEffect, useState } from "react";
-import { getProfileLocal } from "../lib/session";
+import { getProfileLocal, isDemoMode, getDemoRole } from "../lib/session";
 import { apiFetch } from "../lib/api";
+
+// Fonction helper pour afficher les rôles en français
+function getRoleLabel(role) {
+  const labels = {
+    regie: "Régie",
+    entreprise: "Entreprise",
+    technicien: "Technicien",
+    locataire: "Locataire",
+  };
+  return labels[role] || role;
+}
 
 export default function UserBadge() {
   const profile = getProfileLocal();
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [loading, setLoading] = useState(true);
+  const demoMode = isDemoMode();
 
   useEffect(() => {
     // MODE DEMO : Ne JAMAIS appeler l'API
-    const isDemoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
-    
-    if (isDemoMode) {
+    if (demoMode) {
       console.log("🎭 UserBadge - MODE DEMO détecté, aucun appel API");
       setSubscriptionStatus("demo");
       setLoading(false);
@@ -47,8 +57,13 @@ export default function UserBadge() {
     return null;
   }
 
-  const isDemoMode = subscriptionStatus === "demo";
+  const isDemoActive = demoMode || subscriptionStatus === "demo";
   const isProMode = subscriptionStatus === "pro";
+
+  // Nom générique en MODE DEMO
+  const displayName = demoMode 
+    ? `Utilisateur DEMO – ${getRoleLabel(getDemoRole() || profile.role)}`
+    : `${profile.prenom} ${profile.nom}`;
 
   return (
     <div
@@ -60,14 +75,15 @@ export default function UserBadge() {
       }}
     >
       <span style={{ fontWeight: "500" }}>
-        Bonjour, {profile.prenom} {profile.nom}
+        {demoMode && <span style={{ marginRight: "0.5rem" }}>🎭</span>}
+        {displayName}
       </span>
 
       {!loading &&
         (profile.role === "regie" || profile.role === "entreprise") && (
           <span
             style={{
-              background: isDemoMode
+              background: isDemoActive
                 ? "var(--orange)"
                 : isProMode
                   ? "var(--green)"
@@ -80,7 +96,7 @@ export default function UserBadge() {
               boxShadow: "var(--shadow)",
             }}
           >
-            {isDemoMode ? "🆓 DEMO" : isProMode ? "⭐ PRO" : ""}
+            {isDemoActive ? "🆓 DEMO" : isProMode ? "⭐ PRO" : ""}
           </span>
         )}
     </div>

@@ -4,43 +4,24 @@ import Layout from "../../components/Layout";
 import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
 import StatusBadge from "../../components/UI/StatusBadge";
-import { getProfileLocal } from "../../lib/session";
+import { getProfileLocal, isDemoMode } from "../../lib/session";
 
 export default function EntrepriseDashboard() {
   const router = useRouter();
   const [profile, setProfile] = useState(null);
-  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
-    // Vérifier mode DEMO
-    const demoMode = localStorage.getItem("jetc_demo_mode") === "true";
-    setIsDemoMode(demoMode);
+    console.log("🏗️ ENTREPRISE DASHBOARD - MODE DEMO =", isDemoMode());
     
-    console.log("🏗️ ENTREPRISE DASHBOARD - Mode DEMO =", demoMode);
-    console.log("📦 localStorage.jetc_demo_role =", localStorage.getItem("jetc_demo_role"));
-
-    // Charger profil local
     const localProfile = getProfileLocal();
     setProfile(localProfile);
-    
-    console.log("👤 Profil chargé:", localProfile);
 
-    // EN MODE DEMO : JAMAIS de redirection
-    if (demoMode) {
-      // En mode DEMO, si le profil n'a pas encore le bon rôle, le recharger après un délai
-      if (localProfile?.role !== "entreprise") {
-        console.log("⚠️ Rôle temporairement désynchronisé, rechargement dans 100ms...");
-        const timer = setTimeout(() => {
-          const updatedProfile = getProfileLocal();
-          setProfile(updatedProfile);
-          console.log("✅ Profil rechargé:", updatedProfile);
-        }, 100);
-        return () => clearTimeout(timer);
-      }
-      return; // Ne pas continuer l'exécution en mode DEMO
+    // MODE DEMO : Aucune vérification, aucun redirect
+    if (isDemoMode()) {
+      return;
     }
     
-    // EN MODE PRODUCTION : rediriger si pas entreprise
+    // MODE PRODUCTION : Rediriger si pas entreprise
     if (localProfile?.role !== "entreprise") {
       router.push("/");
     }
@@ -163,7 +144,7 @@ export default function EntrepriseDashboard() {
     <Layout>
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
         {/* Badge MODE DEMO */}
-        {isDemoMode && (
+        {isDemoMode() && (
           <div
             style={{
               background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",

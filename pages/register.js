@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Layout from "../components/Layout";
 import { register } from "../lib/auth";
-import { saveSession, saveProfile } from "../lib/session";
+import { saveSession, saveProfile, isDemoMode } from "../lib/session";
 import { getProfile } from "../lib/api";
 import { useDemoMode } from "../context/DemoModeContext";
 
@@ -18,6 +18,14 @@ export default function Register() {
   const [role, setRole] = useState("locataire");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // BLOQUER /register en MODE DEMO
+  useEffect(() => {
+    if (isDemoMode()) {
+      console.log("⛔ MODE DEMO détecté - Accès /register bloqué");
+      router.push("/demo-hub");
+    }
+  }, [router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
