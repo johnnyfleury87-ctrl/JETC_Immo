@@ -1,16 +1,14 @@
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "../components/Layout";
 import { register } from "../lib/auth";
-import { saveSession, saveProfile, isDemoMode } from "../lib/session";
+import { saveSession, saveProfile } from "../lib/session";
 import { getProfile } from "../lib/api";
-import { useDemoMode } from "../context/DemoModeContext";
 import { transitionDemoToProd } from "../lib/demoAccess";
 
 export default function Register() {
   const router = useRouter();
-  const { demoMode } = useDemoMode();
   const [nom, setNom] = useState("");
   const [prenom, setPrenom] = useState("");
   const [email, setEmail] = useState("");
@@ -35,37 +33,13 @@ export default function Register() {
         role,
       };
 
-      // Appel du register (géré automatiquement en mode DEMO dans lib/auth.js)
+      // Appel du register
       const session = await register(payload);
 
       // Sauvegarde du token et rôle dans localStorage
       saveSession(session);
 
-      // MODE DEMO : utiliser les données simulées
-      if (demoMode) {
-        // Sauvegarde du profil simulé (déjà dans session.user)
-        saveProfile(
-          session.user || {
-            id: "demo_user_" + Date.now(),
-            email: email,
-            nom: nom,
-            prenom: prenom,
-            telephone: telephone,
-          }
-        );
-
-        // Afficher un message de confirmation
-        alert(
-          "🎭 Compte créé en mode DEMO\nAucune donnée réelle enregistrée\nRôle : " +
-            role
-        );
-
-        // Redirection vers l'onboarding
-        router.push("/onboarding/role");
-        return;
-      }
-
-      // PRODUCTION : Récupération et sauvegarde du profil réel
+      // Récupération et sauvegarde du profil réel
       const profile = await getProfile();
       saveProfile(profile);
 

@@ -9,7 +9,6 @@ import { apiFetch } from "../../lib/api";
 export default function AdminDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const [stats, setStats] = useState({
     regies: 0,
     entreprises: 0,

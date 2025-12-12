@@ -1,16 +1,14 @@
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "../components/Layout";
 import { login, redirectByRole } from "../lib/auth";
-import { saveSession, saveProfile, isDemoMode } from "../lib/session";
+import { saveSession, saveProfile } from "../lib/session";
 import { getProfile } from "../lib/api";
-import { useDemoMode } from "../context/DemoModeContext";
 import { transitionDemoToProd } from "../lib/demoAccess";
 
 export default function Login() {
   const router = useRouter();
-  const { demoMode } = useDemoMode();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -22,35 +20,13 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // Appel du login (géré automatiquement en mode DEMO dans lib/auth.js)
+      // Appel du login
       const session = await login(email, password);
 
       // Sauvegarde du token et rôle dans localStorage
       saveSession(session);
 
-      // MODE DEMO : utiliser les données simulées
-      if (demoMode) {
-        // Sauvegarde du profil simulé (déjà dans session.user)
-        saveProfile(
-          session.user || {
-            id: "demo_user",
-            email: email,
-            nom: "Demo",
-            prenom: "User",
-          }
-        );
-
-        // Afficher un message de confirmation
-        alert(
-          "🎭 Connexion simulée en mode DEMO\nAucune donnée réelle utilisée"
-        );
-
-        // Redirection selon le rôle
-        redirectByRole(session.role);
-        return;
-      }
-
-      // PRODUCTION : Récupération et sauvegarde du profil réel
+      // Récupération et sauvegarde du profil réel
       const profile = await getProfile();
       saveProfile(profile);
 
