@@ -4,7 +4,7 @@ import { authenticateUser } from "./profile.js";
 /**
  * POST /api/immeubles
  * Création d'un nouvel immeuble
- * 
+ *
  * Body attendu :
  * {
  *   nom?: string,
@@ -38,7 +38,7 @@ export async function createImmeuble(req, res) {
     const userProfile = req.profile;
 
     // Vérification du rôle : seul régie ou admin_jtec
-    if (userProfile.role !== 'regie' && userProfile.role !== 'admin_jtec') {
+    if (userProfile.role !== "regie" && userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Vous n'avez pas les droits pour créer un immeuble",
       });
@@ -46,14 +46,14 @@ export async function createImmeuble(req, res) {
 
     // Déterminer la régie_id
     let regie_id;
-    if (userProfile.role === 'regie') {
+    if (userProfile.role === "regie") {
       regie_id = userProfile.regie_id;
       if (!regie_id) {
         return res.status(400).json({
           error: "Votre profil n'est pas associé à une régie",
         });
       }
-    } else if (userProfile.role === 'admin_jtec') {
+    } else if (userProfile.role === "admin_jtec") {
       // Admin doit spécifier la régie
       regie_id = req.body.regie_id;
       if (!regie_id) {
@@ -91,7 +91,6 @@ export async function createImmeuble(req, res) {
       message: "Immeuble créé avec succès",
       immeuble: immeubleData,
     });
-
   } catch (error) {
     console.error("Erreur serveur lors de la création de l'immeuble:", error);
     return res.status(500).json({
@@ -115,9 +114,9 @@ export async function listImmeubles(req, res) {
       .order("created_at", { ascending: false });
 
     // Filtrer selon le rôle
-    if (userProfile.role === 'regie') {
+    if (userProfile.role === "regie") {
       query = query.eq("regie_id", userProfile.regie_id);
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -136,7 +135,6 @@ export async function listImmeubles(req, res) {
       immeubles: immeublesData,
       total: immeublesData.length,
     });
-
   } catch (error) {
     console.error("Erreur lors de la récupération des immeubles:", error);
     return res.status(500).json({
@@ -169,7 +167,7 @@ export async function getImmeuble(req, res) {
 
     // Vérification des droits d'accès
     if (
-      userProfile.role !== 'admin_jtec' &&
+      userProfile.role !== "admin_jtec" &&
       userProfile.regie_id !== immeubleData.regie_id
     ) {
       return res.status(403).json({
@@ -180,7 +178,6 @@ export async function getImmeuble(req, res) {
     return res.status(200).json({
       immeuble: immeubleData,
     });
-
   } catch (error) {
     console.error("Erreur lors de la récupération de l'immeuble:", error);
     return res.status(500).json({
@@ -213,7 +210,7 @@ export async function updateImmeuble(req, res) {
 
     // Vérification des droits
     if (
-      userProfile.role !== 'admin_jtec' &&
+      userProfile.role !== "admin_jtec" &&
       userProfile.regie_id !== existingImmeuble.regie_id
     ) {
       return res.status(403).json({
@@ -237,7 +234,8 @@ export async function updateImmeuble(req, res) {
     if (code_postal !== undefined) updates.code_postal = code_postal;
     if (ville !== undefined) updates.ville = ville;
     if (nombre_etages !== undefined) updates.nombre_etages = nombre_etages;
-    if (annee_construction !== undefined) updates.annee_construction = annee_construction;
+    if (annee_construction !== undefined)
+      updates.annee_construction = annee_construction;
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({
@@ -265,7 +263,6 @@ export async function updateImmeuble(req, res) {
       message: "Immeuble mis à jour avec succès",
       immeuble: updatedImmeuble,
     });
-
   } catch (error) {
     console.error("Erreur lors de la mise à jour de l'immeuble:", error);
     return res.status(500).json({
@@ -298,7 +295,7 @@ export async function deleteImmeuble(req, res) {
 
     // Vérification des droits
     if (
-      userProfile.role !== 'admin_jtec' &&
+      userProfile.role !== "admin_jtec" &&
       userProfile.regie_id !== existingImmeuble.regie_id
     ) {
       return res.status(403).json({
@@ -323,7 +320,6 @@ export async function deleteImmeuble(req, res) {
     return res.status(200).json({
       message: "Immeuble supprimé avec succès",
     });
-
   } catch (error) {
     console.error("Erreur lors de la suppression de l'immeuble:", error);
     return res.status(500).json({

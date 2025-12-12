@@ -13,18 +13,20 @@
   --text: #e8e8e8;
   --accent: #ffd700;
   --shadow: 0 8px 24px rgba(212, 175, 55, 0.25);
-  
-  --blue: #2196F3;
-  --purple: #9C27B0;
-  --green: #4CAF50;
-  --orange: #FF9800;
-  --dark-green: #2E7D32;
-  --red: #F44336;
+
+  --blue: #2196f3;
+  --purple: #9c27b0;
+  --green: #4caf50;
+  --orange: #ff9800;
+  --dark-green: #2e7d32;
+  --red: #f44336;
 }
 
 /* Body */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, sans-serif;
   background-color: var(--background);
   color: var(--text);
   line-height: 1.6;
@@ -59,7 +61,8 @@ button {
 }
 
 /* Input */
-input, select {
+input,
+select {
   font-family: inherit;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -68,7 +71,8 @@ input, select {
   transition: all 0.3s ease;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   outline: none;
   border-color: var(--primary);
 }
@@ -120,7 +124,7 @@ form {
 
 /* Couleurs dynamiques selon statuts */
 .status-nouveau {
-  background: #2196F3;
+  background: #2196f3;
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
@@ -130,7 +134,7 @@ form {
 }
 
 .status-diffuse {
-  background: #9C27B0;
+  background: #9c27b0;
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
@@ -140,7 +144,7 @@ form {
 }
 
 .status-accepte {
-  background: #4CAF50;
+  background: #4caf50;
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
@@ -150,7 +154,7 @@ form {
 }
 
 .status-planifiee {
-  background: #4CAF50;
+  background: #4caf50;
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
@@ -160,7 +164,7 @@ form {
 }
 
 .status-en_cours {
-  background: #FF9800;
+  background: #ff9800;
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
@@ -170,7 +174,7 @@ form {
 }
 
 .status-termine {
-  background: #2E7D32;
+  background: #2e7d32;
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
@@ -180,7 +184,7 @@ form {
 }
 
 .status-annule {
-  background: #F44336;
+  background: #f44336;
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;

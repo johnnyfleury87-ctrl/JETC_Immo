@@ -1,4 +1,10 @@
-export default function Button({ children, onClick, className = "", type = "button", style = {} }) {
+export default function Button({
+  children,
+  onClick,
+  className = "",
+  type = "button",
+  style = {},
+}) {
   return (
     <button
       type={type}
@@ -14,7 +20,7 @@ export default function Button({ children, onClick, className = "", type = "butt
         cursor: "pointer",
         boxShadow: "var(--shadow)",
         transition: "all 0.2s ease",
-        ...style
+        ...style,
       }}
     >
       {children}

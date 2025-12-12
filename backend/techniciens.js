@@ -4,7 +4,7 @@ import { authenticateUser } from "./profile.js";
 /**
  * POST /api/techniciens
  * Créer un nouveau technicien pour une entreprise
- * 
+ *
  * Body attendu :
  * {
  *   email: string (obligatoire),
@@ -42,15 +42,19 @@ export async function createTechnicien(req, res) {
     const userProfile = req.profile;
 
     // Seules les entreprises et admins peuvent créer des techniciens
-    if (userProfile.role !== 'entreprise' && userProfile.role !== 'admin_jtec') {
+    if (
+      userProfile.role !== "entreprise" &&
+      userProfile.role !== "admin_jtec"
+    ) {
       return res.status(403).json({
         error: "Seules les entreprises peuvent créer des techniciens",
       });
     }
 
-    const entreprise_id = userProfile.role === 'entreprise' 
-      ? userProfile.entreprise_id 
-      : req.body.entreprise_id;
+    const entreprise_id =
+      userProfile.role === "entreprise"
+        ? userProfile.entreprise_id
+        : req.body.entreprise_id;
 
     if (!entreprise_id) {
       return res.status(400).json({
@@ -72,15 +76,16 @@ export async function createTechnicien(req, res) {
     }
 
     // Créer l'utilisateur dans Supabase Auth
-    const { data: authData, error: authError } = await supabaseServer.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: {
-        role: 'technicien',
-        entreprise_id,
-      },
-    });
+    const { data: authData, error: authError } =
+      await supabaseServer.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: {
+          role: "technicien",
+          entreprise_id,
+        },
+      });
 
     if (authError) {
       console.error("Erreur lors de la création de l'utilisateur:", authError);
@@ -95,7 +100,7 @@ export async function createTechnicien(req, res) {
       .from("profiles")
       .insert({
         id: authData.user.id,
-        role: 'technicien',
+        role: "technicien",
         email,
         nom,
         prenom,
@@ -111,10 +116,10 @@ export async function createTechnicien(req, res) {
 
     if (profileError) {
       console.error("Erreur lors de la création du profil:", profileError);
-      
+
       // Rollback : supprimer l'utilisateur Auth créé
       await supabaseServer.auth.admin.deleteUser(authData.user.id);
-      
+
       return res.status(500).json({
         error: "Erreur lors de la création du profil technicien",
         details: profileError.message,
@@ -137,7 +142,7 @@ export async function createTechnicien(req, res) {
 /**
  * GET /api/techniciens
  * Liste des techniciens d'une entreprise
- * 
+ *
  * Query params optionnels :
  * - entreprise_id: uuid (admin uniquement)
  */
@@ -153,11 +158,14 @@ export async function listTechniciens(req, res) {
       .order("created_at", { ascending: false });
 
     // Filtrage selon le rôle
-    if (userProfile.role === 'entreprise' || userProfile.role === 'technicien') {
+    if (
+      userProfile.role === "entreprise" ||
+      userProfile.role === "technicien"
+    ) {
       query = query.eq("entreprise_id", userProfile.entreprise_id);
-    } else if (userProfile.role === 'admin_jtec' && entreprise_id) {
+    } else if (userProfile.role === "admin_jtec" && entreprise_id) {
       query = query.eq("entreprise_id", entreprise_id);
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -194,7 +202,8 @@ export async function getTechnicien(req, res) {
 
     const { data: technicien, error } = await supabaseServer
       .from("profiles")
-      .select(`
+      .select(
+        `
         *,
         entreprises:entreprise_id (
           id,
@@ -202,7 +211,8 @@ export async function getTechnicien(req, res) {
           email,
           telephone
         )
-      `)
+      `
+      )
       .eq("id", id)
       .eq("role", "technicien")
       .single();
@@ -214,13 +224,16 @@ export async function getTechnicien(req, res) {
     }
 
     // Vérification des droits d'accès
-    if (userProfile.role === 'entreprise' || userProfile.role === 'technicien') {
+    if (
+      userProfile.role === "entreprise" ||
+      userProfile.role === "technicien"
+    ) {
       if (technicien.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -239,7 +252,7 @@ export async function getTechnicien(req, res) {
 /**
  * PUT /api/techniciens/:id
  * Mettre à jour un technicien
- * 
+ *
  * Body attendu :
  * {
  *   nom?: string,
@@ -270,26 +283,33 @@ export async function updateTechnicien(req, res) {
     }
 
     // Vérification des droits
-    if (userProfile.role === 'entreprise') {
+    if (userProfile.role === "entreprise") {
       if (existingTechnicien.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role === 'technicien') {
+    } else if (userProfile.role === "technicien") {
       if (existingTechnicien.id !== userProfile.id) {
         return res.status(403).json({
           error: "Vous ne pouvez modifier que votre propre profil",
         });
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Accès refusé",
       });
     }
 
     // Champs modifiables
-    const allowedFields = ['nom', 'prenom', 'telephone', 'adresse', 'code_postal', 'ville'];
+    const allowedFields = [
+      "nom",
+      "prenom",
+      "telephone",
+      "adresse",
+      "code_postal",
+      "ville",
+    ];
     const updateData = {};
 
     for (const field of allowedFields) {
@@ -313,7 +333,10 @@ export async function updateTechnicien(req, res) {
       .single();
 
     if (updateError) {
-      console.error("Erreur lors de la mise à jour du technicien:", updateError);
+      console.error(
+        "Erreur lors de la mise à jour du technicien:",
+        updateError
+      );
       return res.status(500).json({
         error: "Erreur lors de la mise à jour du technicien",
         details: updateError.message,
@@ -357,15 +380,16 @@ export async function deleteTechnicien(req, res) {
     }
 
     // Vérification des droits
-    if (userProfile.role === 'entreprise') {
+    if (userProfile.role === "entreprise") {
       if (technicien.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
-        error: "Seules les entreprises et admins peuvent supprimer des techniciens",
+        error:
+          "Seules les entreprises et admins peuvent supprimer des techniciens",
       });
     }
 
@@ -378,16 +402,21 @@ export async function deleteTechnicien(req, res) {
 
     if (missions && missions.length > 0) {
       return res.status(400).json({
-        error: "Impossible de supprimer un technicien avec des missions en cours",
+        error:
+          "Impossible de supprimer un technicien avec des missions en cours",
         missions_count: missions.length,
       });
     }
 
     // Supprimer l'utilisateur Auth (cascade sur profiles)
-    const { error: deleteAuthError } = await supabaseServer.auth.admin.deleteUser(id);
+    const { error: deleteAuthError } =
+      await supabaseServer.auth.admin.deleteUser(id);
 
     if (deleteAuthError) {
-      console.error("Erreur lors de la suppression de l'utilisateur:", deleteAuthError);
+      console.error(
+        "Erreur lors de la suppression de l'utilisateur:",
+        deleteAuthError
+      );
       return res.status(500).json({
         error: "Erreur lors de la suppression du technicien",
         details: deleteAuthError.message,
@@ -430,13 +459,16 @@ export async function getTechnicienMissions(req, res) {
     }
 
     // Vérification des droits
-    if (userProfile.role === 'entreprise' || userProfile.role === 'technicien') {
+    if (
+      userProfile.role === "entreprise" ||
+      userProfile.role === "technicien"
+    ) {
       if (technicien.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -445,7 +477,8 @@ export async function getTechnicienMissions(req, res) {
     // Récupérer les missions
     const { data: missions, error: missionsError } = await supabaseServer
       .from("missions")
-      .select(`
+      .select(
+        `
         *,
         tickets:ticket_id (
           id,
@@ -462,26 +495,30 @@ export async function getTechnicienMissions(req, res) {
             )
           )
         )
-      `)
+      `
+      )
       .eq("technicien_id", id)
       .order("date_intervention_prevue", { ascending: true });
 
     if (missionsError) {
-      console.error("Erreur lors de la récupération des missions:", missionsError);
+      console.error(
+        "Erreur lors de la récupération des missions:",
+        missionsError
+      );
       return res.status(500).json({
         error: "Erreur lors de la récupération des missions",
         details: missionsError.message,
       });
     }
 
-    res.json({ 
+    res.json({
       technicien: {
         id: technicien.id,
         nom: technicien.nom,
         prenom: technicien.prenom,
         email: technicien.email,
       },
-      missions 
+      missions,
     });
   } catch (error) {
     console.error("Erreur dans getTechnicienMissions:", error);

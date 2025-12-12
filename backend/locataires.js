@@ -4,7 +4,7 @@ import { authenticateUser } from "./profile.js";
 /**
  * POST /api/locataires
  * Création d'un nouveau locataire
- * 
+ *
  * Body attendu :
  * {
  *   profile_id: uuid (obligatoire),
@@ -28,7 +28,7 @@ export async function createLocataire(req, res) {
       loyer_mensuel,
       charges_mensuelles,
       depot_garantie,
-      statut = 'actif',
+      statut = "actif",
       is_demo = false,
     } = req.body;
 
@@ -42,7 +42,7 @@ export async function createLocataire(req, res) {
     const userProfile = req.profile;
 
     // Vérification du rôle
-    if (userProfile.role !== 'regie' && userProfile.role !== 'admin_jtec') {
+    if (userProfile.role !== "regie" && userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Vous n'avez pas les droits pour créer un locataire",
       });
@@ -61,7 +61,7 @@ export async function createLocataire(req, res) {
       });
     }
 
-    if (profileData.role !== 'locataire') {
+    if (profileData.role !== "locataire") {
       return res.status(400).json({
         error: "Le profil doit avoir le rôle 'locataire'",
       });
@@ -84,12 +84,14 @@ export async function createLocataire(req, res) {
     // Vérifier que le logement existe et appartient à la régie
     const { data: logementData, error: logementError } = await supabaseServer
       .from("logements")
-      .select(`
+      .select(
+        `
         *,
         immeubles:immeuble_id (
           regie_id
         )
-      `)
+      `
+      )
       .eq("id", logement_id)
       .single();
 
@@ -101,7 +103,7 @@ export async function createLocataire(req, res) {
 
     // Vérifier les droits sur le logement
     if (
-      userProfile.role === 'regie' &&
+      userProfile.role === "regie" &&
       userProfile.regie_id !== logementData.immeubles?.regie_id
     ) {
       return res.status(403).json({
@@ -135,14 +137,14 @@ export async function createLocataire(req, res) {
 
     if (locataireError) {
       console.error("Erreur création locataire:", locataireError);
-      
+
       // Gestion de l'erreur d'unicité
-      if (locataireError.code === '23505') {
+      if (locataireError.code === "23505") {
         return res.status(400).json({
           error: "Ce profil est déjà associé à un locataire",
         });
       }
-      
+
       return res.status(500).json({
         error: "Erreur lors de la création du locataire",
         details: locataireError.message,
@@ -152,14 +154,13 @@ export async function createLocataire(req, res) {
     // Mettre à jour le statut du logement
     await supabaseServer
       .from("logements")
-      .update({ statut: 'occupé' })
+      .update({ statut: "occupé" })
       .eq("id", logement_id);
 
     return res.status(201).json({
       message: "Locataire créé avec succès",
       locataire: locataireData,
     });
-
   } catch (error) {
     console.error("Erreur serveur lors de la création du locataire:", error);
     return res.status(500).json({
@@ -183,7 +184,8 @@ export async function listLocataires(req, res) {
 
     let query = supabaseServer
       .from("locataires")
-      .select(`
+      .select(
+        `
         *,
         profiles:profile_id (
           id,
@@ -203,7 +205,8 @@ export async function listLocataires(req, res) {
             regie_id
           )
         )
-      `)
+      `
+      )
       .order("created_at", { ascending: false });
 
     // Filtres
@@ -225,18 +228,19 @@ export async function listLocataires(req, res) {
 
     // Filtrer selon le rôle
     let filteredLocataires = locatairesData;
-    
-    if (userProfile.role === 'locataire') {
+
+    if (userProfile.role === "locataire") {
       // Un locataire ne voit que ses propres infos
       filteredLocataires = locatairesData.filter(
-        locataire => locataire.profile_id === userProfile.id
+        (locataire) => locataire.profile_id === userProfile.id
       );
-    } else if (userProfile.role === 'regie' && !logement_id) {
+    } else if (userProfile.role === "regie" && !logement_id) {
       // Une régie ne voit que ses locataires
       filteredLocataires = locatairesData.filter(
-        locataire => locataire.logements?.immeubles?.regie_id === userProfile.regie_id
+        (locataire) =>
+          locataire.logements?.immeubles?.regie_id === userProfile.regie_id
       );
-    } else if (userProfile.role !== 'admin_jtec' && !logement_id) {
+    } else if (userProfile.role !== "admin_jtec" && !logement_id) {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -246,7 +250,6 @@ export async function listLocataires(req, res) {
       locataires: filteredLocataires,
       total: filteredLocataires.length,
     });
-
   } catch (error) {
     console.error("Erreur lors de la récupération des locataires:", error);
     return res.status(500).json({
@@ -267,7 +270,8 @@ export async function getLocataire(req, res) {
     // Récupération du locataire avec toutes les infos
     const { data: locataireData, error: locataireError } = await supabaseServer
       .from("locataires")
-      .select(`
+      .select(
+        `
         *,
         profiles:profile_id (
           id,
@@ -296,7 +300,8 @@ export async function getLocataire(req, res) {
             regie_id
           )
         )
-      `)
+      `
+      )
       .eq("id", id)
       .single();
 
@@ -307,14 +312,17 @@ export async function getLocataire(req, res) {
     }
 
     // Vérification des droits d'accès
-    if (userProfile.role === 'locataire' && userProfile.id !== locataireData.profile_id) {
+    if (
+      userProfile.role === "locataire" &&
+      userProfile.id !== locataireData.profile_id
+    ) {
       return res.status(403).json({
         error: "Vous n'avez pas accès à ce locataire",
       });
     }
 
     if (
-      userProfile.role === 'regie' &&
+      userProfile.role === "regie" &&
       userProfile.regie_id !== locataireData.logements?.immeubles?.regie_id
     ) {
       return res.status(403).json({
@@ -322,9 +330,11 @@ export async function getLocataire(req, res) {
       });
     }
 
-    if (userProfile.role !== 'admin_jtec' && 
-        userProfile.role !== 'regie' && 
-        userProfile.role !== 'locataire') {
+    if (
+      userProfile.role !== "admin_jtec" &&
+      userProfile.role !== "regie" &&
+      userProfile.role !== "locataire"
+    ) {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -333,7 +343,6 @@ export async function getLocataire(req, res) {
     return res.status(200).json({
       locataire: locataireData,
     });
-
   } catch (error) {
     console.error("Erreur lors de la récupération du locataire:", error);
     return res.status(500).json({
@@ -354,12 +363,14 @@ export async function updateLocataire(req, res) {
     // Vérifier que le locataire existe
     const { data: existingLocataire, error: fetchError } = await supabaseServer
       .from("locataires")
-      .select(`
+      .select(
+        `
         *,
         logements:logement_id (
           immeubles:immeuble_id (regie_id)
         )
-      `)
+      `
+      )
       .eq("id", id)
       .single();
 
@@ -371,13 +382,10 @@ export async function updateLocataire(req, res) {
 
     // Vérification des droits
     const isOwnProfile = userProfile.id === existingLocataire.profile_id;
-    const isOwnRegie = userProfile.regie_id === existingLocataire.logements?.immeubles?.regie_id;
-    
-    if (
-      userProfile.role !== 'admin_jtec' &&
-      !isOwnRegie &&
-      !isOwnProfile
-    ) {
+    const isOwnRegie =
+      userProfile.regie_id === existingLocataire.logements?.immeubles?.regie_id;
+
+    if (userProfile.role !== "admin_jtec" && !isOwnRegie && !isOwnProfile) {
       return res.status(403).json({
         error: "Vous n'avez pas les droits pour modifier ce locataire",
       });
@@ -394,13 +402,14 @@ export async function updateLocataire(req, res) {
 
     // Construire l'objet de mise à jour
     const updates = {};
-    
+
     // Un locataire ne peut modifier que certains champs (limités ici, à étendre selon besoin)
-    if (userProfile.role === 'locataire') {
+    if (userProfile.role === "locataire") {
       // Pour l'instant, un locataire ne peut rien modifier directement
       // (à adapter selon les besoins métier)
       return res.status(403).json({
-        error: "Vous ne pouvez pas modifier ces informations. Contactez votre régie.",
+        error:
+          "Vous ne pouvez pas modifier ces informations. Contactez votre régie.",
       });
     }
 
@@ -408,7 +417,8 @@ export async function updateLocataire(req, res) {
     if (date_entree !== undefined) updates.date_entree = date_entree;
     if (date_sortie !== undefined) updates.date_sortie = date_sortie;
     if (loyer_mensuel !== undefined) updates.loyer_mensuel = loyer_mensuel;
-    if (charges_mensuelles !== undefined) updates.charges_mensuelles = charges_mensuelles;
+    if (charges_mensuelles !== undefined)
+      updates.charges_mensuelles = charges_mensuelles;
     if (depot_garantie !== undefined) updates.depot_garantie = depot_garantie;
     if (statut !== undefined) updates.statut = statut;
 
@@ -435,10 +445,10 @@ export async function updateLocataire(req, res) {
     }
 
     // Si le statut change à 'parti', mettre à jour le logement
-    if (statut === 'parti') {
+    if (statut === "parti") {
       await supabaseServer
         .from("logements")
-        .update({ statut: 'vacant' })
+        .update({ statut: "vacant" })
         .eq("id", existingLocataire.logement_id);
     }
 
@@ -446,7 +456,6 @@ export async function updateLocataire(req, res) {
       message: "Locataire mis à jour avec succès",
       locataire: updatedLocataire,
     });
-
   } catch (error) {
     console.error("Erreur lors de la mise à jour du locataire:", error);
     return res.status(500).json({
@@ -467,12 +476,14 @@ export async function deleteLocataire(req, res) {
     // Vérifier que le locataire existe
     const { data: existingLocataire, error: fetchError } = await supabaseServer
       .from("locataires")
-      .select(`
+      .select(
+        `
         *,
         logements:logement_id (
           immeubles:immeuble_id (regie_id)
         )
-      `)
+      `
+      )
       .eq("id", id)
       .single();
 
@@ -484,7 +495,7 @@ export async function deleteLocataire(req, res) {
 
     // Vérification des droits
     if (
-      userProfile.role !== 'admin_jtec' &&
+      userProfile.role !== "admin_jtec" &&
       userProfile.regie_id !== existingLocataire.logements?.immeubles?.regie_id
     ) {
       return res.status(403).json({
@@ -509,13 +520,12 @@ export async function deleteLocataire(req, res) {
     // Mettre à jour le statut du logement
     await supabaseServer
       .from("logements")
-      .update({ statut: 'vacant' })
+      .update({ statut: "vacant" })
       .eq("id", existingLocataire.logement_id);
 
     return res.status(200).json({
       message: "Locataire supprimé avec succès",
     });
-
   } catch (error) {
     console.error("Erreur lors de la suppression du locataire:", error);
     return res.status(500).json({

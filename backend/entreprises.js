@@ -4,7 +4,7 @@ import { authenticateUser } from "./profile.js";
 /**
  * POST /api/entreprises
  * Création d'une nouvelle entreprise
- * 
+ *
  * Body attendu :
  * {
  *   nom: string (obligatoire),
@@ -51,14 +51,17 @@ export async function createEntreprise(req, res) {
 
     // Vérification du rôle : seul admin_jtec ou un utilisateur qui crée sa propre entreprise
     const userProfile = req.profile;
-    if (userProfile.role !== 'admin_jtec' && userProfile.role !== 'entreprise') {
+    if (
+      userProfile.role !== "admin_jtec" &&
+      userProfile.role !== "entreprise"
+    ) {
       return res.status(403).json({
         error: "Vous n'avez pas les droits pour créer une entreprise",
       });
     }
 
     // Si l'utilisateur a déjà une entreprise, il ne peut pas en créer une nouvelle
-    if (userProfile.role === 'entreprise' && userProfile.entreprise_id) {
+    if (userProfile.role === "entreprise" && userProfile.entreprise_id) {
       return res.status(400).json({
         error: "Vous êtes déjà associé à une entreprise",
       });
@@ -81,53 +84,56 @@ export async function createEntreprise(req, res) {
 
     // Validation des spécialités
     const validSpecialites = [
-      'plomberie',
-      'électricité',
-      'serrurerie',
-      'chauffage',
-      'climatisation',
-      'menuiserie',
-      'peinture',
-      'maçonnerie',
-      'vitrerie',
-      'toiture',
-      'isolation',
-      'jardinage',
-      'nettoyage',
-      'autre'
+      "plomberie",
+      "électricité",
+      "serrurerie",
+      "chauffage",
+      "climatisation",
+      "menuiserie",
+      "peinture",
+      "maçonnerie",
+      "vitrerie",
+      "toiture",
+      "isolation",
+      "jardinage",
+      "nettoyage",
+      "autre",
     ];
 
     if (specialites.length > 0) {
-      const invalidSpecialites = specialites.filter(s => !validSpecialites.includes(s));
+      const invalidSpecialites = specialites.filter(
+        (s) => !validSpecialites.includes(s)
+      );
       if (invalidSpecialites.length > 0) {
         return res.status(400).json({
-          error: `Spécialités invalides : ${invalidSpecialites.join(', ')}`,
+          error: `Spécialités invalides : ${invalidSpecialites.join(", ")}`,
           valid_specialites: validSpecialites,
         });
       }
     }
 
     // Création de l'entreprise
-    const { data: entrepriseData, error: entrepriseError } = await supabaseServer
-      .from("entreprises")
-      .insert({
-        nom,
-        siret,
-        email,
-        telephone,
-        adresse,
-        code_postal,
-        ville,
-        nom_responsable,
-        prenom_responsable,
-        telephone_responsable,
-        email_responsable,
-        specialites,
-        rayon_intervention_km,
-        is_demo,
-      })
-      .select()
-      .single();
+    const { data: entrepriseData, error: entrepriseError } =
+      await supabaseServer
+        .from("entreprises")
+        .insert({
+          nom,
+          siret,
+          email,
+          telephone,
+          adresse,
+          code_postal,
+          ville,
+          nom_responsable,
+          prenom_responsable,
+          telephone_responsable,
+          email_responsable,
+          specialites,
+          rayon_intervention_km,
+          is_demo,
+        })
+        .select()
+        .single();
 
     if (entrepriseError) {
       console.error("Erreur création entreprise:", entrepriseError);
@@ -138,7 +144,7 @@ export async function createEntreprise(req, res) {
     }
 
     // Si c'est l'utilisateur lui-même qui crée son entreprise, lier son profil
-    if (userProfile.role === 'entreprise' && !userProfile.entreprise_id) {
+    if (userProfile.role === "entreprise" && !userProfile.entreprise_id) {
       const { error: updateProfileError } = await supabaseServer
         .from("profiles")
         .update({ entreprise_id: entrepriseData.id })
@@ -153,7 +159,6 @@ export async function createEntreprise(req, res) {
       message: "Entreprise créée avec succès",
       entreprise: entrepriseData,
     });
-
   } catch (error) {
     console.error("Erreur serveur lors de la création de l'entreprise:", error);
     return res.status(500).json({
@@ -174,8 +179,8 @@ export async function getEntreprise(req, res) {
 
     // Vérification des droits d'accès
     if (
-      userProfile.role !== 'admin_jtec' &&
-      userProfile.role !== 'regie' &&
+      userProfile.role !== "admin_jtec" &&
+      userProfile.role !== "regie" &&
       userProfile.entreprise_id !== id
     ) {
       return res.status(403).json({
@@ -184,11 +189,12 @@ export async function getEntreprise(req, res) {
     }
 
     // Récupération de l'entreprise
-    const { data: entrepriseData, error: entrepriseError } = await supabaseServer
-      .from("entreprises")
-      .select("*")
-      .eq("id", id)
-      .single();
+    const { data: entrepriseData, error: entrepriseError } =
+      await supabaseServer
+        .from("entreprises")
+        .select("*")
+        .eq("id", id)
+        .single();
 
     if (entrepriseError || !entrepriseData) {
       return res.status(404).json({
@@ -199,7 +205,6 @@ export async function getEntreprise(req, res) {
     return res.status(200).json({
       entreprise: entrepriseData,
     });
-
   } catch (error) {
     console.error("Erreur lors de la récupération de l'entreprise:", error);
     return res.status(500).json({
@@ -218,10 +223,7 @@ export async function updateEntreprise(req, res) {
     const userProfile = req.profile;
 
     // Vérification des droits d'accès
-    if (
-      userProfile.role !== 'admin_jtec' &&
-      userProfile.entreprise_id !== id
-    ) {
+    if (userProfile.role !== "admin_jtec" && userProfile.entreprise_id !== id) {
       return res.status(403).json({
         error: "Vous n'avez pas les droits pour modifier cette entreprise",
       });
@@ -252,12 +254,17 @@ export async function updateEntreprise(req, res) {
     if (adresse !== undefined) updates.adresse = adresse;
     if (code_postal !== undefined) updates.code_postal = code_postal;
     if (ville !== undefined) updates.ville = ville;
-    if (nom_responsable !== undefined) updates.nom_responsable = nom_responsable;
-    if (prenom_responsable !== undefined) updates.prenom_responsable = prenom_responsable;
-    if (telephone_responsable !== undefined) updates.telephone_responsable = telephone_responsable;
-    if (email_responsable !== undefined) updates.email_responsable = email_responsable;
+    if (nom_responsable !== undefined)
+      updates.nom_responsable = nom_responsable;
+    if (prenom_responsable !== undefined)
+      updates.prenom_responsable = prenom_responsable;
+    if (telephone_responsable !== undefined)
+      updates.telephone_responsable = telephone_responsable;
+    if (email_responsable !== undefined)
+      updates.email_responsable = email_responsable;
     if (specialites !== undefined) updates.specialites = specialites;
-    if (rayon_intervention_km !== undefined) updates.rayon_intervention_km = rayon_intervention_km;
+    if (rayon_intervention_km !== undefined)
+      updates.rayon_intervention_km = rayon_intervention_km;
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({
@@ -301,7 +308,6 @@ export async function updateEntreprise(req, res) {
       message: "Entreprise mise à jour avec succès",
       entreprise: updatedEntreprise,
     });
-
   } catch (error) {
     console.error("Erreur lors de la mise à jour de l'entreprise:", error);
     return res.status(500).json({
@@ -321,7 +327,7 @@ export async function listEntreprises(req, res) {
     const userProfile = req.profile;
 
     // Vérification du rôle
-    if (userProfile.role !== 'admin_jtec' && userProfile.role !== 'regie') {
+    if (userProfile.role !== "admin_jtec" && userProfile.role !== "regie") {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -353,7 +359,6 @@ export async function listEntreprises(req, res) {
       entreprises: entreprisesData,
       total: entreprisesData.length,
     });
-
   } catch (error) {
     console.error("Erreur lors de la récupération des entreprises:", error);
     return res.status(500).json({

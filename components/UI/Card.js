@@ -1,6 +1,6 @@
 export default function Card({ children, className = "" }) {
   return (
-    <div 
+    <div
       className={`card fade-in ${className}`}
       style={{
         backgroundColor: "white",
@@ -8,7 +8,7 @@ export default function Card({ children, className = "" }) {
         borderRadius: "12px",
         boxShadow: "var(--shadow)",
         border: "1px solid rgba(0, 0, 0, 0.08)",
-        marginBottom: "1rem"
+        marginBottom: "1rem",
       }}
     >
       {children}

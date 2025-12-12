@@ -14,12 +14,12 @@ export async function getPreferences(req, res) {
     const userId = req.user.id;
 
     const { data: preferences, error } = await supabaseServer
-      .from('preferences_utilisateur')
-      .select('*')
-      .eq('user_id', userId)
+      .from("preferences_utilisateur")
+      .select("*")
+      .eq("user_id", userId)
       .single();
 
-    if (error && error.code !== 'PGRST116') {
+    if (error && error.code !== "PGRST116") {
       throw error;
     }
 
@@ -27,31 +27,35 @@ export async function getPreferences(req, res) {
     if (!preferences) {
       return res.json({
         preferences: {
-          theme: 'light',
-          langue: 'fr',
-          taille_police: 'medium',
+          theme: "light",
+          langue: "fr",
+          taille_police: "medium",
           notifications_email: true,
           notifications_push: true,
           notifications_in_app: true,
-          notifications_types: ["nouveau_ticket", "mission_planifiee", "facture_creee", "message_recu"],
-          vue_par_defaut: 'tableau',
+          notifications_types: [
+            "nouveau_ticket",
+            "mission_planifiee",
+            "facture_creee",
+            "message_recu",
+          ],
+          vue_par_defaut: "tableau",
           elements_par_page: 20,
           afficher_tickets_clotures: false,
           afficher_missions_terminees: false,
           widgets_dashboard: ["stats", "tickets_recents", "missions_en_cours"],
           ordre_widgets: [],
-          timezone: 'Europe/Paris',
-          format_date: 'DD/MM/YYYY',
-          format_heure: '24h'
-        }
+          timezone: "Europe/Paris",
+          format_date: "DD/MM/YYYY",
+          format_heure: "24h",
+        },
       });
     }
 
     return res.json({ preferences });
-
   } catch (error) {
-    console.error('Erreur récupération préférences:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur récupération préférences:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -78,7 +82,7 @@ export async function upsertPreferences(req, res) {
       ordre_widgets,
       timezone,
       format_date,
-      format_heure
+      format_heure,
     } = req.body;
 
     // Construire l'objet de mise à jour
@@ -86,15 +90,23 @@ export async function upsertPreferences(req, res) {
     if (theme !== undefined) updates.theme = theme;
     if (langue !== undefined) updates.langue = langue;
     if (taille_police !== undefined) updates.taille_police = taille_police;
-    if (notifications_email !== undefined) updates.notifications_email = notifications_email;
-    if (notifications_push !== undefined) updates.notifications_push = notifications_push;
-    if (notifications_in_app !== undefined) updates.notifications_in_app = notifications_in_app;
-    if (notifications_types !== undefined) updates.notifications_types = notifications_types;
+    if (notifications_email !== undefined)
+      updates.notifications_email = notifications_email;
+    if (notifications_push !== undefined)
+      updates.notifications_push = notifications_push;
+    if (notifications_in_app !== undefined)
+      updates.notifications_in_app = notifications_in_app;
+    if (notifications_types !== undefined)
+      updates.notifications_types = notifications_types;
     if (vue_par_defaut !== undefined) updates.vue_par_defaut = vue_par_defaut;
-    if (elements_par_page !== undefined) updates.elements_par_page = elements_par_page;
-    if (afficher_tickets_clotures !== undefined) updates.afficher_tickets_clotures = afficher_tickets_clotures;
-    if (afficher_missions_terminees !== undefined) updates.afficher_missions_terminees = afficher_missions_terminees;
-    if (widgets_dashboard !== undefined) updates.widgets_dashboard = widgets_dashboard;
+    if (elements_par_page !== undefined)
+      updates.elements_par_page = elements_par_page;
+    if (afficher_tickets_clotures !== undefined)
+      updates.afficher_tickets_clotures = afficher_tickets_clotures;
+    if (afficher_missions_terminees !== undefined)
+      updates.afficher_missions_terminees = afficher_missions_terminees;
+    if (widgets_dashboard !== undefined)
+      updates.widgets_dashboard = widgets_dashboard;
     if (ordre_widgets !== undefined) updates.ordre_widgets = ordre_widgets;
     if (timezone !== undefined) updates.timezone = timezone;
     if (format_date !== undefined) updates.format_date = format_date;
@@ -102,21 +114,20 @@ export async function upsertPreferences(req, res) {
 
     // Upsert (insert ou update)
     const { data: preferences, error } = await supabaseServer
-      .from('preferences_utilisateur')
-      .upsert(updates, { onConflict: 'user_id' })
+      .from("preferences_utilisateur")
+      .upsert(updates, { onConflict: "user_id" })
       .select()
       .single();
 
     if (error) throw error;
 
-    return res.json({ 
-      message: 'Préférences enregistrées',
-      preferences 
+    return res.json({
+      message: "Préférences enregistrées",
+      preferences,
     });
-
   } catch (error) {
-    console.error('Erreur mise à jour préférences:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur mise à jour préférences:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -129,18 +140,17 @@ export async function resetPreferences(req, res) {
     const userId = req.user.id;
 
     const { error } = await supabaseServer
-      .from('preferences_utilisateur')
+      .from("preferences_utilisateur")
       .delete()
-      .eq('user_id', userId);
+      .eq("user_id", userId);
 
     if (error) throw error;
 
-    return res.json({ 
-      message: 'Préférences réinitialisées'
+    return res.json({
+      message: "Préférences réinitialisées",
     });
-
   } catch (error) {
-    console.error('Erreur réinitialisation préférences:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur réinitialisation préférences:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }

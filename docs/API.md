@@ -13,6 +13,7 @@ API RESTful complète pour la plateforme SaaS de gestion immobilière JETC_Immo.
 ## 🔐 Authentification
 
 ### Inscription
+
 ```http
 POST /api/auth/register
 Content-Type: application/json
@@ -36,6 +37,7 @@ Response 201:
 ```
 
 ### Connexion
+
 ```http
 POST /api/auth/login
 Content-Type: application/json
@@ -54,6 +56,7 @@ Response 200:
 ```
 
 **Utilisation du token:**
+
 ```http
 Authorization: Bearer {access_token}
 ```
@@ -63,9 +66,11 @@ Authorization: Bearer {access_token}
 ## 👤 Profil Utilisateur
 
 ### GET /api/profile
+
 Récupérer son profil.
 
 **Response 200:**
+
 ```json
 {
   "user": {
@@ -82,9 +87,11 @@ Récupérer son profil.
 ```
 
 ### PUT /api/profile
+
 Mettre à jour son profil.
 
 **Body:**
+
 ```json
 {
   "nom": "Nouveau Nom",
@@ -101,9 +108,11 @@ Mettre à jour son profil.
 ## 🏢 Régies
 
 ### POST /api/regies
+
 Créer une régie (admin ou auto-création).
 
 **Body:**
+
 ```json
 {
   "nom": "Régie Parisienne",
@@ -119,12 +128,15 @@ Créer une régie (admin ou auto-création).
 ```
 
 ### GET /api/regies
+
 Lister les régies (admin voit toutes, régie voit la sienne).
 
 ### GET /api/regies/:id
+
 Détails d'une régie.
 
 ### PUT /api/regies/:id
+
 Modifier une régie.
 
 ---
@@ -132,9 +144,11 @@ Modifier une régie.
 ## 🏗️ Entreprises
 
 ### POST /api/entreprises
+
 Créer une entreprise prestataire.
 
 **Body:**
+
 ```json
 {
   "nom": "Plomberie Express",
@@ -143,17 +157,20 @@ Créer une entreprise prestataire.
   "telephone": "0198765432",
   "specialites": ["Plomberie", "Chauffage"],
   "zone_intervention": "Île-de-France",
-  "tarif_horaire": 65.00
+  "tarif_horaire": 65.0
 }
 ```
 
 ### GET /api/entreprises
+
 Lister les entreprises.
 
 ### GET /api/entreprises/:id
+
 Détails d'une entreprise.
 
 ### PUT /api/entreprises/:id
+
 Modifier une entreprise.
 
 ---
@@ -161,9 +178,11 @@ Modifier une entreprise.
 ## 🏘️ Immeubles
 
 ### POST /api/immeubles
+
 Créer un immeuble (régie uniquement).
 
 **Body:**
+
 ```json
 {
   "nom": "Résidence Les Chênes",
@@ -177,15 +196,19 @@ Créer un immeuble (régie uniquement).
 ```
 
 ### GET /api/immeubles
+
 Lister les immeubles (filtrés par régie).
 
 ### GET /api/immeubles/:id
+
 Détails d'un immeuble.
 
 ### PUT /api/immeubles/:id
+
 Modifier un immeuble.
 
 ### DELETE /api/immeubles/:id
+
 Supprimer un immeuble.
 
 ---
@@ -193,9 +216,11 @@ Supprimer un immeuble.
 ## 🏠 Logements
 
 ### POST /api/logements
+
 Créer un logement dans un immeuble.
 
 **Body:**
+
 ```json
 {
   "immeuble_id": "uuid",
@@ -204,23 +229,27 @@ Créer un logement dans un immeuble.
   "type": "T3",
   "superficie": 65.5,
   "nb_pieces": 3,
-  "loyer": 1200.00,
-  "charges": 150.00
+  "loyer": 1200.0,
+  "charges": 150.0
 }
 ```
 
 ### GET /api/logements
+
 Lister les logements.
 
 **Query params:** `?immeuble_id=uuid`
 
 ### GET /api/logements/:id
+
 Détails d'un logement.
 
 ### PUT /api/logements/:id
+
 Modifier un logement.
 
 ### DELETE /api/logements/:id
+
 Supprimer un logement.
 
 ---
@@ -228,9 +257,11 @@ Supprimer un logement.
 ## 👥 Locataires
 
 ### POST /api/locataires
+
 Créer un locataire.
 
 **Body:**
+
 ```json
 {
   "logement_id": "uuid",
@@ -243,17 +274,21 @@ Créer un locataire.
 ```
 
 ### GET /api/locataires
+
 Lister les locataires.
 
 **Query params:** `?logement_id=uuid&immeuble_id=uuid`
 
 ### GET /api/locataires/:id
+
 Détails d'un locataire.
 
 ### PUT /api/locataires/:id
+
 Modifier un locataire.
 
 ### DELETE /api/locataires/:id
+
 Supprimer un locataire (soft delete).
 
 ---
@@ -261,9 +296,11 @@ Supprimer un locataire (soft delete).
 ## 🎫 Tickets
 
 ### POST /api/tickets
+
 Créer un ticket d'intervention.
 
 **Body:**
+
 ```json
 {
   "logement_id": "uuid",
@@ -281,17 +318,21 @@ Créer un ticket d'intervention.
 **Statuts:** nouveau, diffuse, en_attente_devis, accepte, en_cours, termine, cloture, annule
 
 ### GET /api/tickets
+
 Lister les tickets (filtrés selon rôle).
 
 **Query params:** `?statut=nouveau&priorite=haute&logement_id=uuid`
 
 ### GET /api/tickets/:id
+
 Détails d'un ticket.
 
 ### PUT /api/tickets/:id
+
 Modifier un ticket.
 
 **Body (régie):**
+
 ```json
 {
   "statut": "diffuse",
@@ -301,9 +342,11 @@ Modifier un ticket.
 ```
 
 ### PUT /api/tickets/:id/diffuse
+
 Diffuser un ticket aux entreprises (régie uniquement).
 
 **Body:**
+
 ```json
 {
   "diffusion_mode": "general|restreint",
@@ -312,6 +355,7 @@ Diffuser un ticket aux entreprises (régie uniquement).
 ```
 
 ### DELETE /api/tickets/:id
+
 Supprimer un ticket.
 
 ---
@@ -319,9 +363,11 @@ Supprimer un ticket.
 ## 🔧 Missions
 
 ### POST /api/missions/accept-ticket
+
 Accepter un ticket et créer une mission (entreprise uniquement).
 
 **Body:**
+
 ```json
 {
   "ticket_id": "uuid",
@@ -329,12 +375,13 @@ Accepter un ticket et créer une mission (entreprise uniquement).
   "description": "Intervention pour réparer la fuite",
   "date_intervention_prevue": "2024-12-16T14:00:00Z",
   "duree_estimee_minutes": 120,
-  "montant_estime": 350.00,
+  "montant_estime": 350.0,
   "materiel_necessaire": "Joint, silicone, clé à molette"
 }
 ```
 
 ### GET /api/missions
+
 Lister les missions.
 
 **Query params:** `?statut=planifiee&ticket_id=uuid`
@@ -342,15 +389,19 @@ Lister les missions.
 **Statuts:** planifiee, en_cours, terminee, annulee
 
 ### GET /api/missions/:id
+
 Détails d'une mission.
 
 ### PUT /api/missions/:id
+
 Modifier une mission.
 
 ### PUT /api/missions/:id/assign-technicien
+
 Assigner un technicien à une mission.
 
 **Body:**
+
 ```json
 {
   "technicien_id": "uuid",
@@ -359,6 +410,7 @@ Assigner un technicien à une mission.
 ```
 
 ### DELETE /api/missions/:id
+
 Supprimer une mission.
 
 ---
@@ -366,9 +418,11 @@ Supprimer une mission.
 ## 👷 Techniciens
 
 ### POST /api/techniciens
+
 Créer un technicien (entreprise uniquement).
 
 **Body:**
+
 ```json
 {
   "nom": "Laurent",
@@ -381,18 +435,23 @@ Créer un technicien (entreprise uniquement).
 ```
 
 ### GET /api/techniciens
+
 Lister les techniciens de son entreprise.
 
 ### GET /api/techniciens/:id
+
 Détails d'un technicien.
 
 ### PUT /api/techniciens/:id
+
 Modifier un technicien.
 
 ### DELETE /api/techniciens/:id
+
 Supprimer un technicien.
 
 ### GET /api/techniciens/:id/missions
+
 Lister les missions d'un technicien.
 
 ---
@@ -400,9 +459,11 @@ Lister les missions d'un technicien.
 ## 🛠️ Interventions
 
 ### PUT /api/interventions/:id/start
+
 Démarrer une intervention (technicien).
 
 **Body:**
+
 ```json
 {
   "date_debut_reel": "2024-12-16T14:05:00Z"
@@ -410,12 +471,15 @@ Démarrer une intervention (technicien).
 ```
 
 ### PUT /api/interventions/:id/pause
+
 Mettre en pause une intervention.
 
 ### PUT /api/interventions/:id/report-delay
+
 Signaler un retard.
 
 **Body:**
+
 ```json
 {
   "motif_retard": "Embouteillages",
@@ -424,23 +488,27 @@ Signaler un retard.
 ```
 
 ### PUT /api/interventions/:id/complete
+
 Terminer une intervention avec rapport.
 
 **Body:**
+
 ```json
 {
   "date_fin_reel": "2024-12-16T16:30:00Z",
   "travaux_realises": "Remplacement du joint + application silicone",
   "materiel_utilise": ["Joint 40mm", "Silicone sanitaire"],
   "rapport_intervention": "Intervention réussie, fuite réparée",
-  "montant_final": 380.00
+  "montant_final": 380.0
 }
 ```
 
 ### PUT /api/interventions/:id/add-signature
+
 Ajouter une signature (client ou technicien).
 
 **Body:**
+
 ```json
 {
   "type": "client|technicien",
@@ -449,9 +517,11 @@ Ajouter une signature (client ou technicien).
 ```
 
 ### POST /api/interventions/:id/upload-photo
+
 Générer une URL signée pour upload photo.
 
 **Response:**
+
 ```json
 {
   "uploadUrl": "https://supabase.co/storage/...",
@@ -461,6 +531,7 @@ Générer une URL signée pour upload photo.
 ```
 
 ### GET /api/interventions/:id/photos
+
 Récupérer les URLs des photos d'une intervention.
 
 ---
@@ -468,17 +539,19 @@ Récupérer les URLs des photos d'une intervention.
 ## 💰 Factures
 
 ### POST /api/factures
+
 Créer une facture depuis une mission terminée.
 
 **Body:**
+
 ```json
 {
   "mission_id": "uuid",
   "date_emission": "2024-12-16",
   "date_echeance": "2025-01-15",
   "montant_ht": 316.67,
-  "tva_taux": 20.00,
-  "montant_ttc": 380.00,
+  "tva_taux": 20.0,
+  "montant_ttc": 380.0,
   "notes": "Paiement par virement"
 }
 ```
@@ -486,6 +559,7 @@ Créer une facture depuis une mission terminée.
 **Numéro facture généré automatiquement:** `FAC-2024-00001`
 
 ### GET /api/factures
+
 Lister les factures.
 
 **Query params:** `?statut_paiement=en_attente&mission_id=uuid`
@@ -493,15 +567,19 @@ Lister les factures.
 **Statuts:** en_attente, payee, en_retard, annulee
 
 ### GET /api/factures/:id
+
 Détails d'une facture.
 
 ### PUT /api/factures/:id
+
 Modifier une facture.
 
 ### PUT /api/factures/:id/pay
+
 Marquer une facture comme payée (régie).
 
 **Body:**
+
 ```json
 {
   "date_paiement": "2024-12-20",
@@ -511,6 +589,7 @@ Marquer une facture comme payée (régie).
 ```
 
 ### DELETE /api/factures/:id
+
 Supprimer une facture.
 
 ---
@@ -518,9 +597,11 @@ Supprimer une facture.
 ## 💬 Messagerie
 
 ### POST /api/messages
+
 Envoyer un message.
 
 **Body:**
+
 ```json
 {
   "recipient_id": "uuid",
@@ -535,24 +616,31 @@ Envoyer un message.
 **Types:** standard, system, notification, urgence
 
 ### GET /api/messages/conversations
+
 Lister ses conversations avec nombre de non lus.
 
 ### GET /api/messages/conversation/:userId
+
 Récupérer tous les messages avec un utilisateur.
 
 ### PUT /api/messages/:id/read
+
 Marquer un message comme lu.
 
 ### PUT /api/messages/conversation/:userId/read-all
+
 Marquer toute une conversation comme lue.
 
 ### GET /api/messages/context/:type/:id
+
 Récupérer les messages liés à un contexte (ticket/mission/facture).
 
 ### GET /api/messages/unread-count
+
 Compter les messages non lus.
 
 ### DELETE /api/messages/:id
+
 Supprimer un message (15 minutes max).
 
 ---
@@ -560,6 +648,7 @@ Supprimer un message (15 minutes max).
 ## 🔔 Notifications
 
 ### GET /api/notifications
+
 Lister les notifications.
 
 **Query params:** `?lu=false&type=nouveau_ticket&limit=50`
@@ -569,24 +658,31 @@ Lister les notifications.
 **Priorités:** basse, normale, haute, urgente
 
 ### GET /api/notifications/:id
+
 Détails d'une notification.
 
 ### PUT /api/notifications/:id/read
+
 Marquer comme lue.
 
 ### PUT /api/notifications/read-all
+
 Marquer toutes comme lues.
 
 ### PUT /api/notifications/:id/archive
+
 Archiver une notification.
 
 ### GET /api/notifications/unread-count
+
 Compter les notifications non lues.
 
 ### DELETE /api/notifications/:id
+
 Supprimer une notification (seulement si archivée).
 
 ### POST /api/notifications (admin)
+
 Créer une notification manuellement.
 
 ---
@@ -594,11 +690,13 @@ Créer une notification manuellement.
 ## 📦 Plans & Abonnements
 
 ### GET /api/plans
+
 Lister les plans disponibles.
 
 **Query params:** `?type_entite=regie&est_visible=true`
 
 **Response:**
+
 ```json
 {
   "plans": [
@@ -606,12 +704,12 @@ Lister les plans disponibles.
       "id": "uuid",
       "nom": "Plan Starter",
       "type_entite": "regie",
-      "prix_mensuel": 49.00,
-      "prix_annuel": 490.00,
+      "prix_mensuel": 49.0,
+      "prix_annuel": 490.0,
       "max_immeubles": 10,
       "max_logements": 50,
       "max_tickets_par_mois": 100,
-      "features": {"reporting": true, "api": false},
+      "features": { "reporting": true, "api": false },
       "module_facturation": true
     }
   ]
@@ -619,18 +717,23 @@ Lister les plans disponibles.
 ```
 
 ### GET /api/plans/:id
+
 Détails d'un plan.
 
 ### POST /api/plans (admin)
+
 Créer un plan.
 
 ### PUT /api/plans/:id (admin)
+
 Modifier un plan.
 
 ### POST /api/subscriptions
+
 Créer un abonnement.
 
 **Body:**
+
 ```json
 {
   "plan_id": "uuid",
@@ -639,12 +742,15 @@ Créer un abonnement.
 ```
 
 ### GET /api/subscriptions/current
+
 Récupérer son abonnement actif.
 
 ### PUT /api/subscriptions/:id/change-plan
+
 Changer de plan.
 
 **Body:**
+
 ```json
 {
   "nouveau_plan_id": "uuid"
@@ -652,9 +758,11 @@ Changer de plan.
 ```
 
 ### PUT /api/subscriptions/:id/cancel
+
 Annuler un abonnement.
 
 ### GET /api/subscriptions/check-limit/:limit_type
+
 Vérifier si on peut créer une ressource.
 
 **limit_type:** immeubles, logements, locataires, tickets, missions, techniciens
@@ -664,9 +772,11 @@ Vérifier si on peut créer une ressource.
 ## 📊 Dashboard Admin
 
 ### GET /api/admin/stats
+
 Statistiques globales de la plateforme.
 
 **Response:**
+
 ```json
 {
   "stats": {
@@ -674,7 +784,7 @@ Statistiques globales de la plateforme.
     "regies_actives": 120,
     "total_entreprises": 80,
     "entreprises_actives": 65,
-    "revenus_mensuels_recurrents": 12500.00,
+    "revenus_mensuels_recurrents": 12500.0,
     "abonnements_actifs": 185,
     "tickets_en_attente": 45
   }
@@ -682,46 +792,59 @@ Statistiques globales de la plateforme.
 ```
 
 ### GET /api/admin/stats/subscriptions-by-plan
+
 Abonnements par plan.
 
 ### GET /api/admin/stats/tickets
+
 Statistiques tickets (par statut et priorité).
 
 ### GET /api/admin/stats/missions
+
 Statistiques missions.
 
 ### GET /api/admin/stats/factures
+
 Statistiques factures.
 
 ### GET /api/admin/top/regies
+
 Top 50 régies par activité.
 
 ### GET /api/admin/top/entreprises
+
 Top 50 entreprises par CA.
 
 ### GET /api/admin/stats/evolution
+
 Évolution sur 12 mois.
 
 ### GET /api/admin/subscriptions/expiring
+
 Abonnements expirant dans 30 jours.
 
 ### GET /api/admin/regies
+
 Liste paginée des régies.
 
 **Query params:** `?page=1&limit=20&search=paris&subscription_actif=true`
 
 ### GET /api/admin/entreprises
+
 Liste paginée des entreprises.
 
 ### GET /api/admin/users
+
 Liste paginée des utilisateurs.
 
 **Query params:** `?role=regie`
 
 ### PUT /api/admin/subscriptions/:id/toggle
+
 Suspendre/activer un abonnement.
 
 **Body:**
+
 ```json
 {
   "statut": "actif|suspendu|annule"
@@ -733,12 +856,15 @@ Suspendre/activer un abonnement.
 ## ⚙️ Préférences Utilisateur
 
 ### GET /api/preferences
+
 Récupérer ses préférences (avec valeurs par défaut).
 
 ### PUT /api/preferences
+
 Mettre à jour ses préférences.
 
 **Body:**
+
 ```json
 {
   "theme": "dark",
@@ -754,6 +880,7 @@ Mettre à jour ses préférences.
 ```
 
 ### POST /api/preferences/reset
+
 Réinitialiser aux valeurs par défaut.
 
 ---
@@ -761,19 +888,22 @@ Réinitialiser aux valeurs par défaut.
 ## 🔧 Paramètres Application
 
 ### GET /api/parametres
+
 Récupérer les paramètres de son entité.
 
 ### PUT /api/parametres
+
 Mettre à jour les paramètres.
 
 **Body:**
+
 ```json
 {
   "delai_reponse_max_heures": 24,
   "priorites_actives": ["normale", "haute", "urgente"],
   "auto_assignation_tickets": true,
   "mode_facturation": "mission",
-  "tva_par_defaut": 20.00,
+  "tva_par_defaut": 20.0,
   "webhook_actif": true,
   "logo_url": "https://...",
   "couleur_primaire": "#1E40AF"
@@ -781,6 +911,7 @@ Mettre à jour les paramètres.
 ```
 
 ### DELETE /api/parametres/:id (admin)
+
 Supprimer des paramètres.
 
 ---
@@ -788,45 +919,49 @@ Supprimer des paramètres.
 ## 🔗 Webhooks
 
 ### GET /api/webhooks
+
 Lister ses webhooks.
 
 ### POST /api/webhooks
+
 Créer un webhook.
 
 **Body:**
+
 ```json
 {
   "nom": "Notification Slack",
   "url": "https://hooks.slack.com/services/...",
   "methode": "POST",
-  "headers": {"Content-Type": "application/json"},
+  "headers": { "Content-Type": "application/json" },
   "secret": "mon_secret_hmac",
-  "evenements": [
-    "ticket_cree",
-    "mission_terminee",
-    "facture_payee"
-  ],
+  "evenements": ["ticket_cree", "mission_terminee", "facture_payee"],
   "retry_max": 3,
   "timeout_secondes": 30
 }
 ```
 
 **Événements disponibles:**
+
 - ticket_cree, ticket_diffuse, ticket_accepte, ticket_cloture
 - mission_creee, mission_planifiee, mission_en_cours, mission_terminee
 - facture_creee, facture_payee
 - message_recu, notification_urgente
 
 ### GET /api/webhooks/:id
+
 Détails d'un webhook.
 
 ### PUT /api/webhooks/:id
+
 Modifier un webhook.
 
 ### DELETE /api/webhooks/:id
+
 Supprimer un webhook.
 
 ### POST /api/webhooks/:id/test
+
 Tester un webhook.
 
 ---
@@ -834,22 +969,27 @@ Tester un webhook.
 ## 📜 Logs d'Activité
 
 ### GET /api/logs
+
 Lister les logs (ses logs ou tous si admin).
 
 **Query params:** `?action=login&statut=error&date_debut=2024-12-01&limit=100&page=1`
 
 ### GET /api/logs/:id
+
 Détails d'un log.
 
 ### GET /api/logs/stats (admin)
+
 Statistiques d'activité.
 
 **Query params:** `?periode=7` (derniers X jours)
 
 ### DELETE /api/logs/cleanup (admin)
+
 Nettoyer les anciens logs.
 
 **Body:**
+
 ```json
 {
   "jours_retention": 90
@@ -857,6 +997,7 @@ Nettoyer les anciens logs.
 ```
 
 ### GET /api/logs/export (admin)
+
 Exporter les logs en CSV.
 
 ---
@@ -864,37 +1005,43 @@ Exporter les logs en CSV.
 ## 🔒 Sécurité
 
 ### Authentification
+
 Toutes les routes (sauf `/auth/*`) nécessitent un token JWT valide.
 
 ### Row Level Security (RLS)
+
 Politiques PostgreSQL garantissent l'isolation des données:
+
 - Régie voit uniquement ses immeubles/logements/locataires
 - Entreprise voit uniquement ses missions/techniciens
 - Locataire voit uniquement ses tickets
 - Admin voit tout
 
 ### Webhooks HMAC
+
 Signature des payloads webhook avec `X-Webhook-Signature` (SHA-256).
 
 ### Logs d'audit
+
 Toutes les actions importantes sont enregistrées dans `logs_activite`.
 
 ---
 
 ## 📦 Codes d'erreur
 
-| Code | Description |
-|------|-------------|
-| 200  | Succès |
-| 201  | Ressource créée |
-| 400  | Requête invalide |
-| 401  | Non authentifié |
-| 403  | Accès refusé |
-| 404  | Ressource non trouvée |
+| Code | Description                      |
+| ---- | -------------------------------- |
+| 200  | Succès                           |
+| 201  | Ressource créée                  |
+| 400  | Requête invalide                 |
+| 401  | Non authentifié                  |
+| 403  | Accès refusé                     |
+| 404  | Ressource non trouvée            |
 | 409  | Conflit (ex: email déjà utilisé) |
-| 500  | Erreur serveur |
+| 500  | Erreur serveur                   |
 
 **Format erreur:**
+
 ```json
 {
   "error": "Description de l'erreur"
@@ -906,6 +1053,7 @@ Toutes les actions importantes sont enregistrées dans `logs_activite`.
 ## 🚀 Exemples d'intégration
 
 ### Créer un ticket complet
+
 ```bash
 # 1. Login
 curl -X POST http://localhost:3000/api/auth/login \
@@ -933,6 +1081,7 @@ curl -X PUT http://localhost:3000/api/tickets/{id}/diffuse \
 ```
 
 ### Suivre une mission (entreprise)
+
 ```bash
 # 1. Accepter le ticket
 curl -X POST http://localhost:3000/api/missions/accept-ticket \

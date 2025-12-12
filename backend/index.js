@@ -4,23 +4,145 @@ import { register } from "./auth/register.js";
 import { login } from "./auth/login.js";
 import { authenticateUser, getProfile, updateProfile } from "./profile.js";
 import { createRegie, getRegie, updateRegie, listRegies } from "./regies.js";
-import { createEntreprise, getEntreprise, updateEntreprise, listEntreprises } from "./entreprises.js";
-import { createImmeuble, getImmeuble, updateImmeuble, deleteImmeuble, listImmeubles } from "./immeubles.js";
-import { createLogement, getLogement, updateLogement, deleteLogement, listLogements } from "./logements.js";
-import { createLocataire, getLocataire, updateLocataire, deleteLocataire, listLocataires } from "./locataires.js";
-import { createTicket, getTicket, updateTicket, deleteTicket, listTickets, diffuseTicket } from "./tickets.js";
-import { acceptTicket, getMission, updateMission, deleteMission, listMissions, assignTechnicien } from "./missions.js";
-import { createTechnicien, getTechnicien, updateTechnicien, deleteTechnicien, listTechniciens, getTechnicienMissions } from "./techniciens.js";
-import { startIntervention, pauseIntervention, reportDelay, completeIntervention, addSignature, getPhotoUploadUrl, getInterventionPhotos } from "./interventions.js";
-import { createFacture, getFacture, updateFacture, deleteFacture, listFactures, markFacturePaid } from "./factures.js";
-import { sendMessage, getConversation, markAsRead, markConversationAsRead, listConversations, getContextMessages, getUnreadCount, deleteMessage } from "./messages.js";
-import { listNotifications, getNotification, markAsRead as markNotificationAsRead, markAllAsRead, archiveNotification, getUnreadCount as getNotificationUnreadCount, deleteNotification, createNotification } from "./notifications.js";
-import { listPlans, getPlan, createPlan, updatePlan, createSubscription, getCurrentSubscription, changePlan, cancelSubscription, checkLimit } from "./subscriptions.js";
-import { getGlobalStats, getSubscriptionsByPlan, getTicketsStats, getMissionsStats, getFacturesStats, getTopRegies, getTopEntreprises, getEvolutionMensuelle, getExpiringSubscriptions, listAllRegies, listAllEntreprises, listAllUsers, toggleSubscription } from "./admin.js";
-import { getPreferences, upsertPreferences, resetPreferences } from "./preferences.js";
-import { getParametres, upsertParametres, deleteParametres } from "./parametres.js";
-import { listWebhooks, createWebhook, getWebhook, updateWebhook, deleteWebhook, testWebhook } from "./webhooks.js";
-import { listLogs, getLog, getLogsStats, cleanupLogs, exportLogs } from "./logs.js";
+import {
+  createEntreprise,
+  getEntreprise,
+  updateEntreprise,
+  listEntreprises,
+} from "./entreprises.js";
+import {
+  createImmeuble,
+  getImmeuble,
+  updateImmeuble,
+  deleteImmeuble,
+  listImmeubles,
+} from "./immeubles.js";
+import {
+  createLogement,
+  getLogement,
+  updateLogement,
+  deleteLogement,
+  listLogements,
+} from "./logements.js";
+import {
+  createLocataire,
+  getLocataire,
+  updateLocataire,
+  deleteLocataire,
+  listLocataires,
+} from "./locataires.js";
+import {
+  createTicket,
+  getTicket,
+  updateTicket,
+  deleteTicket,
+  listTickets,
+  diffuseTicket,
+} from "./tickets.js";
+import {
+  acceptTicket,
+  getMission,
+  updateMission,
+  deleteMission,
+  listMissions,
+  assignTechnicien,
+} from "./missions.js";
+import {
+  createTechnicien,
+  getTechnicien,
+  updateTechnicien,
+  deleteTechnicien,
+  listTechniciens,
+  getTechnicienMissions,
+} from "./techniciens.js";
+import {
+  startIntervention,
+  pauseIntervention,
+  reportDelay,
+  completeIntervention,
+  addSignature,
+  getPhotoUploadUrl,
+  getInterventionPhotos,
+} from "./interventions.js";
+import {
+  createFacture,
+  getFacture,
+  updateFacture,
+  deleteFacture,
+  listFactures,
+  markFacturePaid,
+} from "./factures.js";
+import {
+  sendMessage,
+  getConversation,
+  markAsRead,
+  markConversationAsRead,
+  listConversations,
+  getContextMessages,
+  getUnreadCount,
+  deleteMessage,
+} from "./messages.js";
+import {
+  listNotifications,
+  getNotification,
+  markAsRead as markNotificationAsRead,
+  markAllAsRead,
+  archiveNotification,
+  getUnreadCount as getNotificationUnreadCount,
+  deleteNotification,
+  createNotification,
+} from "./notifications.js";
+import {
+  listPlans,
+  getPlan,
+  createPlan,
+  updatePlan,
+  createSubscription,
+  getCurrentSubscription,
+  changePlan,
+  cancelSubscription,
+  checkLimit,
+} from "./subscriptions.js";
+import {
+  getGlobalStats,
+  getSubscriptionsByPlan,
+  getTicketsStats,
+  getMissionsStats,
+  getFacturesStats,
+  getTopRegies,
+  getTopEntreprises,
+  getEvolutionMensuelle,
+  getExpiringSubscriptions,
+  listAllRegies,
+  listAllEntreprises,
+  listAllUsers,
+  toggleSubscription,
+} from "./admin.js";
+import {
+  getPreferences,
+  upsertPreferences,
+  resetPreferences,
+} from "./preferences.js";
+import {
+  getParametres,
+  upsertParametres,
+  deleteParametres,
+} from "./parametres.js";
+import {
+  listWebhooks,
+  createWebhook,
+  getWebhook,
+  updateWebhook,
+  deleteWebhook,
+  testWebhook,
+} from "./webhooks.js";
+import {
+  listLogs,
+  getLog,
+  getLogsStats,
+  cleanupLogs,
+  exportLogs,
+} from "./logs.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,7 +166,7 @@ app.get("/api/health", async (req, res) => {
       .from("profiles")
       .select("count")
       .limit(1);
-    
+
     if (error) throw error;
 
     res.json({
@@ -211,7 +333,11 @@ app.put("/api/missions/:id", authenticateUser, updateMission);
 app.delete("/api/missions/:id", authenticateUser, deleteMission);
 
 // Assigner un technicien à une mission
-app.put("/api/missions/:id/assign-technicien", authenticateUser, assignTechnicien);
+app.put(
+  "/api/missions/:id/assign-technicien",
+  authenticateUser,
+  assignTechnicien
+);
 
 // ============================================================================
 // ROUTES TECHNICIENS (Étape 8)
@@ -233,7 +359,11 @@ app.put("/api/techniciens/:id", authenticateUser, updateTechnicien);
 app.delete("/api/techniciens/:id", authenticateUser, deleteTechnicien);
 
 // Récupérer les missions d'un technicien
-app.get("/api/techniciens/:id/missions", authenticateUser, getTechnicienMissions);
+app.get(
+  "/api/techniciens/:id/missions",
+  authenticateUser,
+  getTechnicienMissions
+);
 
 // ============================================================================
 // ROUTES INTERVENTIONS (Étape 9)
@@ -249,16 +379,28 @@ app.put("/api/interventions/:id/pause", authenticateUser, pauseIntervention);
 app.put("/api/interventions/:id/report-delay", authenticateUser, reportDelay);
 
 // Terminer une intervention avec rapport
-app.put("/api/interventions/:id/complete", authenticateUser, completeIntervention);
+app.put(
+  "/api/interventions/:id/complete",
+  authenticateUser,
+  completeIntervention
+);
 
 // Ajouter une signature
 app.put("/api/interventions/:id/add-signature", authenticateUser, addSignature);
 
 // Générer URL pour upload photo
-app.post("/api/interventions/:id/upload-photo", authenticateUser, getPhotoUploadUrl);
+app.post(
+  "/api/interventions/:id/upload-photo",
+  authenticateUser,
+  getPhotoUploadUrl
+);
 
 // Récupérer les photos d'une intervention
-app.get("/api/interventions/:id/photos", authenticateUser, getInterventionPhotos);
+app.get(
+  "/api/interventions/:id/photos",
+  authenticateUser,
+  getInterventionPhotos
+);
 
 // ============================================================================
 // ROUTES FACTURES (Étape 10)
@@ -293,16 +435,28 @@ app.post("/api/messages", authenticateUser, sendMessage);
 app.get("/api/messages/conversations", authenticateUser, listConversations);
 
 // Récupérer une conversation avec un utilisateur
-app.get("/api/messages/conversation/:userId", authenticateUser, getConversation);
+app.get(
+  "/api/messages/conversation/:userId",
+  authenticateUser,
+  getConversation
+);
 
 // Marquer un message comme lu
 app.put("/api/messages/:id/read", authenticateUser, markAsRead);
 
 // Marquer tous les messages d'une conversation comme lus
-app.put("/api/messages/conversation/:userId/read-all", authenticateUser, markConversationAsRead);
+app.put(
+  "/api/messages/conversation/:userId/read-all",
+  authenticateUser,
+  markConversationAsRead
+);
 
 // Récupérer les messages liés à un contexte (ticket/mission/facture)
-app.get("/api/messages/context/:type/:id", authenticateUser, getContextMessages);
+app.get(
+  "/api/messages/context/:type/:id",
+  authenticateUser,
+  getContextMessages
+);
 
 // Compter les messages non lus
 app.get("/api/messages/unread-count", authenticateUser, getUnreadCount);
@@ -321,16 +475,28 @@ app.get("/api/notifications", authenticateUser, listNotifications);
 app.get("/api/notifications/:id", authenticateUser, getNotification);
 
 // Marquer une notification comme lue
-app.put("/api/notifications/:id/read", authenticateUser, markNotificationAsRead);
+app.put(
+  "/api/notifications/:id/read",
+  authenticateUser,
+  markNotificationAsRead
+);
 
 // Marquer toutes les notifications comme lues
 app.put("/api/notifications/read-all", authenticateUser, markAllAsRead);
 
 // Archiver une notification
-app.put("/api/notifications/:id/archive", authenticateUser, archiveNotification);
+app.put(
+  "/api/notifications/:id/archive",
+  authenticateUser,
+  archiveNotification
+);
 
 // Compter les notifications non lues
-app.get("/api/notifications/unread-count", authenticateUser, getNotificationUnreadCount);
+app.get(
+  "/api/notifications/unread-count",
+  authenticateUser,
+  getNotificationUnreadCount
+);
 
 // Supprimer une notification archivée
 app.delete("/api/notifications/:id", authenticateUser, deleteNotification);
@@ -367,7 +533,11 @@ app.put("/api/subscriptions/:id/change-plan", authenticateUser, changePlan);
 app.put("/api/subscriptions/:id/cancel", authenticateUser, cancelSubscription);
 
 // Vérifier les limites du plan
-app.get("/api/subscriptions/check-limit/:limit_type", authenticateUser, checkLimit);
+app.get(
+  "/api/subscriptions/check-limit/:limit_type",
+  authenticateUser,
+  checkLimit
+);
 
 // ============================================================================
 // ROUTES ADMIN DASHBOARD (Étape 14)
@@ -377,7 +547,11 @@ app.get("/api/subscriptions/check-limit/:limit_type", authenticateUser, checkLim
 app.get("/api/admin/stats", authenticateUser, getGlobalStats);
 
 // Statistiques abonnements par plan
-app.get("/api/admin/stats/subscriptions-by-plan", authenticateUser, getSubscriptionsByPlan);
+app.get(
+  "/api/admin/stats/subscriptions-by-plan",
+  authenticateUser,
+  getSubscriptionsByPlan
+);
 
 // Statistiques tickets
 app.get("/api/admin/stats/tickets", authenticateUser, getTicketsStats);
@@ -398,7 +572,11 @@ app.get("/api/admin/top/entreprises", authenticateUser, getTopEntreprises);
 app.get("/api/admin/stats/evolution", authenticateUser, getEvolutionMensuelle);
 
 // Abonnements expirant
-app.get("/api/admin/subscriptions/expiring", authenticateUser, getExpiringSubscriptions);
+app.get(
+  "/api/admin/subscriptions/expiring",
+  authenticateUser,
+  getExpiringSubscriptions
+);
 
 // Liste régies (pagination)
 app.get("/api/admin/regies", authenticateUser, listAllRegies);
@@ -410,7 +588,11 @@ app.get("/api/admin/entreprises", authenticateUser, listAllEntreprises);
 app.get("/api/admin/users", authenticateUser, listAllUsers);
 
 // Suspendre/Activer abonnement
-app.put("/api/admin/subscriptions/:id/toggle", authenticateUser, toggleSubscription);
+app.put(
+  "/api/admin/subscriptions/:id/toggle",
+  authenticateUser,
+  toggleSubscription
+);
 
 // ============================================================================
 // ROUTES PRÉFÉRENCES UTILISATEUR (Étape 15)

@@ -4,7 +4,7 @@ import { authenticateUser } from "./profile.js";
 /**
  * POST /api/logements
  * Création d'un nouveau logement
- * 
+ *
  * Body attendu :
  * {
  *   immeuble_id: uuid (obligatoire),
@@ -26,7 +26,7 @@ export async function createLogement(req, res) {
       superficie_m2,
       nombre_pieces,
       type_logement,
-      statut = 'vacant',
+      statut = "vacant",
       is_demo = false,
     } = req.body;
 
@@ -40,7 +40,7 @@ export async function createLogement(req, res) {
     const userProfile = req.profile;
 
     // Vérification du rôle
-    if (userProfile.role !== 'regie' && userProfile.role !== 'admin_jtec') {
+    if (userProfile.role !== "regie" && userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Vous n'avez pas les droits pour créer un logement",
       });
@@ -61,7 +61,7 @@ export async function createLogement(req, res) {
 
     // Vérifier les droits sur l'immeuble
     if (
-      userProfile.role === 'regie' &&
+      userProfile.role === "regie" &&
       userProfile.regie_id !== immeubleData.regie_id
     ) {
       return res.status(403).json({
@@ -87,14 +87,14 @@ export async function createLogement(req, res) {
 
     if (logementError) {
       console.error("Erreur création logement:", logementError);
-      
+
       // Gestion de l'erreur d'unicité
-      if (logementError.code === '23505') {
+      if (logementError.code === "23505") {
         return res.status(400).json({
           error: "Un logement avec ce numéro existe déjà dans cet immeuble",
         });
       }
-      
+
       return res.status(500).json({
         error: "Erreur lors de la création du logement",
         details: logementError.message,
@@ -105,7 +105,6 @@ export async function createLogement(req, res) {
       message: "Logement créé avec succès",
       logement: logementData,
     });
-
   } catch (error) {
     console.error("Erreur serveur lors de la création du logement:", error);
     return res.status(500).json({
@@ -129,7 +128,8 @@ export async function listLogements(req, res) {
 
     let query = supabaseServer
       .from("logements")
-      .select(`
+      .select(
+        `
         *,
         immeubles:immeuble_id (
           id,
@@ -139,7 +139,8 @@ export async function listLogements(req, res) {
           ville,
           regie_id
         )
-      `)
+      `
+      )
       .order("created_at", { ascending: false });
 
     // Filtres
@@ -161,11 +162,11 @@ export async function listLogements(req, res) {
 
     // Filtrer selon le rôle (si pas d'immeuble_id spécifié)
     let filteredLogements = logementsData;
-    if (userProfile.role === 'regie' && !immeuble_id) {
+    if (userProfile.role === "regie" && !immeuble_id) {
       filteredLogements = logementsData.filter(
-        logement => logement.immeubles?.regie_id === userProfile.regie_id
+        (logement) => logement.immeubles?.regie_id === userProfile.regie_id
       );
-    } else if (userProfile.role !== 'admin_jtec' && !immeuble_id) {
+    } else if (userProfile.role !== "admin_jtec" && !immeuble_id) {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -175,7 +176,6 @@ export async function listLogements(req, res) {
       logements: filteredLogements,
       total: filteredLogements.length,
     });
-
   } catch (error) {
     console.error("Erreur lors de la récupération des logements:", error);
     return res.status(500).json({
@@ -196,7 +196,8 @@ export async function getLogement(req, res) {
     // Récupération du logement avec l'immeuble
     const { data: logementData, error: logementError } = await supabaseServer
       .from("logements")
-      .select(`
+      .select(
+        `
         *,
         immeubles:immeuble_id (
           id,
@@ -206,7 +207,8 @@ export async function getLogement(req, res) {
           ville,
           regie_id
         )
-      `)
+      `
+      )
       .eq("id", id)
       .single();
 
@@ -218,7 +220,7 @@ export async function getLogement(req, res) {
 
     // Vérification des droits d'accès
     if (
-      userProfile.role !== 'admin_jtec' &&
+      userProfile.role !== "admin_jtec" &&
       userProfile.regie_id !== logementData.immeubles?.regie_id
     ) {
       return res.status(403).json({
@@ -229,7 +231,6 @@ export async function getLogement(req, res) {
     return res.status(200).json({
       logement: logementData,
     });
-
   } catch (error) {
     console.error("Erreur lors de la récupération du logement:", error);
     return res.status(500).json({
@@ -250,10 +251,12 @@ export async function updateLogement(req, res) {
     // Vérifier que le logement existe
     const { data: existingLogement, error: fetchError } = await supabaseServer
       .from("logements")
-      .select(`
+      .select(
+        `
         *,
         immeubles:immeuble_id (regie_id)
-      `)
+      `
+      )
       .eq("id", id)
       .single();
 
@@ -265,7 +268,7 @@ export async function updateLogement(req, res) {
 
     // Vérification des droits
     if (
-      userProfile.role !== 'admin_jtec' &&
+      userProfile.role !== "admin_jtec" &&
       userProfile.regie_id !== existingLogement.immeubles?.regie_id
     ) {
       return res.status(403).json({
@@ -307,14 +310,14 @@ export async function updateLogement(req, res) {
 
     if (updateError) {
       console.error("Erreur mise à jour logement:", updateError);
-      
+
       // Gestion de l'erreur d'unicité
-      if (updateError.code === '23505') {
+      if (updateError.code === "23505") {
         return res.status(400).json({
           error: "Un logement avec ce numéro existe déjà dans cet immeuble",
         });
       }
-      
+
       return res.status(500).json({
         error: "Erreur lors de la mise à jour du logement",
         details: updateError.message,
@@ -325,7 +328,6 @@ export async function updateLogement(req, res) {
       message: "Logement mis à jour avec succès",
       logement: updatedLogement,
     });
-
   } catch (error) {
     console.error("Erreur lors de la mise à jour du logement:", error);
     return res.status(500).json({
@@ -346,10 +348,12 @@ export async function deleteLogement(req, res) {
     // Vérifier que le logement existe
     const { data: existingLogement, error: fetchError } = await supabaseServer
       .from("logements")
-      .select(`
+      .select(
+        `
         *,
         immeubles:immeuble_id (regie_id)
-      `)
+      `
+      )
       .eq("id", id)
       .single();
 
@@ -361,7 +365,7 @@ export async function deleteLogement(req, res) {
 
     // Vérification des droits
     if (
-      userProfile.role !== 'admin_jtec' &&
+      userProfile.role !== "admin_jtec" &&
       userProfile.regie_id !== existingLogement.immeubles?.regie_id
     ) {
       return res.status(403).json({
@@ -386,7 +390,6 @@ export async function deleteLogement(req, res) {
     return res.status(200).json({
       message: "Logement supprimé avec succès",
     });
-
   } catch (error) {
     console.error("Erreur lors de la suppression du logement:", error);
     return res.status(500).json({

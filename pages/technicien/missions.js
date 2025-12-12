@@ -39,38 +39,60 @@ export default function TechnicienMissions() {
     <Layout>
       <Card>
         <h1 className="page-title">⚙️ Mes missions</h1>
-        
+
         {loading ? (
           <p style={{ textAlign: "center", padding: "2rem" }}>Chargement...</p>
         ) : (
           <div>
             {missions.length === 0 ? (
-              <p style={{ textAlign: "center", padding: "2rem", opacity: 0.6 }}>Aucune mission assignée</p>
+              <p style={{ textAlign: "center", padding: "2rem", opacity: 0.6 }}>
+                Aucune mission assignée
+              </p>
             ) : (
               <div style={{ display: "grid", gap: "1rem" }}>
                 {missions.map((mission) => (
                   <Card key={mission.id} className="hover-glow">
                     <div style={{ marginBottom: "1rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: "0.75rem" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "start",
+                          marginBottom: "0.75rem",
+                        }}
+                      >
                         <div>
-                          <h3 style={{ margin: "0 0 0.5rem 0", color: "var(--primary)" }}>
+                          <h3
+                            style={{
+                              margin: "0 0 0.5rem 0",
+                              color: "var(--primary)",
+                            }}
+                          >
                             ⚙️ Mission #{mission.id}
                           </h3>
                           <StatusBadge status={mission.statut} />
                         </div>
                         <span style={{ fontSize: "1.5rem" }}>👤</span>
                       </div>
-                      
-                      <div style={{ marginTop: "1rem", fontSize: "0.95rem", color: "var(--text)" }}>
+
+                      <div
+                        style={{
+                          marginTop: "1rem",
+                          fontSize: "0.95rem",
+                          color: "var(--text)",
+                        }}
+                      >
                         <p style={{ margin: "0.25rem 0" }}>
-                          <strong>👤 Locataire :</strong> {mission.locataire_nom || "Non défini"}
+                          <strong>👤 Locataire :</strong>{" "}
+                          {mission.locataire_nom || "Non défini"}
                         </p>
                         <p style={{ margin: "0.25rem 0" }}>
-                          <strong>📍 Adresse :</strong> {mission.adresse || "Non définie"}
+                          <strong>📍 Adresse :</strong>{" "}
+                          {mission.adresse || "Non définie"}
                         </p>
                       </div>
                     </div>
-                    
+
                     <Button style={{ width: "100%" }}>Voir les détails</Button>
                   </Card>
                 ))}

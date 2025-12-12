@@ -3,7 +3,7 @@ import { supabaseServer } from "../_supabase.js";
 /**
  * POST /api/auth/register
  * Inscription d'un nouvel utilisateur
- * 
+ *
  * Body attendu :
  * {
  *   email: string,
@@ -42,32 +42,39 @@ export async function register(req, res) {
     }
 
     // Validation du rôle
-    const validRoles = ['locataire', 'regie', 'entreprise', 'technicien', 'admin_jtec'];
+    const validRoles = [
+      "locataire",
+      "regie",
+      "entreprise",
+      "technicien",
+      "admin_jtec",
+    ];
     if (!validRoles.includes(role)) {
       return res.status(400).json({
-        error: `Rôle invalide. Valeurs autorisées : ${validRoles.join(', ')}`,
+        error: `Rôle invalide. Valeurs autorisées : ${validRoles.join(", ")}`,
       });
     }
 
     // Validation des liaisons selon le rôle
-    if ((role === 'locataire' || role === 'regie') && !regie_id) {
+    if ((role === "locataire" || role === "regie") && !regie_id) {
       return res.status(400).json({
         error: `Le champ regie_id est obligatoire pour le rôle ${role}`,
       });
     }
 
-    if ((role === 'entreprise' || role === 'technicien') && !entreprise_id) {
+    if ((role === "entreprise" || role === "technicien") && !entreprise_id) {
       return res.status(400).json({
         error: `Le champ entreprise_id est obligatoire pour le rôle ${role}`,
       });
     }
 
     // Création de l'utilisateur dans Supabase Auth
-    const { data: authData, error: authError } = await supabaseServer.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true, // Auto-confirm l'email en mode DEMO
-    });
+    const { data: authData, error: authError } =
+      await supabaseServer.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true, // Auto-confirm l'email en mode DEMO
+      });
 
     if (authError) {
       console.error("Erreur création utilisateur Auth:", authError);
@@ -89,8 +96,9 @@ export async function register(req, res) {
         adresse,
         code_postal,
         ville,
-        regie_id: role === 'locataire' || role === 'regie' ? regie_id : null,
-        entreprise_id: role === 'entreprise' || role === 'technicien' ? entreprise_id : null,
+        regie_id: role === "locataire" || role === "regie" ? regie_id : null,
+        entreprise_id:
+          role === "entreprise" || role === "technicien" ? entreprise_id : null,
         is_demo,
       })
       .select()
@@ -98,10 +106,10 @@ export async function register(req, res) {
 
     if (profileError) {
       console.error("Erreur création profil:", profileError);
-      
+
       // Rollback : supprimer l'utilisateur Auth créé
       await supabaseServer.auth.admin.deleteUser(authData.user.id);
-      
+
       return res.status(500).json({
         error: "Erreur lors de la création du profil",
         details: profileError.message,
@@ -119,7 +127,6 @@ export async function register(req, res) {
         prenom: profileData.prenom,
       },
     });
-
   } catch (error) {
     console.error("Erreur serveur lors de l'inscription:", error);
     return res.status(500).json({

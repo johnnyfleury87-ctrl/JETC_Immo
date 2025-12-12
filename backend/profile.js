@@ -18,7 +18,8 @@ export async function authenticateUser(req, res, next) {
     const token = authHeader.substring(7); // Enlever "Bearer "
 
     // Vérifier le token avec Supabase
-    const { data: userData, error: userError } = await supabaseServer.auth.getUser(token);
+    const { data: userData, error: userError } =
+      await supabaseServer.auth.getUser(token);
 
     if (userError || !userData.user) {
       return res.status(401).json({
@@ -44,7 +45,6 @@ export async function authenticateUser(req, res, next) {
     req.profile = profileData;
 
     next();
-
   } catch (error) {
     console.error("Erreur middleware d'authentification:", error);
     return res.status(500).json({
@@ -80,7 +80,6 @@ export async function getProfile(req, res) {
         updated_at: profile.updated_at,
       },
     });
-
   } catch (error) {
     console.error("Erreur lors de la récupération du profil:", error);
     return res.status(500).json({
@@ -92,7 +91,7 @@ export async function getProfile(req, res) {
 /**
  * PUT /api/profile
  * Met à jour le profil de l'utilisateur connecté
- * 
+ *
  * Body attendu :
  * {
  *   nom?: string,
@@ -102,7 +101,7 @@ export async function getProfile(req, res) {
  *   code_postal?: string,
  *   ville?: string
  * }
- * 
+ *
  * Note : On ne peut PAS modifier :
  * - role
  * - regie_id
@@ -112,14 +111,7 @@ export async function getProfile(req, res) {
 export async function updateProfile(req, res) {
   try {
     const userId = req.user.id;
-    const {
-      nom,
-      prenom,
-      telephone,
-      adresse,
-      code_postal,
-      ville,
-    } = req.body;
+    const { nom, prenom, telephone, adresse, code_postal, ville } = req.body;
 
     // Construire l'objet de mise à jour (uniquement les champs fournis)
     const updates = {};
@@ -170,7 +162,6 @@ export async function updateProfile(req, res) {
         is_demo: updatedProfile.is_demo,
       },
     });
-
   } catch (error) {
     console.error("Erreur lors de la mise à jour du profil:", error);
     return res.status(500).json({

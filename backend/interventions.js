@@ -11,7 +11,11 @@ export async function startIntervention(req, res) {
     const userProfile = req.profile;
 
     // Seuls les techniciens et entreprises peuvent démarrer une intervention
-    if (userProfile.role !== 'technicien' && userProfile.role !== 'entreprise' && userProfile.role !== 'admin_jtec') {
+    if (
+      userProfile.role !== "technicien" &&
+      userProfile.role !== "entreprise" &&
+      userProfile.role !== "admin_jtec"
+    ) {
       return res.status(403).json({
         error: "Seuls les techniciens peuvent démarrer une intervention",
       });
@@ -31,13 +35,16 @@ export async function startIntervention(req, res) {
     }
 
     // Vérifier les droits
-    if (userProfile.role === 'technicien') {
-      if (mission.technicien_id !== userProfile.id && mission.entreprise_id !== userProfile.entreprise_id) {
+    if (userProfile.role === "technicien") {
+      if (
+        mission.technicien_id !== userProfile.id &&
+        mission.entreprise_id !== userProfile.entreprise_id
+      ) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role === 'entreprise') {
+    } else if (userProfile.role === "entreprise") {
       if (mission.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
           error: "Accès refusé",
@@ -46,7 +53,7 @@ export async function startIntervention(req, res) {
     }
 
     // Vérifier le statut
-    if (!['planifiée', 'en_route', 'en_pause'].includes(mission.statut)) {
+    if (!["planifiée", "en_route", "en_pause"].includes(mission.statut)) {
       return res.status(400).json({
         error: `Impossible de démarrer une intervention avec le statut "${mission.statut}"`,
       });
@@ -54,7 +61,7 @@ export async function startIntervention(req, res) {
 
     // Mettre à jour la mission
     const updateData = {
-      statut: 'en_cours',
+      statut: "en_cours",
     };
 
     // Si c'est le premier démarrage, enregistrer la date
@@ -80,7 +87,7 @@ export async function startIntervention(req, res) {
     // Mettre à jour le statut du ticket
     await supabaseServer
       .from("tickets")
-      .update({ statut: 'en_cours' })
+      .update({ statut: "en_cours" })
       .eq("id", mission.ticket_id);
 
     res.json({
@@ -120,26 +127,29 @@ export async function pauseIntervention(req, res) {
     }
 
     // Vérifier les droits
-    if (userProfile.role === 'technicien') {
-      if (mission.technicien_id !== userProfile.id && mission.entreprise_id !== userProfile.entreprise_id) {
+    if (userProfile.role === "technicien") {
+      if (
+        mission.technicien_id !== userProfile.id &&
+        mission.entreprise_id !== userProfile.entreprise_id
+      ) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role === 'entreprise') {
+    } else if (userProfile.role === "entreprise") {
       if (mission.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Accès refusé",
       });
     }
 
     // Vérifier le statut
-    if (mission.statut !== 'en_cours') {
+    if (mission.statut !== "en_cours") {
       return res.status(400).json({
         error: "Seule une intervention en cours peut être mise en pause",
       });
@@ -149,8 +159,10 @@ export async function pauseIntervention(req, res) {
     const { data: updatedMission, error: updateError } = await supabaseServer
       .from("missions")
       .update({
-        statut: 'en_pause',
-        notes_internes: motif ? `${mission.notes_internes || ''}\n[Pause] ${motif}` : mission.notes_internes,
+        statut: "en_pause",
+        notes_internes: motif
+          ? `${mission.notes_internes || ""}\n[Pause] ${motif}`
+          : mission.notes_internes,
       })
       .eq("id", id)
       .select()
@@ -180,7 +192,7 @@ export async function pauseIntervention(req, res) {
 /**
  * PUT /api/interventions/:id/report-delay
  * Signaler un retard
- * 
+ *
  * Body attendu :
  * {
  *   motif_retard: string,
@@ -213,19 +225,22 @@ export async function reportDelay(req, res) {
     }
 
     // Vérifier les droits
-    if (userProfile.role === 'technicien') {
-      if (mission.technicien_id !== userProfile.id && mission.entreprise_id !== userProfile.entreprise_id) {
+    if (userProfile.role === "technicien") {
+      if (
+        mission.technicien_id !== userProfile.id &&
+        mission.entreprise_id !== userProfile.entreprise_id
+      ) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role === 'entreprise') {
+    } else if (userProfile.role === "entreprise") {
       if (mission.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -235,7 +250,7 @@ export async function reportDelay(req, res) {
     const updateData = {
       est_en_retard: true,
       motif_retard,
-      statut: 'reportée',
+      statut: "reportée",
     };
 
     if (nouvelle_date_prevue) {
@@ -273,7 +288,7 @@ export async function reportDelay(req, res) {
 /**
  * PUT /api/interventions/:id/complete
  * Terminer une intervention avec rapport
- * 
+ *
  * Body attendu :
  * {
  *   rapport_intervention?: string,
@@ -315,26 +330,29 @@ export async function completeIntervention(req, res) {
     }
 
     // Vérifier les droits
-    if (userProfile.role === 'technicien') {
-      if (mission.technicien_id !== userProfile.id && mission.entreprise_id !== userProfile.entreprise_id) {
+    if (userProfile.role === "technicien") {
+      if (
+        mission.technicien_id !== userProfile.id &&
+        mission.entreprise_id !== userProfile.entreprise_id
+      ) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role === 'entreprise') {
+    } else if (userProfile.role === "entreprise") {
       if (mission.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Accès refusé",
       });
     }
 
     // Vérifier le statut
-    if (!['en_cours', 'en_pause'].includes(mission.statut)) {
+    if (!["en_cours", "en_pause"].includes(mission.statut)) {
       return res.status(400).json({
         error: `Impossible de terminer une intervention avec le statut "${mission.statut}"`,
       });
@@ -342,7 +360,7 @@ export async function completeIntervention(req, res) {
 
     // Mettre à jour la mission
     const updateData = {
-      statut: 'terminée',
+      statut: "terminée",
       rapport_intervention: rapport_intervention || travaux_realises,
       travaux_realises,
       materiel_utilise,
@@ -373,7 +391,7 @@ export async function completeIntervention(req, res) {
     await supabaseServer
       .from("tickets")
       .update({
-        statut: 'terminé',
+        statut: "terminé",
         date_cloture: new Date().toISOString(),
       })
       .eq("id", mission.ticket_id);
@@ -394,7 +412,7 @@ export async function completeIntervention(req, res) {
 /**
  * PUT /api/interventions/:id/add-signature
  * Ajouter une signature (client ou technicien)
- * 
+ *
  * Body attendu :
  * {
  *   type: 'client' | 'technicien',
@@ -413,7 +431,7 @@ export async function addSignature(req, res) {
       });
     }
 
-    if (!['client', 'technicien'].includes(type)) {
+    if (!["client", "technicien"].includes(type)) {
       return res.status(400).json({
         error: "Type doit être 'client' ou 'technicien'",
       });
@@ -433,40 +451,50 @@ export async function addSignature(req, res) {
     }
 
     // Vérifier les droits
-    if (type === 'technicien') {
-      if (userProfile.role === 'technicien') {
-        if (mission.technicien_id !== userProfile.id && mission.entreprise_id !== userProfile.entreprise_id) {
+    if (type === "technicien") {
+      if (userProfile.role === "technicien") {
+        if (
+          mission.technicien_id !== userProfile.id &&
+          mission.entreprise_id !== userProfile.entreprise_id
+        ) {
           return res.status(403).json({
             error: "Accès refusé",
           });
         }
-      } else if (userProfile.role === 'entreprise') {
+      } else if (userProfile.role === "entreprise") {
         if (mission.entreprise_id !== userProfile.entreprise_id) {
           return res.status(403).json({
             error: "Accès refusé",
           });
         }
-      } else if (userProfile.role !== 'admin_jtec') {
+      } else if (userProfile.role !== "admin_jtec") {
         return res.status(403).json({
-          error: "Seuls les techniciens et entreprises peuvent ajouter leur signature",
+          error:
+            "Seuls les techniciens et entreprises peuvent ajouter leur signature",
         });
       }
-    } else if (type === 'client') {
+    } else if (type === "client") {
       // Pour la signature client, on peut étendre pour permettre au locataire de signer
       // Pour l'instant, on autorise les techniciens/entreprises à uploader pour le client
-      if (userProfile.role === 'technicien') {
-        if (mission.technicien_id !== userProfile.id && mission.entreprise_id !== userProfile.entreprise_id) {
+      if (userProfile.role === "technicien") {
+        if (
+          mission.technicien_id !== userProfile.id &&
+          mission.entreprise_id !== userProfile.entreprise_id
+        ) {
           return res.status(403).json({
             error: "Accès refusé",
           });
         }
-      } else if (userProfile.role === 'entreprise') {
+      } else if (userProfile.role === "entreprise") {
         if (mission.entreprise_id !== userProfile.entreprise_id) {
           return res.status(403).json({
             error: "Accès refusé",
           });
         }
-      } else if (userProfile.role !== 'admin_jtec' && userProfile.role !== 'locataire') {
+      } else if (
+        userProfile.role !== "admin_jtec" &&
+        userProfile.role !== "locataire"
+      ) {
         return res.status(403).json({
           error: "Accès refusé",
         });
@@ -475,8 +503,8 @@ export async function addSignature(req, res) {
 
     // Mettre à jour la mission
     const updateData = {};
-    
-    if (type === 'client') {
+
+    if (type === "client") {
       updateData.signature_client_url = signature_url;
     } else {
       updateData.signature_technicien_url = signature_url;
@@ -484,8 +512,8 @@ export async function addSignature(req, res) {
 
     // Si les deux signatures sont présentes, enregistrer la date
     if (
-      (type === 'client' && mission.signature_technicien_url) ||
-      (type === 'technicien' && mission.signature_client_url)
+      (type === "client" && mission.signature_technicien_url) ||
+      (type === "technicien" && mission.signature_client_url)
     ) {
       updateData.date_signature = new Date().toISOString();
     }
@@ -523,7 +551,7 @@ export async function addSignature(req, res) {
  * Uploader une photo d'intervention
  * Note : Cette route retourne une URL signée pour l'upload
  * L'upload réel se fait ensuite directement vers Supabase Storage
- * 
+ *
  * Body attendu :
  * {
  *   filename: string
@@ -555,19 +583,22 @@ export async function getPhotoUploadUrl(req, res) {
     }
 
     // Vérifier les droits
-    if (userProfile.role === 'technicien') {
-      if (mission.technicien_id !== userProfile.id && mission.entreprise_id !== userProfile.entreprise_id) {
+    if (userProfile.role === "technicien") {
+      if (
+        mission.technicien_id !== userProfile.id &&
+        mission.entreprise_id !== userProfile.entreprise_id
+      ) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role === 'entreprise') {
+    } else if (userProfile.role === "entreprise") {
       if (mission.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -579,7 +610,7 @@ export async function getPhotoUploadUrl(req, res) {
 
     // Créer une URL signée pour l'upload (valide 1 heure)
     const { data, error } = await supabaseServer.storage
-      .from('photos-missions')
+      .from("photos-missions")
       .createSignedUploadUrl(filePath);
 
     if (error) {
@@ -617,13 +648,15 @@ export async function getInterventionPhotos(req, res) {
     // Récupérer la mission avec le ticket pour vérifier les droits
     const { data: mission, error: missionError } = await supabaseServer
       .from("missions")
-      .select(`
+      .select(
+        `
         *,
         tickets:ticket_id (
           regie_id,
           locataire_id
         )
-      `)
+      `
+      )
       .eq("id", id)
       .single();
 
@@ -635,13 +668,16 @@ export async function getInterventionPhotos(req, res) {
 
     // Vérifier les droits d'accès
     let hasAccess = false;
-    if (userProfile.role === 'admin_jtec') {
+    if (userProfile.role === "admin_jtec") {
       hasAccess = true;
-    } else if (userProfile.role === 'entreprise' || userProfile.role === 'technicien') {
+    } else if (
+      userProfile.role === "entreprise" ||
+      userProfile.role === "technicien"
+    ) {
       hasAccess = mission.entreprise_id === userProfile.entreprise_id;
-    } else if (userProfile.role === 'regie') {
+    } else if (userProfile.role === "regie") {
       hasAccess = mission.tickets.regie_id === userProfile.regie_id;
-    } else if (userProfile.role === 'locataire') {
+    } else if (userProfile.role === "locataire") {
       const { data: locataire } = await supabaseServer
         .from("locataires")
         .select("id")
@@ -658,10 +694,10 @@ export async function getInterventionPhotos(req, res) {
 
     // Lister les fichiers dans le dossier de la mission
     const { data: files, error: listError } = await supabaseServer.storage
-      .from('photos-missions')
+      .from("photos-missions")
       .list(id, {
         limit: 100,
-        sortBy: { column: 'created_at', order: 'desc' },
+        sortBy: { column: "created_at", order: "desc" },
       });
 
     if (listError) {
@@ -676,7 +712,7 @@ export async function getInterventionPhotos(req, res) {
     const photosWithUrls = await Promise.all(
       files.map(async (file) => {
         const { data: urlData } = await supabaseServer.storage
-          .from('photos-missions')
+          .from("photos-missions")
           .createSignedUrl(`${id}/${file.name}`, 3600);
 
         return {

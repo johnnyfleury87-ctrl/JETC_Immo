@@ -1,18 +1,18 @@
 /* Thème Zen - Minimaliste & Apaisant */
 body[data-theme="zen"] {
-  --primary: #607d8b;      /* Gris bleuté */
-  --secondary: #90a4ae;    /* Gris clair */
-  --background: #fafafa;   /* Blanc cassé */
-  --text: #455a64;         /* Gris foncé */
-  --accent: #b0bec5;       /* Bleu pastel */
+  --primary: #607d8b; /* Gris bleuté */
+  --secondary: #90a4ae; /* Gris clair */
+  --background: #fafafa; /* Blanc cassé */
+  --text: #455a64; /* Gris foncé */
+  --accent: #b0bec5; /* Bleu pastel */
   --shadow: 0 4px 12px rgba(96, 125, 139, 0.1);
-  
-  --blue: #2196F3;
-  --purple: #9C27B0;
-  --green: #4CAF50;
-  --orange: #FF9800;
-  --dark-green: #2E7D32;
-  --red: #F44336;
+
+  --blue: #2196f3;
+  --purple: #9c27b0;
+  --green: #4caf50;
+  --orange: #ff9800;
+  --dark-green: #2e7d32;
+  --red: #f44336;
 }
 
 /* Animations lentes et respirantes */

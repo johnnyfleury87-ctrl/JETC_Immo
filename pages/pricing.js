@@ -48,13 +48,15 @@ export default function PricingPage() {
 
   if (loading) {
     return (
-      <div style={{ 
-        minHeight: "100vh", 
-        display: "flex", 
-        alignItems: "center", 
-        justifyContent: "center",
-        background: "var(--background)" 
-      }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "var(--background)",
+        }}
+      >
         <Card>
           <p style={{ padding: "2rem" }}>Chargement des plans...</p>
         </Card>
@@ -63,22 +65,26 @@ export default function PricingPage() {
   }
 
   return (
-    <div style={{ 
-      minHeight: "100vh", 
-      background: "var(--background)",
-      color: "var(--text)"
-    }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "var(--background)",
+        color: "var(--text)",
+      }}
+    >
       {/* Header */}
-      <header style={{ 
-        padding: "1.5rem 2rem", 
-        background: "var(--primary)",
-        color: "white",
-        boxShadow: "var(--shadow)",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center"
-      }}>
-        <h1 
+      <header
+        style={{
+          padding: "1.5rem 2rem",
+          background: "var(--primary)",
+          color: "white",
+          boxShadow: "var(--shadow)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1
           style={{ margin: 0, fontSize: "1.5rem", cursor: "pointer" }}
           onClick={() => router.push("/")}
         >
@@ -87,13 +93,13 @@ export default function PricingPage() {
         <div style={{ display: "flex", gap: "1rem" }}>
           {!user ? (
             <>
-              <Button 
+              <Button
                 onClick={() => router.push("/login")}
                 style={{ background: "transparent", border: "2px solid white" }}
               >
                 🔐 Connexion
               </Button>
-              <Button 
+              <Button
                 onClick={() => router.push("/register")}
                 style={{ background: "white", color: "var(--primary)" }}
               >
@@ -101,7 +107,7 @@ export default function PricingPage() {
               </Button>
             </>
           ) : (
-            <Button 
+            <Button
               onClick={() => router.push(`/${user.role}/dashboard`)}
               style={{ background: "white", color: "var(--primary)" }}
             >
@@ -112,134 +118,205 @@ export default function PricingPage() {
       </header>
 
       {/* Hero Pricing */}
-      <section style={{ 
-        textAlign: "center", 
-        padding: "3rem 2rem",
-        background: "linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)",
-        color: "white"
-      }}>
+      <section
+        style={{
+          textAlign: "center",
+          padding: "3rem 2rem",
+          background:
+            "linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)",
+          color: "white",
+        }}
+      >
         <h1 style={{ fontSize: "2.5rem", margin: "0 0 1rem 0" }}>
           💰 Tarifs JETC IMMO
         </h1>
-        <p style={{ fontSize: "1.2rem", opacity: 0.95, maxWidth: "600px", margin: "0 auto" }}>
-          Choisissez le plan adapté à vos besoins. Commencez gratuitement en mode DEMO.
+        <p
+          style={{
+            fontSize: "1.2rem",
+            opacity: 0.95,
+            maxWidth: "600px",
+            margin: "0 auto",
+          }}
+        >
+          Choisissez le plan adapté à vos besoins. Commencez gratuitement en
+          mode DEMO.
         </p>
       </section>
 
       {/* Plans */}
-      <section style={{ 
-        padding: "4rem 2rem",
-        maxWidth: "1200px",
-        margin: "0 auto"
-      }}>
-        <div style={{ 
-          display: "grid", 
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "2rem"
-        }}>
+      <section
+        style={{
+          padding: "4rem 2rem",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "2rem",
+          }}
+        >
           {plans.map((plan) => {
             const isDemo = plan.nom_plan.toLowerCase().includes("demo");
             const isPro = plan.nom_plan.toLowerCase().includes("pro");
 
             return (
-              <Card 
+              <Card
                 key={plan.id}
                 className="hover-glow"
-                style={{ 
+                style={{
                   padding: "2rem",
                   textAlign: "center",
-                  border: isPro ? "3px solid var(--accent)" : "1px solid rgba(0,0,0,0.1)",
-                  position: "relative"
+                  border: isPro
+                    ? "3px solid var(--accent)"
+                    : "1px solid rgba(0,0,0,0.1)",
+                  position: "relative",
                 }}
               >
                 {isPro && (
-                  <div style={{
-                    position: "absolute",
-                    top: "-15px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    background: "var(--accent)",
-                    color: "white",
-                    padding: "0.25rem 1rem",
-                    borderRadius: "20px",
-                    fontSize: "0.85rem",
-                    fontWeight: "700"
-                  }}>
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "-15px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      background: "var(--accent)",
+                      color: "white",
+                      padding: "0.25rem 1rem",
+                      borderRadius: "20px",
+                      fontSize: "0.85rem",
+                      fontWeight: "700",
+                    }}
+                  >
                     ⭐ RECOMMANDÉ
                   </div>
                 )}
 
-                <h3 style={{ 
-                  fontSize: "1.8rem", 
-                  margin: "0 0 1rem 0",
-                  color: isDemo ? "var(--orange)" : "var(--primary)"
-                }}>
+                <h3
+                  style={{
+                    fontSize: "1.8rem",
+                    margin: "0 0 1rem 0",
+                    color: isDemo ? "var(--orange)" : "var(--primary)",
+                  }}
+                >
                   {plan.nom_plan}
                 </h3>
 
                 <div style={{ margin: "1.5rem 0" }}>
-                  <span style={{ 
-                    fontSize: "3rem", 
-                    fontWeight: "700",
-                    color: "var(--primary)"
-                  }}>
-                    {plan.prix_mensuel === 0 ? "Gratuit" : `${plan.prix_mensuel}€`}
+                  <span
+                    style={{
+                      fontSize: "3rem",
+                      fontWeight: "700",
+                      color: "var(--primary)",
+                    }}
+                  >
+                    {plan.prix_mensuel === 0
+                      ? "Gratuit"
+                      : `${plan.prix_mensuel}€`}
                   </span>
                   {plan.prix_mensuel > 0 && (
-                    <span style={{ fontSize: "1rem", opacity: 0.7 }}> / mois</span>
+                    <span style={{ fontSize: "1rem", opacity: 0.7 }}>
+                      {" "}
+                      / mois
+                    </span>
                   )}
                 </div>
 
-                <div style={{ 
-                  textAlign: "left", 
-                  margin: "2rem 0",
-                  minHeight: "200px"
-                }}>
+                <div
+                  style={{
+                    textAlign: "left",
+                    margin: "2rem 0",
+                    minHeight: "200px",
+                  }}
+                >
                   {/* Features statiques selon le type de plan */}
                   {isDemo && (
                     <ul style={{ listStyle: "none", padding: 0 }}>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Accès limité à toutes les fonctionnalités</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Mode démo (lecture seule pour certaines actions)</li>
+                      <li style={{ padding: "0.5rem 0" }}>
+                        ✅ Accès limité à toutes les fonctionnalités
+                      </li>
+                      <li style={{ padding: "0.5rem 0" }}>
+                        ✅ Mode démo (lecture seule pour certaines actions)
+                      </li>
                       <li style={{ padding: "0.5rem 0" }}>✅ 1 utilisateur</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Support communautaire</li>
-                      <li style={{ padding: "0.5rem 0", opacity: 0.5 }}>❌ Pas de facturation</li>
-                      <li style={{ padding: "0.5rem 0", opacity: 0.5 }}>❌ Données de test uniquement</li>
+                      <li style={{ padding: "0.5rem 0" }}>
+                        ✅ Support communautaire
+                      </li>
+                      <li style={{ padding: "0.5rem 0", opacity: 0.5 }}>
+                        ❌ Pas de facturation
+                      </li>
+                      <li style={{ padding: "0.5rem 0", opacity: 0.5 }}>
+                        ❌ Données de test uniquement
+                      </li>
                     </ul>
                   )}
 
                   {plan.nom_plan.toLowerCase().includes("régie") && isPro && (
                     <ul style={{ listStyle: "none", padding: 0 }}>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Gestion complète du parc immobilier</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Diffusion illimitée de tickets</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Dashboard analytique avancé</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Suivi des interventions en temps réel</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Jusqu'à 10 utilisateurs</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Support prioritaire</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Exports et rapports</li>
+                      <li style={{ padding: "0.5rem 0" }}>
+                        ✅ Gestion complète du parc immobilier
+                      </li>
+                      <li style={{ padding: "0.5rem 0" }}>
+                        ✅ Diffusion illimitée de tickets
+                      </li>
+                      <li style={{ padding: "0.5rem 0" }}>
+                        ✅ Dashboard analytique avancé
+                      </li>
+                      <li style={{ padding: "0.5rem 0" }}>
+                        ✅ Suivi des interventions en temps réel
+                      </li>
+                      <li style={{ padding: "0.5rem 0" }}>
+                        ✅ Jusqu'à 10 utilisateurs
+                      </li>
+                      <li style={{ padding: "0.5rem 0" }}>
+                        ✅ Support prioritaire
+                      </li>
+                      <li style={{ padding: "0.5rem 0" }}>
+                        ✅ Exports et rapports
+                      </li>
                     </ul>
                   )}
 
-                  {plan.nom_plan.toLowerCase().includes("entreprise") && isPro && (
-                    <ul style={{ listStyle: "none", padding: 0 }}>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Réception de tickets multi-régies</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Gestion d'équipe de techniciens</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Planification avancée des missions</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Facturation automatisée</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Jusqu'à 20 techniciens</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ Support prioritaire</li>
-                      <li style={{ padding: "0.5rem 0" }}>✅ API access</li>
-                    </ul>
-                  )}
+                  {plan.nom_plan.toLowerCase().includes("entreprise") &&
+                    isPro && (
+                      <ul style={{ listStyle: "none", padding: 0 }}>
+                        <li style={{ padding: "0.5rem 0" }}>
+                          ✅ Réception de tickets multi-régies
+                        </li>
+                        <li style={{ padding: "0.5rem 0" }}>
+                          ✅ Gestion d'équipe de techniciens
+                        </li>
+                        <li style={{ padding: "0.5rem 0" }}>
+                          ✅ Planification avancée des missions
+                        </li>
+                        <li style={{ padding: "0.5rem 0" }}>
+                          ✅ Facturation automatisée
+                        </li>
+                        <li style={{ padding: "0.5rem 0" }}>
+                          ✅ Jusqu'à 20 techniciens
+                        </li>
+                        <li style={{ padding: "0.5rem 0" }}>
+                          ✅ Support prioritaire
+                        </li>
+                        <li style={{ padding: "0.5rem 0" }}>✅ API access</li>
+                      </ul>
+                    )}
                 </div>
 
                 <Button
                   onClick={() => handleChoosePlan(plan.id)}
-                  style={{ 
+                  style={{
                     width: "100%",
                     padding: "1rem",
                     fontSize: "1.1rem",
                     fontWeight: "700",
-                    background: isDemo ? "var(--orange)" : isPro ? "var(--accent)" : "var(--primary)"
+                    background: isDemo
+                      ? "var(--orange)"
+                      : isPro
+                        ? "var(--accent)"
+                        : "var(--primary)",
                   }}
                   className="hover-bounce"
                 >
@@ -252,13 +329,15 @@ export default function PricingPage() {
       </section>
 
       {/* Footer */}
-      <footer style={{ 
-        textAlign: "center", 
-        padding: "2rem",
-        background: "var(--card-bg)",
-        marginTop: "4rem",
-        borderTop: "1px solid rgba(0,0,0,0.1)"
-      }}>
+      <footer
+        style={{
+          textAlign: "center",
+          padding: "2rem",
+          background: "var(--card-bg)",
+          marginTop: "4rem",
+          borderTop: "1px solid rgba(0,0,0,0.1)",
+        }}
+      >
         <p style={{ margin: 0, opacity: 0.7 }}>
           © 2025 JETC IMMO - Tous droits réservés
         </p>

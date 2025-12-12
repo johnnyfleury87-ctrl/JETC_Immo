@@ -15,18 +15,18 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    
+
     try {
       // Appel du login réel via API backend
       const session = await login(email, password);
-      
+
       // Sauvegarde du token et rôle dans localStorage
       saveSession(session);
-      
+
       // Récupération et sauvegarde du profil
       const profile = await getProfile();
       saveProfile(profile);
-      
+
       // Redirection selon le rôle
       redirectByRole(session.role);
     } catch (err) {
@@ -40,12 +40,14 @@ export default function Login() {
       <div className="card fade-in">
         <h1 className="page-title">Connexion</h1>
 
-        {error && <div style={{ color: "red", marginBottom: "1rem" }}>{error}</div>}
+        {error && (
+          <div style={{ color: "red", marginBottom: "1rem" }}>{error}</div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <label>Email</label>
-          <input 
-            type="email" 
+          <input
+            type="email"
             placeholder="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -53,8 +55,8 @@ export default function Login() {
           />
 
           <label>Mot de passe</label>
-          <input 
-            type="password" 
+          <input
+            type="password"
             placeholder="mot de passe"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -68,8 +70,8 @@ export default function Login() {
             <option value="zen">Zen</option>
           </select>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn hover-glow click-scale"
             disabled={loading}
           >

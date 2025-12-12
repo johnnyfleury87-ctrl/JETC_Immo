@@ -64,19 +64,15 @@ export default function SignaturePad({ onSave }) {
         onMouseLeave={stopDrawing}
       />
       <div style={{ marginTop: "0.5rem" }}>
-        <button 
-          type="button" 
-          className="btn hover-glow" 
+        <button
+          type="button"
+          className="btn hover-glow"
           onClick={saveSignature}
           style={{ marginRight: "0.5rem" }}
         >
           Enregistrer la signature
         </button>
-        <button 
-          type="button" 
-          className="btn" 
-          onClick={clearCanvas}
-        >
+        <button type="button" className="btn" onClick={clearCanvas}>
           Effacer
         </button>
       </div>

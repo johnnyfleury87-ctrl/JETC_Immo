@@ -4,7 +4,7 @@ import { authenticateUser } from "./profile.js";
 /**
  * POST /api/missions/accept-ticket
  * Accepter un ticket et créer une mission
- * 
+ *
  * Body attendu :
  * {
  *   ticket_id: uuid (obligatoire),
@@ -40,7 +40,10 @@ export async function acceptTicket(req, res) {
     const userProfile = req.profile;
 
     // Seules les entreprises peuvent accepter des tickets
-    if (userProfile.role !== 'entreprise' && userProfile.role !== 'admin_jtec') {
+    if (
+      userProfile.role !== "entreprise" &&
+      userProfile.role !== "admin_jtec"
+    ) {
       return res.status(403).json({
         error: "Seules les entreprises peuvent accepter des tickets",
       });
@@ -60,16 +63,20 @@ export async function acceptTicket(req, res) {
     }
 
     // Vérifier que le ticket est dans un état qui permet l'acceptation
-    if (!['diffusé', 'nouveau', 'en_attente_diffusion'].includes(ticket.statut)) {
+    if (
+      !["diffusé", "nouveau", "en_attente_diffusion"].includes(ticket.statut)
+    ) {
       return res.status(400).json({
         error: `Ce ticket ne peut pas être accepté (statut actuel: ${ticket.statut})`,
       });
     }
 
     // Vérifier que l'entreprise a accès à ce ticket
-    if (userProfile.role === 'entreprise') {
-      if (ticket.diffusion_mode === 'restreint') {
-        if (!ticket.entreprises_autorisees.includes(userProfile.entreprise_id)) {
+    if (userProfile.role === "entreprise") {
+      if (ticket.diffusion_mode === "restreint") {
+        if (
+          !ticket.entreprises_autorisees.includes(userProfile.entreprise_id)
+        ) {
           return res.status(403).json({
             error: "Vous n'êtes pas autorisé à accepter ce ticket",
           });
@@ -78,11 +85,12 @@ export async function acceptTicket(req, res) {
     }
 
     // Vérifier qu'une mission n'existe pas déjà pour ce ticket (empêcher les doublons)
-    const { data: existingMission, error: missionCheckError } = await supabaseServer
-      .from("missions")
-      .select("id, entreprise_id")
-      .eq("ticket_id", ticket_id)
-      .single();
+    const { data: existingMission, error: missionCheckError } =
+      await supabaseServer
+        .from("missions")
+        .select("id, entreprise_id")
+        .eq("ticket_id", ticket_id)
+        .single();
 
     if (existingMission) {
       return res.status(409).json({
@@ -94,10 +102,13 @@ export async function acceptTicket(req, res) {
     // Créer la mission
     const missionData = {
       ticket_id,
-      entreprise_id: userProfile.role === 'entreprise' ? userProfile.entreprise_id : req.body.entreprise_id,
+      entreprise_id:
+        userProfile.role === "entreprise"
+          ? userProfile.entreprise_id
+          : req.body.entreprise_id,
       titre: titre || ticket.titre,
       description: description || ticket.description,
-      statut: date_intervention_prevue ? 'planifiée' : 'en_attente',
+      statut: date_intervention_prevue ? "planifiée" : "en_attente",
       date_intervention_prevue,
       duree_estimee_minutes,
       montant_estime,
@@ -124,17 +135,21 @@ export async function acceptTicket(req, res) {
     const { error: updateTicketError } = await supabaseServer
       .from("tickets")
       .update({
-        statut: 'accepté',
+        statut: "accepté",
         date_acceptation: new Date().toISOString(),
       })
       .eq("id", ticket_id);
 
     if (updateTicketError) {
-      console.error("Erreur lors de la mise à jour du ticket:", updateTicketError);
+      console.error(
+        "Erreur lors de la mise à jour du ticket:",
+        updateTicketError
+      );
       // Note : la mission a été créée, mais le ticket n'a pas été mis à jour
       // On retourne quand même un succès avec un avertissement
       return res.status(201).json({
-        message: "Mission créée avec succès, mais erreur lors de la mise à jour du ticket",
+        message:
+          "Mission créée avec succès, mais erreur lors de la mise à jour du ticket",
         mission,
         warning: updateTicketError.message,
       });
@@ -156,7 +171,7 @@ export async function acceptTicket(req, res) {
 /**
  * GET /api/missions
  * Liste des missions avec filtrage selon le rôle
- * 
+ *
  * Query params optionnels :
  * - statut: string
  * - entreprise_id: uuid
@@ -170,7 +185,8 @@ export async function listMissions(req, res) {
 
     let query = supabaseServer
       .from("missions")
-      .select(`
+      .select(
+        `
         *,
         tickets:ticket_id (
           id,
@@ -189,16 +205,17 @@ export async function listMissions(req, res) {
           email,
           telephone
         )
-      `)
+      `
+      )
       .order("created_at", { ascending: false });
 
     // Filtrage selon le rôle
-    if (userProfile.role === 'entreprise') {
+    if (userProfile.role === "entreprise") {
       query = query.eq("entreprise_id", userProfile.entreprise_id);
-    } else if (userProfile.role === 'technicien') {
+    } else if (userProfile.role === "technicien") {
       // Un technicien peut voir soit ses missions assignées, soit toutes les missions de son entreprise
       query = query.eq("entreprise_id", userProfile.entreprise_id);
-    } else if (userProfile.role === 'regie') {
+    } else if (userProfile.role === "regie") {
       // Une régie voit les missions liées à ses tickets
       const { data: regieTickets } = await supabaseServer
         .from("tickets")
@@ -206,12 +223,12 @@ export async function listMissions(req, res) {
         .eq("regie_id", userProfile.regie_id);
 
       if (regieTickets && regieTickets.length > 0) {
-        const ticketIds = regieTickets.map(t => t.id);
+        const ticketIds = regieTickets.map((t) => t.id);
         query = query.in("ticket_id", ticketIds);
       } else {
         return res.json({ missions: [] });
       }
-    } else if (userProfile.role === 'locataire') {
+    } else if (userProfile.role === "locataire") {
       // Un locataire voit les missions liées à ses tickets
       const { data: locataireData } = await supabaseServer
         .from("locataires")
@@ -226,7 +243,7 @@ export async function listMissions(req, res) {
           .eq("locataire_id", locataireData.id);
 
         if (locataireTickets && locataireTickets.length > 0) {
-          const ticketIds = locataireTickets.map(t => t.id);
+          const ticketIds = locataireTickets.map((t) => t.id);
           query = query.in("ticket_id", ticketIds);
         } else {
           return res.json({ missions: [] });
@@ -234,7 +251,7 @@ export async function listMissions(req, res) {
       } else {
         return res.json({ missions: [] });
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Rôle non autorisé",
       });
@@ -244,7 +261,7 @@ export async function listMissions(req, res) {
     if (statut) {
       query = query.eq("statut", statut);
     }
-    if (entreprise_id && userProfile.role === 'admin_jtec') {
+    if (entreprise_id && userProfile.role === "admin_jtec") {
       query = query.eq("entreprise_id", entreprise_id);
     }
     if (technicien_id) {
@@ -285,7 +302,8 @@ export async function getMission(req, res) {
 
     const { data: mission, error } = await supabaseServer
       .from("missions")
-      .select(`
+      .select(
+        `
         *,
         tickets:ticket_id (
           id,
@@ -330,7 +348,8 @@ export async function getMission(req, res) {
           telephone,
           adresse
         )
-      `)
+      `
+      )
       .eq("id", id)
       .single();
 
@@ -341,19 +360,22 @@ export async function getMission(req, res) {
     }
 
     // Vérification des droits d'accès
-    if (userProfile.role === 'entreprise' || userProfile.role === 'technicien') {
+    if (
+      userProfile.role === "entreprise" ||
+      userProfile.role === "technicien"
+    ) {
       if (mission.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role === 'regie') {
+    } else if (userProfile.role === "regie") {
       if (mission.tickets.regie_id !== userProfile.regie_id) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role === 'locataire') {
+    } else if (userProfile.role === "locataire") {
       const { data: locataireData } = await supabaseServer
         .from("locataires")
         .select("id")
@@ -365,7 +387,7 @@ export async function getMission(req, res) {
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -384,7 +406,7 @@ export async function getMission(req, res) {
 /**
  * PUT /api/missions/:id
  * Mettre à jour une mission
- * 
+ *
  * Champs modifiables selon le rôle :
  * - Entreprise : tous les champs sauf ticket_id
  * - Technicien : statut, dates intervention, rapport, photos, signature
@@ -413,7 +435,7 @@ export async function updateMission(req, res) {
     let updateData = {};
 
     // Déterminer les champs modifiables selon le rôle
-    if (userProfile.role === 'entreprise') {
+    if (userProfile.role === "entreprise") {
       // Vérifier que c'est bien l'entreprise de la mission
       if (existingMission.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
@@ -422,15 +444,30 @@ export async function updateMission(req, res) {
       }
 
       allowedFields = [
-        'titre', 'description', 'statut', 'technicien_id',
-        'date_intervention_prevue', 'date_intervention_debut', 'date_intervention_fin',
-        'duree_estimee_minutes', 'notes_internes', 'materiel_necessaire',
-        'est_en_retard', 'motif_retard', 'nouvelle_date_prevue',
-        'rapport_intervention', 'travaux_realises', 'materiel_utilise', 'photos_urls',
-        'signature_client_url', 'signature_technicien_url', 'date_signature',
-        'montant_estime', 'montant_final'
+        "titre",
+        "description",
+        "statut",
+        "technicien_id",
+        "date_intervention_prevue",
+        "date_intervention_debut",
+        "date_intervention_fin",
+        "duree_estimee_minutes",
+        "notes_internes",
+        "materiel_necessaire",
+        "est_en_retard",
+        "motif_retard",
+        "nouvelle_date_prevue",
+        "rapport_intervention",
+        "travaux_realises",
+        "materiel_utilise",
+        "photos_urls",
+        "signature_client_url",
+        "signature_technicien_url",
+        "date_signature",
+        "montant_estime",
+        "montant_final",
       ];
-    } else if (userProfile.role === 'technicien') {
+    } else if (userProfile.role === "technicien") {
       // Vérifier que c'est bien le technicien assigné ou de la même entreprise
       if (existingMission.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
@@ -439,21 +476,46 @@ export async function updateMission(req, res) {
       }
 
       allowedFields = [
-        'statut', 'date_intervention_debut', 'date_intervention_fin',
-        'est_en_retard', 'motif_retard', 'nouvelle_date_prevue',
-        'rapport_intervention', 'travaux_realises', 'materiel_utilise', 'photos_urls',
-        'signature_technicien_url', 'date_signature'
+        "statut",
+        "date_intervention_debut",
+        "date_intervention_fin",
+        "est_en_retard",
+        "motif_retard",
+        "nouvelle_date_prevue",
+        "rapport_intervention",
+        "travaux_realises",
+        "materiel_utilise",
+        "photos_urls",
+        "signature_technicien_url",
+        "date_signature",
       ];
-    } else if (userProfile.role === 'admin_jtec') {
+    } else if (userProfile.role === "admin_jtec") {
       // Admin peut tout modifier
       allowedFields = [
-        'titre', 'description', 'statut', 'entreprise_id', 'technicien_id',
-        'date_intervention_prevue', 'date_intervention_debut', 'date_intervention_fin',
-        'duree_estimee_minutes', 'notes_internes', 'materiel_necessaire',
-        'est_en_retard', 'motif_retard', 'nouvelle_date_prevue',
-        'rapport_intervention', 'travaux_realises', 'materiel_utilise', 'photos_urls',
-        'signature_client_url', 'signature_technicien_url', 'date_signature',
-        'montant_estime', 'montant_final', 'facture_id'
+        "titre",
+        "description",
+        "statut",
+        "entreprise_id",
+        "technicien_id",
+        "date_intervention_prevue",
+        "date_intervention_debut",
+        "date_intervention_fin",
+        "duree_estimee_minutes",
+        "notes_internes",
+        "materiel_necessaire",
+        "est_en_retard",
+        "motif_retard",
+        "nouvelle_date_prevue",
+        "rapport_intervention",
+        "travaux_realises",
+        "materiel_utilise",
+        "photos_urls",
+        "signature_client_url",
+        "signature_technicien_url",
+        "date_signature",
+        "montant_estime",
+        "montant_final",
+        "facture_id",
       ];
     } else {
       return res.status(403).json({
@@ -477,17 +539,19 @@ export async function updateMission(req, res) {
 
     // Validation des transitions de statut
     const validTransitions = {
-      'en_attente': ['planifiée', 'annulée'],
-      'planifiée': ['en_route', 'reportée', 'annulée'],
-      'en_route': ['en_cours', 'reportée', 'annulée'],
-      'en_cours': ['en_pause', 'terminée', 'reportée'],
-      'en_pause': ['en_cours', 'terminée', 'reportée', 'annulée'],
-      'reportée': ['planifiée', 'annulée'],
+      en_attente: ["planifiée", "annulée"],
+      planifiée: ["en_route", "reportée", "annulée"],
+      en_route: ["en_cours", "reportée", "annulée"],
+      en_cours: ["en_pause", "terminée", "reportée"],
+      en_pause: ["en_cours", "terminée", "reportée", "annulée"],
+      reportée: ["planifiée", "annulée"],
     };
 
     if (updateData.statut && updateData.statut !== existingMission.statut) {
       if (validTransitions[existingMission.statut]) {
-        if (!validTransitions[existingMission.statut].includes(updateData.statut)) {
+        if (
+          !validTransitions[existingMission.statut].includes(updateData.statut)
+        ) {
           return res.status(400).json({
             error: `Transition de statut non autorisée de ${existingMission.statut} vers ${updateData.statut}`,
           });
@@ -504,7 +568,10 @@ export async function updateMission(req, res) {
       .single();
 
     if (updateError) {
-      console.error("Erreur lors de la mise à jour de la mission:", updateError);
+      console.error(
+        "Erreur lors de la mise à jour de la mission:",
+        updateError
+      );
       return res.status(500).json({
         error: "Erreur lors de la mise à jour de la mission",
         details: updateError.message,
@@ -512,12 +579,12 @@ export async function updateMission(req, res) {
     }
 
     // Si la mission est terminée, mettre à jour le statut du ticket
-    if (updateData.statut === 'terminée') {
+    if (updateData.statut === "terminée") {
       await supabaseServer
         .from("tickets")
-        .update({ 
-          statut: 'terminé',
-          date_cloture: new Date().toISOString()
+        .update({
+          statut: "terminé",
+          date_cloture: new Date().toISOString(),
         })
         .eq("id", existingMission.ticket_id);
     }
@@ -558,7 +625,7 @@ export async function deleteMission(req, res) {
     }
 
     // Vérification des droits
-    if (userProfile.role === 'entreprise') {
+    if (userProfile.role === "entreprise") {
       if (mission.entreprise_id !== userProfile.entreprise_id) {
         return res.status(403).json({
           error: "Accès refusé",
@@ -566,12 +633,12 @@ export async function deleteMission(req, res) {
       }
 
       // Une entreprise ne peut supprimer que les missions non commencées
-      if (!['en_attente', 'planifiée'].includes(mission.statut)) {
+      if (!["en_attente", "planifiée"].includes(mission.statut)) {
         return res.status(403).json({
           error: "Vous ne pouvez supprimer que les missions non commencées",
         });
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Vous n'avez pas les droits pour supprimer cette mission",
       });
@@ -584,7 +651,10 @@ export async function deleteMission(req, res) {
       .eq("id", id);
 
     if (deleteError) {
-      console.error("Erreur lors de la suppression de la mission:", deleteError);
+      console.error(
+        "Erreur lors de la suppression de la mission:",
+        deleteError
+      );
       return res.status(500).json({
         error: "Erreur lors de la suppression de la mission",
         details: deleteError.message,
@@ -594,7 +664,7 @@ export async function deleteMission(req, res) {
     // Remettre le ticket en statut "diffusé" pour permettre à une autre entreprise de l'accepter
     await supabaseServer
       .from("tickets")
-      .update({ statut: 'diffusé' })
+      .update({ statut: "diffusé" })
       .eq("id", mission.ticket_id);
 
     res.json({
@@ -612,7 +682,7 @@ export async function deleteMission(req, res) {
 /**
  * PUT /api/missions/:id/assign-technicien
  * Assigner un technicien à une mission
- * 
+ *
  * Body attendu :
  * {
  *   technicien_id: uuid (obligatoire),
@@ -633,7 +703,10 @@ export async function assignTechnicien(req, res) {
     }
 
     // Seules les entreprises peuvent assigner des techniciens
-    if (userProfile.role !== 'entreprise' && userProfile.role !== 'admin_jtec') {
+    if (
+      userProfile.role !== "entreprise" &&
+      userProfile.role !== "admin_jtec"
+    ) {
       return res.status(403).json({
         error: "Seules les entreprises peuvent assigner des techniciens",
       });
@@ -653,7 +726,10 @@ export async function assignTechnicien(req, res) {
     }
 
     // Vérifier que c'est bien l'entreprise de la mission
-    if (userProfile.role === 'entreprise' && mission.entreprise_id !== userProfile.entreprise_id) {
+    if (
+      userProfile.role === "entreprise" &&
+      mission.entreprise_id !== userProfile.entreprise_id
+    ) {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -687,8 +763,8 @@ export async function assignTechnicien(req, res) {
     // Si une date d'intervention est fournie, mettre à jour et passer en statut "planifiée"
     if (date_intervention_prevue) {
       updateData.date_intervention_prevue = date_intervention_prevue;
-      if (mission.statut === 'en_attente') {
-        updateData.statut = 'planifiée';
+      if (mission.statut === "en_attente") {
+        updateData.statut = "planifiée";
       }
     }
 
@@ -697,7 +773,8 @@ export async function assignTechnicien(req, res) {
       .from("missions")
       .update(updateData)
       .eq("id", id)
-      .select(`
+      .select(
+        `
         *,
         techniciens:technicien_id (
           id,
@@ -706,7 +783,8 @@ export async function assignTechnicien(req, res) {
           email,
           telephone
         )
-      `)
+      `
+      )
       .single();
 
     if (updateError) {
@@ -729,4 +807,3 @@ export async function assignTechnicien(req, res) {
     });
   }
 }
-

@@ -10,7 +10,10 @@ export default function UserBadge() {
   useEffect(() => {
     const checkSubscription = async () => {
       // Vérifier uniquement pour les rôles régie et entreprise
-      if (profile && (profile.role === "regie" || profile.role === "entreprise")) {
+      if (
+        profile &&
+        (profile.role === "regie" || profile.role === "entreprise")
+      ) {
         try {
           const subData = await apiFetch("/billing/subscription");
           setSubscriptionStatus(subData?.statut === "actif" ? "pro" : "demo");
@@ -38,29 +41,38 @@ export default function UserBadge() {
   const isProMode = subscriptionStatus === "pro";
 
   return (
-    <div style={{ 
-      marginLeft: "auto", 
-      display: "flex", 
-      alignItems: "center", 
-      gap: "1rem" 
-    }}>
+    <div
+      style={{
+        marginLeft: "auto",
+        display: "flex",
+        alignItems: "center",
+        gap: "1rem",
+      }}
+    >
       <span style={{ fontWeight: "500" }}>
         Bonjour, {profile.prenom} {profile.nom}
       </span>
-      
-      {!loading && (profile.role === "regie" || profile.role === "entreprise") && (
-        <span style={{
-          background: isDemoMode ? "var(--orange)" : isProMode ? "var(--green)" : "transparent",
-          color: "white",
-          padding: "0.35rem 0.75rem",
-          borderRadius: "6px",
-          fontSize: "0.85rem",
-          fontWeight: "700",
-          boxShadow: "var(--shadow)"
-        }}>
-          {isDemoMode ? "🆓 DEMO" : isProMode ? "⭐ PRO" : ""}
-        </span>
-      )}
+
+      {!loading &&
+        (profile.role === "regie" || profile.role === "entreprise") && (
+          <span
+            style={{
+              background: isDemoMode
+                ? "var(--orange)"
+                : isProMode
+                  ? "var(--green)"
+                  : "transparent",
+              color: "white",
+              padding: "0.35rem 0.75rem",
+              borderRadius: "6px",
+              fontSize: "0.85rem",
+              fontWeight: "700",
+              boxShadow: "var(--shadow)",
+            }}
+          >
+            {isDemoMode ? "🆓 DEMO" : isProMode ? "⭐ PRO" : ""}
+          </span>
+        )}
     </div>
   );
 }

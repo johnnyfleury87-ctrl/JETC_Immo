@@ -55,11 +55,13 @@ export default function Register() {
       <div className="card fade-in">
         <h1 className="page-title">Créer un compte</h1>
 
-        {error && <div style={{ color: "red", marginBottom: "1rem" }}>{error}</div>}
+        {error && (
+          <div style={{ color: "red", marginBottom: "1rem" }}>{error}</div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <label>Nom</label>
-          <input 
+          <input
             type="text"
             value={nom}
             onChange={(e) => setNom(e.target.value)}
@@ -67,7 +69,7 @@ export default function Register() {
           />
 
           <label>Prénom</label>
-          <input 
+          <input
             type="text"
             value={prenom}
             onChange={(e) => setPrenom(e.target.value)}
@@ -75,7 +77,7 @@ export default function Register() {
           />
 
           <label>Email</label>
-          <input 
+          <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -83,7 +85,7 @@ export default function Register() {
           />
 
           <label>Téléphone</label>
-          <input 
+          <input
             type="text"
             value={telephone}
             onChange={(e) => setTelephone(e.target.value)}
@@ -91,7 +93,7 @@ export default function Register() {
           />
 
           <label>Mot de passe</label>
-          <input 
+          <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -106,8 +108,8 @@ export default function Register() {
             <option value="technicien">Technicien</option>
           </select>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn hover-glow click-scale"
             disabled={loading}
           >

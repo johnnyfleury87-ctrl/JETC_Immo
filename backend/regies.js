@@ -4,7 +4,7 @@ import { authenticateUser } from "./profile.js";
 /**
  * POST /api/regies
  * Création d'une nouvelle régie
- * 
+ *
  * Body attendu :
  * {
  *   nom: string (obligatoire),
@@ -47,14 +47,14 @@ export async function createRegie(req, res) {
 
     // Vérification du rôle : seul admin_jtec ou un utilisateur qui crée sa propre régie
     const userProfile = req.profile;
-    if (userProfile.role !== 'admin_jtec' && userProfile.role !== 'regie') {
+    if (userProfile.role !== "admin_jtec" && userProfile.role !== "regie") {
       return res.status(403).json({
         error: "Vous n'avez pas les droits pour créer une régie",
       });
     }
 
     // Si l'utilisateur a déjà une régie, il ne peut pas en créer une nouvelle
-    if (userProfile.role === 'regie' && userProfile.regie_id) {
+    if (userProfile.role === "regie" && userProfile.regie_id) {
       return res.status(400).json({
         error: "Vous êtes déjà associé à une régie",
       });
@@ -104,7 +104,7 @@ export async function createRegie(req, res) {
     }
 
     // Si c'est l'utilisateur lui-même qui crée sa régie, lier son profil
-    if (userProfile.role === 'regie' && !userProfile.regie_id) {
+    if (userProfile.role === "regie" && !userProfile.regie_id) {
       const { error: updateProfileError } = await supabaseServer
         .from("profiles")
         .update({ regie_id: regieData.id })
@@ -120,7 +120,6 @@ export async function createRegie(req, res) {
       message: "Régie créée avec succès",
       regie: regieData,
     });
-
   } catch (error) {
     console.error("Erreur serveur lors de la création de la régie:", error);
     return res.status(500).json({
@@ -140,10 +139,7 @@ export async function getRegie(req, res) {
     const userProfile = req.profile;
 
     // Vérification des droits d'accès
-    if (
-      userProfile.role !== 'admin_jtec' &&
-      userProfile.regie_id !== id
-    ) {
+    if (userProfile.role !== "admin_jtec" && userProfile.regie_id !== id) {
       return res.status(403).json({
         error: "Vous n'avez pas accès à cette régie",
       });
@@ -165,7 +161,6 @@ export async function getRegie(req, res) {
     return res.status(200).json({
       regie: regieData,
     });
-
   } catch (error) {
     console.error("Erreur lors de la récupération de la régie:", error);
     return res.status(500).json({
@@ -177,7 +172,7 @@ export async function getRegie(req, res) {
 /**
  * PUT /api/regies/:id
  * Mise à jour d'une régie
- * 
+ *
  * Body attendu : mêmes champs que POST (tous optionnels)
  */
 export async function updateRegie(req, res) {
@@ -186,10 +181,7 @@ export async function updateRegie(req, res) {
     const userProfile = req.profile;
 
     // Vérification des droits d'accès
-    if (
-      userProfile.role !== 'admin_jtec' &&
-      userProfile.regie_id !== id
-    ) {
+    if (userProfile.role !== "admin_jtec" && userProfile.regie_id !== id) {
       return res.status(403).json({
         error: "Vous n'avez pas les droits pour modifier cette régie",
       });
@@ -218,10 +210,14 @@ export async function updateRegie(req, res) {
     if (adresse !== undefined) updates.adresse = adresse;
     if (code_postal !== undefined) updates.code_postal = code_postal;
     if (ville !== undefined) updates.ville = ville;
-    if (nom_responsable !== undefined) updates.nom_responsable = nom_responsable;
-    if (prenom_responsable !== undefined) updates.prenom_responsable = prenom_responsable;
-    if (telephone_responsable !== undefined) updates.telephone_responsable = telephone_responsable;
-    if (email_responsable !== undefined) updates.email_responsable = email_responsable;
+    if (nom_responsable !== undefined)
+      updates.nom_responsable = nom_responsable;
+    if (prenom_responsable !== undefined)
+      updates.prenom_responsable = prenom_responsable;
+    if (telephone_responsable !== undefined)
+      updates.telephone_responsable = telephone_responsable;
+    if (email_responsable !== undefined)
+      updates.email_responsable = email_responsable;
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({
@@ -265,7 +261,6 @@ export async function updateRegie(req, res) {
       message: "Régie mise à jour avec succès",
       regie: updatedRegie,
     });
-
   } catch (error) {
     console.error("Erreur lors de la mise à jour de la régie:", error);
     return res.status(500).json({
@@ -283,7 +278,7 @@ export async function listRegies(req, res) {
     const userProfile = req.profile;
 
     // Seul admin JTEC peut lister toutes les régies
-    if (userProfile.role !== 'admin_jtec') {
+    if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Accès refusé : réservé aux administrateurs",
       });
@@ -306,7 +301,6 @@ export async function listRegies(req, res) {
       regies: regiesData,
       total: regiesData.length,
     });
-
   } catch (error) {
     console.error("Erreur lors de la récupération des régies:", error);
     return res.status(500).json({

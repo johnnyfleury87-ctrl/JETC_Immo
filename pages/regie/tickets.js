@@ -52,9 +52,9 @@ export default function RegieTickets() {
     try {
       await apiFetch("/regie/tickets/diffuse", {
         method: "POST",
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           ticket_id: ticketId,
-          entreprises: [] // Liste vide pour l'instant
+          entreprises: [], // Liste vide pour l'instant
         }),
       });
       alert("Diffusion restreinte effectuée");
@@ -69,7 +69,7 @@ export default function RegieTickets() {
     <Layout>
       <div className="card fade-in">
         <h1 className="page-title">Gestion des tickets</h1>
-        
+
         {loading ? (
           <p>Chargement...</p>
         ) : (
@@ -79,20 +79,27 @@ export default function RegieTickets() {
             ) : (
               <ul>
                 {tickets.map((ticket) => (
-                  <li key={ticket.id} style={{ marginBottom: "1rem", padding: "1rem", border: "1px solid #ddd" }}>
+                  <li
+                    key={ticket.id}
+                    style={{
+                      marginBottom: "1rem",
+                      padding: "1rem",
+                      border: "1px solid #ddd",
+                    }}
+                  >
                     <h3>{ticket.titre}</h3>
                     <p>Statut : {ticket.statut}</p>
                     <p>Catégorie : {ticket.categorie}</p>
                     <div style={{ marginTop: "0.5rem" }}>
-                      <button 
-                        className="btn hover-glow" 
+                      <button
+                        className="btn hover-glow"
                         onClick={() => handleDiffuseAll(ticket.id)}
                         style={{ marginRight: "0.5rem" }}
                       >
                         Diffuser à toutes les entreprises
                       </button>
-                      <button 
-                        className="btn hover-glow" 
+                      <button
+                        className="btn hover-glow"
                         onClick={() => handleDiffuseRestricted(ticket.id)}
                       >
                         Diffusion restreinte

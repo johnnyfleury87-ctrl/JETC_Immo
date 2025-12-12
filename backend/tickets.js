@@ -4,7 +4,7 @@ import { authenticateUser } from "./profile.js";
 /**
  * POST /api/tickets
  * Création d'un nouveau ticket
- * 
+ *
  * Body attendu :
  * {
  *   locataire_id: uuid (obligatoire si role=locataire),
@@ -27,9 +27,9 @@ export async function createTicket(req, res) {
       titre,
       description,
       categorie,
-      priorite = 'normale',
+      priorite = "normale",
       date_souhaitee_intervention,
-      diffusion_mode = 'general',
+      diffusion_mode = "general",
       entreprises_autorisees = [],
       is_demo = false,
     } = req.body;
@@ -46,13 +46,14 @@ export async function createTicket(req, res) {
     let regieId;
 
     // Si l'utilisateur est un locataire, on récupère automatiquement son locataire_id
-    if (userProfile.role === 'locataire') {
-      const { data: locataireData, error: locataireError } = await supabaseServer
-        .from("locataires")
-        .select("id, logement_id")
-        .eq("profile_id", userProfile.id)
-        .eq("statut", "actif")
-        .single();
+    if (userProfile.role === "locataire") {
+      const { data: locataireData, error: locataireError } =
+        await supabaseServer
+          .from("locataires")
+          .select("id, logement_id")
+          .eq("profile_id", userProfile.id)
+          .eq("statut", "actif")
+          .single();
 
       if (locataireError || !locataireData) {
         return res.status(404).json({
@@ -73,12 +74,14 @@ export async function createTicket(req, res) {
     // Vérifier que le logement existe et récupérer la regie_id
     const { data: logementData, error: logementError } = await supabaseServer
       .from("logements")
-      .select(`
+      .select(
+        `
         *,
         immeubles:immeuble_id (
           regie_id
         )
-      `)
+      `
+      )
       .eq("id", logement_id)
       .single();
 
@@ -91,14 +94,15 @@ export async function createTicket(req, res) {
     regieId = logementData.immeubles.regie_id;
 
     // Si l'utilisateur est une régie, vérifier qu'il s'agit de sa régie
-    if (userProfile.role === 'regie' && userProfile.regie_id !== regieId) {
+    if (userProfile.role === "regie" && userProfile.regie_id !== regieId) {
       return res.status(403).json({
-        error: "Vous ne pouvez pas créer un ticket pour un logement d'une autre régie",
+        error:
+          "Vous ne pouvez pas créer un ticket pour un logement d'une autre régie",
       });
     }
 
     // Si finalLocataireId n'est pas défini et que c'est une régie qui crée le ticket
-    if (!finalLocataireId && userProfile.role === 'regie') {
+    if (!finalLocataireId && userProfile.role === "regie") {
       // La régie peut créer un ticket sans locataire (ex: travaux préventifs)
       // Dans ce cas, on récupère le locataire du logement s'il existe
       const { data: locataireLogement } = await supabaseServer
@@ -112,26 +116,35 @@ export async function createTicket(req, res) {
         finalLocataireId = locataireLogement.id;
       } else {
         return res.status(400).json({
-          error: "Aucun locataire actif trouvé pour ce logement. Veuillez spécifier locataire_id.",
+          error:
+            "Aucun locataire actif trouvé pour ce logement. Veuillez spécifier locataire_id.",
         });
       }
     }
 
     // Validation du mode de diffusion
-    if (diffusion_mode === 'restreint' && (!entreprises_autorisees || entreprises_autorisees.length === 0)) {
+    if (
+      diffusion_mode === "restreint" &&
+      (!entreprises_autorisees || entreprises_autorisees.length === 0)
+    ) {
       return res.status(400).json({
-        error: "En mode restreint, vous devez spécifier au moins une entreprise autorisée",
+        error:
+          "En mode restreint, vous devez spécifier au moins une entreprise autorisée",
       });
     }
 
     // Validation des entreprises autorisées
-    if (diffusion_mode === 'restreint' && entreprises_autorisees.length > 0) {
-      const { data: entreprisesData, error: entreprisesError } = await supabaseServer
-        .from("entreprises")
-        .select("id")
-        .in("id", entreprises_autorisees);
+    if (diffusion_mode === "restreint" && entreprises_autorisees.length > 0) {
+      const { data: entreprisesData, error: entreprisesError } =
+        await supabaseServer
+          .from("entreprises")
+          .select("id")
+          .in("id", entreprises_autorisees);
 
-      if (entreprisesError || entreprisesData.length !== entreprises_autorisees.length) {
+      if (
+        entreprisesError ||
+        entreprisesData.length !== entreprises_autorisees.length
+      ) {
         return res.status(400).json({
           error: "Une ou plusieurs entreprises spécifiées n'existent pas",
         });
@@ -149,10 +162,11 @@ export async function createTicket(req, res) {
         description,
         categorie,
         priorite,
-        statut: 'nouveau',
+        statut: "nouveau",
         date_souhaitee_intervention,
         diffusion_mode,
-        entreprises_autorisees: diffusion_mode === 'restreint' ? entreprises_autorisees : [],
+        entreprises_autorisees:
+          diffusion_mode === "restreint" ? entreprises_autorisees : [],
         is_demo,
       })
       .select()
@@ -182,7 +196,7 @@ export async function createTicket(req, res) {
 /**
  * GET /api/tickets
  * Liste des tickets avec filtrage selon le rôle
- * 
+ *
  * Query params optionnels :
  * - statut: string
  * - priorite: string
@@ -197,7 +211,8 @@ export async function listTickets(req, res) {
 
     let query = supabaseServer
       .from("tickets")
-      .select(`
+      .select(
+        `
         *,
         locataires:locataire_id (
           id,
@@ -226,11 +241,12 @@ export async function listTickets(req, res) {
           nom,
           email
         )
-      `)
+      `
+      )
       .order("created_at", { ascending: false });
 
     // Filtrage selon le rôle
-    if (userProfile.role === 'locataire') {
+    if (userProfile.role === "locataire") {
       // Un locataire ne voit que ses propres tickets
       const { data: locataireData } = await supabaseServer
         .from("locataires")
@@ -243,16 +259,19 @@ export async function listTickets(req, res) {
       } else {
         return res.json({ tickets: [] });
       }
-    } else if (userProfile.role === 'regie') {
+    } else if (userProfile.role === "regie") {
       // Une régie voit tous les tickets de ses logements
       query = query.eq("regie_id", userProfile.regie_id);
-    } else if (userProfile.role === 'entreprise' || userProfile.role === 'technicien') {
+    } else if (
+      userProfile.role === "entreprise" ||
+      userProfile.role === "technicien"
+    ) {
       // Une entreprise voit les tickets selon le mode de diffusion
       query = query.or(`
         diffusion_mode.eq.general,
         and(diffusion_mode.eq.restreint,entreprises_autorisees.cs.{${userProfile.entreprise_id}})
       `);
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Rôle non autorisé",
       });
@@ -306,7 +325,8 @@ export async function getTicket(req, res) {
 
     const { data: ticket, error } = await supabaseServer
       .from("tickets")
-      .select(`
+      .select(
+        `
         *,
         locataires:locataire_id (
           id,
@@ -343,7 +363,8 @@ export async function getTicket(req, res) {
           email,
           telephone
         )
-      `)
+      `
+      )
       .eq("id", id)
       .single();
 
@@ -354,7 +375,7 @@ export async function getTicket(req, res) {
     }
 
     // Vérification des droits d'accès selon le rôle
-    if (userProfile.role === 'locataire') {
+    if (userProfile.role === "locataire") {
       const { data: locataireData } = await supabaseServer
         .from("locataires")
         .select("id")
@@ -366,22 +387,27 @@ export async function getTicket(req, res) {
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role === 'regie') {
+    } else if (userProfile.role === "regie") {
       if (ticket.regie_id !== userProfile.regie_id) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role === 'entreprise' || userProfile.role === 'technicien') {
+    } else if (
+      userProfile.role === "entreprise" ||
+      userProfile.role === "technicien"
+    ) {
       // Vérifier le mode de diffusion
-      if (ticket.diffusion_mode === 'restreint') {
-        if (!ticket.entreprises_autorisees.includes(userProfile.entreprise_id)) {
+      if (ticket.diffusion_mode === "restreint") {
+        if (
+          !ticket.entreprises_autorisees.includes(userProfile.entreprise_id)
+        ) {
           return res.status(403).json({
             error: "Accès refusé",
           });
         }
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Accès refusé",
       });
@@ -400,7 +426,7 @@ export async function getTicket(req, res) {
 /**
  * PUT /api/tickets/:id
  * Mettre à jour un ticket
- * 
+ *
  * Body attendu (selon le rôle) :
  * - Locataire : peut modifier titre, description, priorite (seulement si statut=nouveau)
  * - Régie : peut modifier tous les champs sauf locataire_id et logement_id
@@ -429,7 +455,7 @@ export async function updateTicket(req, res) {
     let updateData = {};
 
     // Déterminer les champs modifiables selon le rôle
-    if (userProfile.role === 'locataire') {
+    if (userProfile.role === "locataire") {
       // Un locataire ne peut modifier que ses propres tickets non diffusés
       const { data: locataireData } = await supabaseServer
         .from("locataires")
@@ -443,14 +469,22 @@ export async function updateTicket(req, res) {
         });
       }
 
-      if (!['nouveau', 'en_attente_diffusion'].includes(existingTicket.statut)) {
+      if (
+        !["nouveau", "en_attente_diffusion"].includes(existingTicket.statut)
+      ) {
         return res.status(403).json({
           error: "Vous ne pouvez modifier que les tickets non encore diffusés",
         });
       }
 
-      allowedFields = ['titre', 'description', 'categorie', 'priorite', 'date_souhaitee_intervention'];
-    } else if (userProfile.role === 'regie') {
+      allowedFields = [
+        "titre",
+        "description",
+        "categorie",
+        "priorite",
+        "date_souhaitee_intervention",
+      ];
+    } else if (userProfile.role === "regie") {
       // Une régie peut modifier tous les champs de ses tickets
       if (existingTicket.regie_id !== userProfile.regie_id) {
         return res.status(403).json({
@@ -459,40 +493,59 @@ export async function updateTicket(req, res) {
       }
 
       allowedFields = [
-        'titre', 'description', 'categorie', 'priorite', 'statut',
-        'date_souhaitee_intervention', 'diffusion_mode', 'entreprises_autorisees'
+        "titre",
+        "description",
+        "categorie",
+        "priorite",
+        "statut",
+        "date_souhaitee_intervention",
+        "diffusion_mode",
+        "entreprises_autorisees",
       ];
-    } else if (userProfile.role === 'entreprise') {
+    } else if (userProfile.role === "entreprise") {
       // Une entreprise peut modifier le statut (acceptation/refus)
-      if (existingTicket.diffusion_mode === 'restreint' &&
-          !existingTicket.entreprises_autorisees.includes(userProfile.entreprise_id)) {
+      if (
+        existingTicket.diffusion_mode === "restreint" &&
+        !existingTicket.entreprises_autorisees.includes(
+          userProfile.entreprise_id
+        )
+      ) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
 
-      allowedFields = ['statut'];
-      
+      allowedFields = ["statut"];
+
       // Validation des transitions de statut pour les entreprises
       const validTransitions = {
-        'diffusé': ['accepté', 'refusé'],
-        'accepté': ['en_cours'],
-        'en_cours': ['terminé'],
+        diffusé: ["accepté", "refusé"],
+        accepté: ["en_cours"],
+        en_cours: ["terminé"],
       };
 
       if (req.body.statut && validTransitions[existingTicket.statut]) {
-        if (!validTransitions[existingTicket.statut].includes(req.body.statut)) {
+        if (
+          !validTransitions[existingTicket.statut].includes(req.body.statut)
+        ) {
           return res.status(400).json({
             error: `Transition de statut non autorisée de ${existingTicket.statut} vers ${req.body.statut}`,
           });
         }
       }
-    } else if (userProfile.role === 'admin_jtec') {
+    } else if (userProfile.role === "admin_jtec") {
       // Admin peut tout modifier
       allowedFields = [
-        'titre', 'description', 'categorie', 'priorite', 'statut',
-        'date_souhaitee_intervention', 'diffusion_mode', 'entreprises_autorisees',
-        'date_acceptation', 'date_cloture'
+        "titre",
+        "description",
+        "categorie",
+        "priorite",
+        "statut",
+        "date_souhaitee_intervention",
+        "diffusion_mode",
+        "entreprises_autorisees",
+        "date_acceptation",
+        "date_cloture",
       ];
     } else {
       return res.status(403).json({
@@ -508,10 +561,14 @@ export async function updateTicket(req, res) {
     }
 
     // Validation du mode de diffusion
-    if (updateData.diffusion_mode === 'restreint' &&
-        (!updateData.entreprises_autorisees || updateData.entreprises_autorisees.length === 0)) {
+    if (
+      updateData.diffusion_mode === "restreint" &&
+      (!updateData.entreprises_autorisees ||
+        updateData.entreprises_autorisees.length === 0)
+    ) {
       return res.status(400).json({
-        error: "En mode restreint, vous devez spécifier au moins une entreprise autorisée",
+        error:
+          "En mode restreint, vous devez spécifier au moins une entreprise autorisée",
       });
     }
 
@@ -523,10 +580,10 @@ export async function updateTicket(req, res) {
     }
 
     // Gestion automatique des dates
-    if (updateData.statut === 'accepté' && !existingTicket.date_acceptation) {
+    if (updateData.statut === "accepté" && !existingTicket.date_acceptation) {
       updateData.date_acceptation = new Date().toISOString();
     }
-    if (updateData.statut === 'terminé' && !existingTicket.date_cloture) {
+    if (updateData.statut === "terminé" && !existingTicket.date_cloture) {
       updateData.date_cloture = new Date().toISOString();
     }
 
@@ -582,7 +639,7 @@ export async function deleteTicket(req, res) {
     }
 
     // Vérification des droits selon le rôle
-    if (userProfile.role === 'locataire') {
+    if (userProfile.role === "locataire") {
       const { data: locataireData } = await supabaseServer
         .from("locataires")
         .select("id")
@@ -596,18 +653,18 @@ export async function deleteTicket(req, res) {
       }
 
       // Un locataire ne peut supprimer que les tickets non diffusés
-      if (!['nouveau', 'en_attente_diffusion'].includes(ticket.statut)) {
+      if (!["nouveau", "en_attente_diffusion"].includes(ticket.statut)) {
         return res.status(403).json({
           error: "Vous ne pouvez supprimer que les tickets non encore diffusés",
         });
       }
-    } else if (userProfile.role === 'regie') {
+    } else if (userProfile.role === "regie") {
       if (ticket.regie_id !== userProfile.regie_id) {
         return res.status(403).json({
           error: "Accès refusé",
         });
       }
-    } else if (userProfile.role !== 'admin_jtec') {
+    } else if (userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Rôle non autorisé pour supprimer un ticket",
       });
@@ -643,7 +700,7 @@ export async function deleteTicket(req, res) {
  * PUT /api/tickets/:id/diffuse
  * Diffuser un ticket aux entreprises
  * Endpoint spécifique pour la régie
- * 
+ *
  * Body attendu :
  * {
  *   diffusion_mode: 'general' | 'restreint',
@@ -657,7 +714,7 @@ export async function diffuseTicket(req, res) {
     const userProfile = req.profile;
 
     // Seules les régies et admins peuvent diffuser
-    if (userProfile.role !== 'regie' && userProfile.role !== 'admin_jtec') {
+    if (userProfile.role !== "regie" && userProfile.role !== "admin_jtec") {
       return res.status(403).json({
         error: "Seules les régies peuvent diffuser des tickets",
       });
@@ -677,40 +734,51 @@ export async function diffuseTicket(req, res) {
     }
 
     // Vérifier que c'est bien la régie du ticket
-    if (userProfile.role === 'regie' && ticket.regie_id !== userProfile.regie_id) {
+    if (
+      userProfile.role === "regie" &&
+      ticket.regie_id !== userProfile.regie_id
+    ) {
       return res.status(403).json({
         error: "Accès refusé",
       });
     }
 
     // Vérifier que le ticket est dans un état qui permet la diffusion
-    if (!['nouveau', 'en_attente_diffusion'].includes(ticket.statut)) {
+    if (!["nouveau", "en_attente_diffusion"].includes(ticket.statut)) {
       return res.status(400).json({
-        error: "Ce ticket ne peut plus être diffusé (statut actuel: " + ticket.statut + ")",
+        error:
+          "Ce ticket ne peut plus être diffusé (statut actuel: " +
+          ticket.statut +
+          ")",
       });
     }
 
     // Validation
-    if (!['general', 'restreint'].includes(diffusion_mode)) {
+    if (!["general", "restreint"].includes(diffusion_mode)) {
       return res.status(400).json({
         error: "Le mode de diffusion doit être 'general' ou 'restreint'",
       });
     }
 
-    if (diffusion_mode === 'restreint' && entreprises_autorisees.length === 0) {
+    if (diffusion_mode === "restreint" && entreprises_autorisees.length === 0) {
       return res.status(400).json({
-        error: "En mode restreint, vous devez spécifier au moins une entreprise",
+        error:
+          "En mode restreint, vous devez spécifier au moins une entreprise",
       });
     }
 
     // Vérifier que les entreprises existent
-    if (diffusion_mode === 'restreint') {
-      const { data: entreprisesData, error: entreprisesError } = await supabaseServer
-        .from("entreprises")
-        .select("id")
-        .in("id", entreprises_autorisees);
+    if (diffusion_mode === "restreint") {
+      const { data: entreprisesData, error: entreprisesError } =
+        await supabaseServer
+          .from("entreprises")
+          .select("id")
+          .in("id", entreprises_autorisees);
 
-      if (entreprisesError || entreprisesData.length !== entreprises_autorisees.length) {
+      if (
+        entreprisesError ||
+        entreprisesData.length !== entreprises_autorisees.length
+      ) {
         return res.status(400).json({
           error: "Une ou plusieurs entreprises spécifiées n'existent pas",
         });
@@ -722,8 +790,9 @@ export async function diffuseTicket(req, res) {
       .from("tickets")
       .update({
         diffusion_mode,
-        entreprises_autorisees: diffusion_mode === 'restreint' ? entreprises_autorisees : [],
-        statut: 'diffusé',
+        entreprises_autorisees:
+          diffusion_mode === "restreint" ? entreprises_autorisees : [],
+        statut: "diffusé",
       })
       .eq("id", id)
       .select()

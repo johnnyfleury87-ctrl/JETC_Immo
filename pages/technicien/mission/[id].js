@@ -127,26 +127,30 @@ export default function TechnicienMissionDetail() {
     <Layout>
       <div className="card fade-in">
         <h1 className="page-title">Détail de ma mission</h1>
-        
+
         {loading ? (
           <p>Chargement...</p>
         ) : mission ? (
           <div>
             <h2>Mission #{mission.id}</h2>
-            <p><strong>Statut :</strong> {mission.statut}</p>
-            <p><strong>Locataire :</strong> {mission.locataire_nom || "N/A"}</p>
-            <p><strong>Adresse :</strong> {mission.adresse || "N/A"}</p>
-            <p><strong>Description :</strong> {mission.description}</p>
-            
+            <p>
+              <strong>Statut :</strong> {mission.statut}
+            </p>
+            <p>
+              <strong>Locataire :</strong> {mission.locataire_nom || "N/A"}
+            </p>
+            <p>
+              <strong>Adresse :</strong> {mission.adresse || "N/A"}
+            </p>
+            <p>
+              <strong>Description :</strong> {mission.description}
+            </p>
+
             <div style={{ marginTop: "2rem" }}>
               <h3>Ajouter une photo</h3>
-              <input 
-                type="file" 
-                onChange={handleFileChange}
-                accept="image/*"
-              />
-              <button 
-                className="btn hover-glow" 
+              <input type="file" onChange={handleFileChange} accept="image/*" />
+              <button
+                className="btn hover-glow"
                 onClick={handleUploadPhoto}
                 style={{ marginLeft: "0.5rem" }}
               >
@@ -160,9 +164,19 @@ export default function TechnicienMissionDetail() {
                 {files.map((file, index) => (
                   <div key={index} style={{ marginBottom: "1rem" }}>
                     {file.url ? (
-                      <img src={file.url} alt={file.name} style={{ maxWidth: "400px" }} />
+                      <img
+                        src={file.url}
+                        alt={file.name}
+                        style={{ maxWidth: "400px" }}
+                      />
                     ) : (
-                      <a href={file.url} target="_blank" rel="noopener noreferrer">{file.name}</a>
+                      <a
+                        href={file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {file.name}
+                      </a>
                     )}
                   </div>
                 ))}
@@ -170,32 +184,29 @@ export default function TechnicienMissionDetail() {
             )}
 
             <SignaturePad onSave={handleSaveSignature} />
-            
+
             <div style={{ marginTop: "2rem" }}>
               {mission.statut === "planifiee" && (
-                <button 
-                  className="btn hover-glow" 
+                <button
+                  className="btn hover-glow"
                   onClick={handleStart}
                   style={{ marginRight: "0.5rem" }}
                 >
                   Commencer
                 </button>
               )}
-              
+
               {mission.statut === "en_cours" && (
-                <button 
-                  className="btn hover-glow" 
+                <button
+                  className="btn hover-glow"
                   onClick={handleEnd}
                   style={{ marginRight: "0.5rem" }}
                 >
                   Terminer
                 </button>
               )}
-              
-              <button 
-                className="btn hover-glow" 
-                onClick={handleCancel}
-              >
+
+              <button className="btn hover-glow" onClick={handleCancel}>
                 Annuler
               </button>
             </div>

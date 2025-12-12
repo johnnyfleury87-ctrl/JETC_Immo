@@ -3,17 +3,17 @@
 // Description : Dashboard et gestion Admin JTEC (Étape 14)
 // ============================================================================
 
-import { supabase } from './index.js';
+import { supabase } from "./index.js";
 
 // Middleware pour vérifier le rôle admin
 async function checkAdminRole(userId) {
   const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', userId)
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
     .single();
 
-  if (error || !profile || profile.role !== 'admin_jtec') {
+  if (error || !profile || profile.role !== "admin_jtec") {
     return false;
   }
   return true;
@@ -30,25 +30,28 @@ export async function getGlobalStats(req, res) {
     // Vérifier le rôle admin
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     // Récupérer les statistiques depuis la vue
     const { data: stats, error } = await supabase
-      .from('vue_stats_globales')
-      .select('*')
+      .from("vue_stats_globales")
+      .select("*")
       .single();
 
     if (error) {
-      console.error('Erreur getGlobalStats:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des statistiques' });
+      console.error("Erreur getGlobalStats:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération des statistiques" });
     }
 
     return res.json({ stats });
-
   } catch (error) {
-    console.error('Erreur getGlobalStats:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur getGlobalStats:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -62,23 +65,26 @@ export async function getSubscriptionsByPlan(req, res) {
 
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const { data: stats, error } = await supabase
-      .from('vue_abonnements_par_plan')
-      .select('*');
+      .from("vue_abonnements_par_plan")
+      .select("*");
 
     if (error) {
-      console.error('Erreur getSubscriptionsByPlan:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des statistiques' });
+      console.error("Erreur getSubscriptionsByPlan:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération des statistiques" });
     }
 
     return res.json({ stats });
-
   } catch (error) {
-    console.error('Erreur getSubscriptionsByPlan:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur getSubscriptionsByPlan:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -92,23 +98,26 @@ export async function getTicketsStats(req, res) {
 
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const { data: stats, error } = await supabase
-      .from('vue_tickets_par_statut')
-      .select('*');
+      .from("vue_tickets_par_statut")
+      .select("*");
 
     if (error) {
-      console.error('Erreur getTicketsStats:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des statistiques' });
+      console.error("Erreur getTicketsStats:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération des statistiques" });
     }
 
     return res.json({ stats });
-
   } catch (error) {
-    console.error('Erreur getTicketsStats:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur getTicketsStats:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -122,23 +131,26 @@ export async function getMissionsStats(req, res) {
 
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const { data: stats, error } = await supabase
-      .from('vue_missions_par_statut')
-      .select('*');
+      .from("vue_missions_par_statut")
+      .select("*");
 
     if (error) {
-      console.error('Erreur getMissionsStats:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des statistiques' });
+      console.error("Erreur getMissionsStats:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération des statistiques" });
     }
 
     return res.json({ stats });
-
   } catch (error) {
-    console.error('Erreur getMissionsStats:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur getMissionsStats:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -152,23 +164,26 @@ export async function getFacturesStats(req, res) {
 
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const { data: stats, error } = await supabase
-      .from('vue_factures_par_statut')
-      .select('*');
+      .from("vue_factures_par_statut")
+      .select("*");
 
     if (error) {
-      console.error('Erreur getFacturesStats:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des statistiques' });
+      console.error("Erreur getFacturesStats:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération des statistiques" });
     }
 
     return res.json({ stats });
-
   } catch (error) {
-    console.error('Erreur getFacturesStats:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur getFacturesStats:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -182,23 +197,26 @@ export async function getTopRegies(req, res) {
 
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const { data: regies, error } = await supabase
-      .from('vue_top_regies')
-      .select('*');
+      .from("vue_top_regies")
+      .select("*");
 
     if (error) {
-      console.error('Erreur getTopRegies:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des régies' });
+      console.error("Erreur getTopRegies:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération des régies" });
     }
 
     return res.json({ regies });
-
   } catch (error) {
-    console.error('Erreur getTopRegies:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur getTopRegies:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -212,23 +230,26 @@ export async function getTopEntreprises(req, res) {
 
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const { data: entreprises, error } = await supabase
-      .from('vue_top_entreprises')
-      .select('*');
+      .from("vue_top_entreprises")
+      .select("*");
 
     if (error) {
-      console.error('Erreur getTopEntreprises:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des entreprises' });
+      console.error("Erreur getTopEntreprises:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération des entreprises" });
     }
 
     return res.json({ entreprises });
-
   } catch (error) {
-    console.error('Erreur getTopEntreprises:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur getTopEntreprises:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -242,23 +263,26 @@ export async function getEvolutionMensuelle(req, res) {
 
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const { data: evolution, error } = await supabase
-      .from('vue_evolution_mensuelle')
-      .select('*');
+      .from("vue_evolution_mensuelle")
+      .select("*");
 
     if (error) {
-      console.error('Erreur getEvolutionMensuelle:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération de l\'évolution' });
+      console.error("Erreur getEvolutionMensuelle:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération de l'évolution" });
     }
 
     return res.json({ evolution });
-
   } catch (error) {
-    console.error('Erreur getEvolutionMensuelle:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur getEvolutionMensuelle:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -272,23 +296,26 @@ export async function getExpiringSubscriptions(req, res) {
 
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const { data: subscriptions, error } = await supabase
-      .from('vue_abonnements_expirant')
-      .select('*');
+      .from("vue_abonnements_expirant")
+      .select("*");
 
     if (error) {
-      console.error('Erreur getExpiringSubscriptions:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des abonnements' });
+      console.error("Erreur getExpiringSubscriptions:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération des abonnements" });
     }
 
     return res.json({ subscriptions });
-
   } catch (error) {
-    console.error('Erreur getExpiringSubscriptions:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur getExpiringSubscriptions:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -303,50 +330,58 @@ export async function listAllRegies(req, res) {
 
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     let query = supabase
-      .from('regies')
-      .select(`
+      .from("regies")
+      .select(
+        `
         *,
         plan:plans(nom, prix_mensuel),
         immeubles_count:immeubles(count),
         locataires_count:locataires(count)
-      `, { count: 'exact' })
-      .order('created_at', { ascending: false })
+      `,
+        { count: "exact" }
+      )
+      .order("created_at", { ascending: false })
       .range(offset, offset + parseInt(limit) - 1);
 
     if (search) {
-      query = query.or(`nom.ilike.%${search}%,email.ilike.%${search}%,siret.ilike.%${search}%`);
+      query = query.or(
+        `nom.ilike.%${search}%,email.ilike.%${search}%,siret.ilike.%${search}%`
+      );
     }
 
     if (subscription_actif !== undefined) {
-      query = query.eq('subscription_actif', subscription_actif === 'true');
+      query = query.eq("subscription_actif", subscription_actif === "true");
     }
 
     const { data: regies, error, count } = await query;
 
     if (error) {
-      console.error('Erreur listAllRegies:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des régies' });
+      console.error("Erreur listAllRegies:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération des régies" });
     }
 
-    return res.json({ 
+    return res.json({
       regies,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
         total: count,
-        totalPages: Math.ceil(count / parseInt(limit))
-      }
+        totalPages: Math.ceil(count / parseInt(limit)),
+      },
     });
-
   } catch (error) {
-    console.error('Erreur listAllRegies:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur listAllRegies:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -361,50 +396,58 @@ export async function listAllEntreprises(req, res) {
 
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     let query = supabase
-      .from('entreprises')
-      .select(`
+      .from("entreprises")
+      .select(
+        `
         *,
         plan:plans(nom, prix_mensuel),
         techniciens_count:profiles!profiles_entreprise_id_fkey(count),
         missions_count:missions(count)
-      `, { count: 'exact' })
-      .order('created_at', { ascending: false })
+      `,
+        { count: "exact" }
+      )
+      .order("created_at", { ascending: false })
       .range(offset, offset + parseInt(limit) - 1);
 
     if (search) {
-      query = query.or(`nom.ilike.%${search}%,email.ilike.%${search}%,siret.ilike.%${search}%`);
+      query = query.or(
+        `nom.ilike.%${search}%,email.ilike.%${search}%,siret.ilike.%${search}%`
+      );
     }
 
     if (subscription_actif !== undefined) {
-      query = query.eq('subscription_actif', subscription_actif === 'true');
+      query = query.eq("subscription_actif", subscription_actif === "true");
     }
 
     const { data: entreprises, error, count } = await query;
 
     if (error) {
-      console.error('Erreur listAllEntreprises:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des entreprises' });
+      console.error("Erreur listAllEntreprises:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération des entreprises" });
     }
 
-    return res.json({ 
+    return res.json({
       entreprises,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
         total: count,
-        totalPages: Math.ceil(count / parseInt(limit))
-      }
+        totalPages: Math.ceil(count / parseInt(limit)),
+      },
     });
-
   } catch (error) {
-    console.error('Erreur listAllEntreprises:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur listAllEntreprises:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -419,49 +462,57 @@ export async function listAllUsers(req, res) {
 
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     let query = supabase
-      .from('profiles')
-      .select(`
+      .from("profiles")
+      .select(
+        `
         *,
         regie:regies(nom),
         entreprise:entreprises(nom)
-      `, { count: 'exact' })
-      .order('created_at', { ascending: false })
+      `,
+        { count: "exact" }
+      )
+      .order("created_at", { ascending: false })
       .range(offset, offset + parseInt(limit) - 1);
 
     if (search) {
-      query = query.or(`nom.ilike.%${search}%,prenom.ilike.%${search}%,email.ilike.%${search}%`);
+      query = query.or(
+        `nom.ilike.%${search}%,prenom.ilike.%${search}%,email.ilike.%${search}%`
+      );
     }
 
     if (role) {
-      query = query.eq('role', role);
+      query = query.eq("role", role);
     }
 
     const { data: users, error, count } = await query;
 
     if (error) {
-      console.error('Erreur listAllUsers:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
+      console.error("Erreur listAllUsers:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération des utilisateurs" });
     }
 
-    return res.json({ 
+    return res.json({
       users,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
         total: count,
-        totalPages: Math.ceil(count / parseInt(limit))
-      }
+        totalPages: Math.ceil(count / parseInt(limit)),
+      },
     });
-
   } catch (error) {
-    console.error('Erreur listAllUsers:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur listAllUsers:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -477,16 +528,18 @@ export async function toggleSubscription(req, res) {
 
     const isAdmin = await checkAdminRole(userId);
     if (!isAdmin) {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
-    if (!['actif', 'suspendu', 'annule'].includes(statut)) {
-      return res.status(400).json({ error: 'Statut invalide' });
+    if (!["actif", "suspendu", "annule"].includes(statut)) {
+      return res.status(400).json({ error: "Statut invalide" });
     }
 
     const { data: subscription, error } = await supabase
-      .from('subscriptions')
-      .update({ 
+      .from("subscriptions")
+      .update({
         statut,
         historique: supabase.raw(`
           COALESCE(historique, '[]'::jsonb) || 
@@ -495,37 +548,38 @@ export async function toggleSubscription(req, res) {
             'action', 'admin_change_statut',
             'nouveau_statut', '${statut}'
           )::jsonb
-        `)
+        `),
       })
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
     if (error) {
-      console.error('Erreur toggleSubscription:', error);
-      return res.status(500).json({ error: 'Erreur lors de la modification de l\'abonnement' });
+      console.error("Erreur toggleSubscription:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la modification de l'abonnement" });
     }
 
     // Mettre à jour l'entité associée
     if (subscription.regie_id) {
       await supabase
-        .from('regies')
-        .update({ subscription_actif: statut === 'actif' })
-        .eq('id', subscription.regie_id);
+        .from("regies")
+        .update({ subscription_actif: statut === "actif" })
+        .eq("id", subscription.regie_id);
     } else if (subscription.entreprise_id) {
       await supabase
-        .from('entreprises')
-        .update({ subscription_actif: statut === 'actif' })
-        .eq('id', subscription.entreprise_id);
+        .from("entreprises")
+        .update({ subscription_actif: statut === "actif" })
+        .eq("id", subscription.entreprise_id);
     }
 
-    return res.json({ 
+    return res.json({
       message: `Abonnement ${statut} avec succès`,
-      subscription 
+      subscription,
     });
-
   } catch (error) {
-    console.error('Erreur toggleSubscription:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur toggleSubscription:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }

@@ -3,7 +3,7 @@
 // Description : Gestion des abonnements et plans
 // ============================================================================
 
-import { supabase, supabaseServer } from './index.js';
+import { supabase, supabaseServer } from "./index.js";
 
 // ============================================================================
 // PLANS - ENDPOINT 1 : Lister tous les plans disponibles
@@ -15,29 +15,30 @@ export async function listPlans(req, res) {
     const { type_entite } = req.query;
 
     let query = supabase
-      .from('plans')
-      .select('*')
-      .eq('est_actif', true)
-      .eq('est_visible', true)
-      .order('ordre_affichage', { ascending: true });
+      .from("plans")
+      .select("*")
+      .eq("est_actif", true)
+      .eq("est_visible", true)
+      .order("ordre_affichage", { ascending: true });
 
     // Filtrer par type si spécifié
-    if (type_entite && ['regie', 'entreprise', 'both'].includes(type_entite)) {
+    if (type_entite && ["regie", "entreprise", "both"].includes(type_entite)) {
       query = query.or(`type_entite.eq.${type_entite},type_entite.eq.both`);
     }
 
     const { data: plans, error } = await query;
 
     if (error) {
-      console.error('Erreur listPlans:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des plans' });
+      console.error("Erreur listPlans:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération des plans" });
     }
 
     return res.json({ plans });
-
   } catch (error) {
-    console.error('Erreur listPlans:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur listPlans:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -50,20 +51,19 @@ export async function getPlan(req, res) {
     const { id } = req.params;
 
     const { data: plan, error } = await supabase
-      .from('plans')
-      .select('*')
-      .eq('id', id)
+      .from("plans")
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (error || !plan) {
-      return res.status(404).json({ error: 'Plan non trouvé' });
+      return res.status(404).json({ error: "Plan non trouvé" });
     }
 
     return res.json({ plan });
-
   } catch (error) {
-    console.error('Erreur getPlan:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur getPlan:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -78,35 +78,38 @@ export async function createPlan(req, res) {
 
     // Vérifier que l'utilisateur est admin
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
       .single();
 
-    if (profileError || !profile || profile.role !== 'admin_jtec') {
-      return res.status(403).json({ error: 'Seuls les administrateurs peuvent créer des plans' });
+    if (profileError || !profile || profile.role !== "admin_jtec") {
+      return res
+        .status(403)
+        .json({ error: "Seuls les administrateurs peuvent créer des plans" });
     }
 
     // Créer le plan
     const { data: plan, error: createError } = await supabase
-      .from('plans')
+      .from("plans")
       .insert(planData)
       .select()
       .single();
 
     if (createError) {
-      console.error('Erreur createPlan:', createError);
-      return res.status(500).json({ error: 'Erreur lors de la création du plan' });
+      console.error("Erreur createPlan:", createError);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la création du plan" });
     }
 
-    return res.status(201).json({ 
-      message: 'Plan créé avec succès',
-      plan 
+    return res.status(201).json({
+      message: "Plan créé avec succès",
+      plan,
     });
-
   } catch (error) {
-    console.error('Erreur createPlan:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur createPlan:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -122,13 +125,15 @@ export async function updatePlan(req, res) {
 
     // Vérifier que l'utilisateur est admin
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
       .single();
 
-    if (profileError || !profile || profile.role !== 'admin_jtec') {
-      return res.status(403).json({ error: 'Seuls les administrateurs peuvent modifier des plans' });
+    if (profileError || !profile || profile.role !== "admin_jtec") {
+      return res.status(403).json({
+        error: "Seuls les administrateurs peuvent modifier des plans",
+      });
     }
 
     // Empêcher la modification de certains champs
@@ -137,24 +142,23 @@ export async function updatePlan(req, res) {
     delete updates.updated_at;
 
     const { data: plan, error: updateError } = await supabase
-      .from('plans')
+      .from("plans")
       .update(updates)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
     if (updateError || !plan) {
-      return res.status(404).json({ error: 'Plan non trouvé' });
+      return res.status(404).json({ error: "Plan non trouvé" });
     }
 
-    return res.json({ 
-      message: 'Plan mis à jour avec succès',
-      plan 
+    return res.json({
+      message: "Plan mis à jour avec succès",
+      plan,
     });
-
   } catch (error) {
-    console.error('Erreur updatePlan:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur updatePlan:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -165,142 +169,171 @@ export async function updatePlan(req, res) {
 // ============================================================================
 export async function createSubscription(req, res) {
   try {
-    const { plan_id, regie_id, entreprise_id, frequence_paiement = 'mensuel' } = req.body;
+    const {
+      plan_id,
+      regie_id,
+      entreprise_id,
+      frequence_paiement = "mensuel",
+    } = req.body;
     const userId = req.user.id;
 
     // Validation
     if (!plan_id) {
-      return res.status(400).json({ error: 'plan_id est requis' });
+      return res.status(400).json({ error: "plan_id est requis" });
     }
 
     if (!regie_id && !entreprise_id) {
-      return res.status(400).json({ error: 'regie_id ou entreprise_id est requis' });
+      return res
+        .status(400)
+        .json({ error: "regie_id ou entreprise_id est requis" });
     }
 
     if (regie_id && entreprise_id) {
-      return res.status(400).json({ error: 'Spécifiez soit regie_id, soit entreprise_id, pas les deux' });
+      return res.status(400).json({
+        error: "Spécifiez soit regie_id, soit entreprise_id, pas les deux",
+      });
     }
 
     // Récupérer le profil utilisateur
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('role, regie_id, entreprise_id')
-      .eq('id', userId)
+      .from("profiles")
+      .select("role, regie_id, entreprise_id")
+      .eq("id", userId)
       .single();
 
     if (profileError || !profile) {
-      return res.status(403).json({ error: 'Profil non trouvé' });
+      return res.status(403).json({ error: "Profil non trouvé" });
     }
 
     // Vérifier les permissions
-    if (profile.role !== 'admin_jtec') {
-      if (regie_id && (profile.role !== 'regie' || profile.regie_id !== regie_id)) {
-        return res.status(403).json({ error: 'Vous ne pouvez créer un abonnement que pour votre propre régie' });
+    if (profile.role !== "admin_jtec") {
+      if (
+        regie_id &&
+        (profile.role !== "regie" || profile.regie_id !== regie_id)
+      ) {
+        return res.status(403).json({
+          error:
+            "Vous ne pouvez créer un abonnement que pour votre propre régie",
+        });
       }
-      if (entreprise_id && (profile.role !== 'entreprise' || profile.entreprise_id !== entreprise_id)) {
-        return res.status(403).json({ error: 'Vous ne pouvez créer un abonnement que pour votre propre entreprise' });
+      if (
+        entreprise_id &&
+        (profile.role !== "entreprise" ||
+          profile.entreprise_id !== entreprise_id)
+      ) {
+        return res.status(403).json({
+          error:
+            "Vous ne pouvez créer un abonnement que pour votre propre entreprise",
+        });
       }
     }
 
     // Récupérer le plan
     const { data: plan, error: planError } = await supabase
-      .from('plans')
-      .select('*')
-      .eq('id', plan_id)
+      .from("plans")
+      .select("*")
+      .eq("id", plan_id)
       .single();
 
     if (planError || !plan) {
-      return res.status(404).json({ error: 'Plan non trouvé' });
+      return res.status(404).json({ error: "Plan non trouvé" });
     }
 
     // Vérifier qu'il n'existe pas déjà un abonnement actif
     let existingSubQuery = supabase
-      .from('subscriptions')
-      .select('id')
-      .in('statut', ['essai', 'actif']);
+      .from("subscriptions")
+      .select("id")
+      .in("statut", ["essai", "actif"]);
 
     if (regie_id) {
-      existingSubQuery = existingSubQuery.eq('regie_id', regie_id);
+      existingSubQuery = existingSubQuery.eq("regie_id", regie_id);
     } else {
-      existingSubQuery = existingSubQuery.eq('entreprise_id', entreprise_id);
+      existingSubQuery = existingSubQuery.eq("entreprise_id", entreprise_id);
     }
 
-    const { data: existingSub, error: checkError } = await existingSubQuery.maybeSingle();
+    const { data: existingSub, error: checkError } =
+      await existingSubQuery.maybeSingle();
 
     if (existingSub) {
-      return res.status(409).json({ 
-        error: 'Un abonnement actif existe déjà. Annulez-le avant d\'en créer un nouveau.',
-        subscription_id: existingSub.id
+      return res.status(409).json({
+        error:
+          "Un abonnement actif existe déjà. Annulez-le avant d'en créer un nouveau.",
+        subscription_id: existingSub.id,
       });
     }
 
     // Calculer les dates
     const dateDebut = new Date();
-    const dateFinEssai = plan.periode_essai_jours > 0 
-      ? new Date(Date.now() + plan.periode_essai_jours * 24 * 60 * 60 * 1000)
-      : null;
-    
-    const dateFin = frequence_paiement === 'annuel'
-      ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
-      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const dateFinEssai =
+      plan.periode_essai_jours > 0
+        ? new Date(Date.now() + plan.periode_essai_jours * 24 * 60 * 60 * 1000)
+        : null;
 
-    const montantFacture = frequence_paiement === 'annuel' && plan.prix_annuel
-      ? plan.prix_annuel
-      : plan.prix_mensuel;
+    const dateFin =
+      frequence_paiement === "annuel"
+        ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+    const montantFacture =
+      frequence_paiement === "annuel" && plan.prix_annuel
+        ? plan.prix_annuel
+        : plan.prix_mensuel;
 
     // Créer l'abonnement
     const { data: subscription, error: createError } = await supabaseServer
-      .from('subscriptions')
+      .from("subscriptions")
       .insert({
         regie_id: regie_id || null,
         entreprise_id: entreprise_id || null,
         plan_id,
-        statut: dateFinEssai ? 'essai' : 'actif',
+        statut: dateFinEssai ? "essai" : "actif",
         date_debut: dateDebut.toISOString(),
         date_fin_essai: dateFinEssai?.toISOString() || null,
         date_fin: dateFin.toISOString(),
-        date_prochain_paiement: dateFinEssai?.toISOString() || dateFin.toISOString(),
+        date_prochain_paiement:
+          dateFinEssai?.toISOString() || dateFin.toISOString(),
         frequence_paiement,
         montant_facture: montantFacture,
-        date_reset_usage: dateDebut.toISOString()
+        date_reset_usage: dateDebut.toISOString(),
       })
       .select()
       .single();
 
     if (createError) {
-      console.error('Erreur createSubscription:', createError);
-      return res.status(500).json({ error: 'Erreur lors de la création de l\'abonnement' });
+      console.error("Erreur createSubscription:", createError);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la création de l'abonnement" });
     }
 
     // Mettre à jour la régie ou entreprise avec le plan_id
     if (regie_id) {
       await supabase
-        .from('regies')
-        .update({ 
+        .from("regies")
+        .update({
           plan_id,
           subscription_actif: true,
-          date_fin_abonnement: dateFin.toISOString()
+          date_fin_abonnement: dateFin.toISOString(),
         })
-        .eq('id', regie_id);
+        .eq("id", regie_id);
     } else {
       await supabase
-        .from('entreprises')
-        .update({ 
+        .from("entreprises")
+        .update({
           plan_id,
           subscription_actif: true,
-          date_fin_abonnement: dateFin.toISOString()
+          date_fin_abonnement: dateFin.toISOString(),
         })
-        .eq('id', entreprise_id);
+        .eq("id", entreprise_id);
     }
 
-    return res.status(201).json({ 
-      message: 'Abonnement créé avec succès',
-      subscription 
+    return res.status(201).json({
+      message: "Abonnement créé avec succès",
+      subscription,
     });
-
   } catch (error) {
-    console.error('Erreur createSubscription:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur createSubscription:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -314,50 +347,55 @@ export async function getCurrentSubscription(req, res) {
 
     // Récupérer le profil utilisateur
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('role, regie_id, entreprise_id')
-      .eq('id', userId)
+      .from("profiles")
+      .select("role, regie_id, entreprise_id")
+      .eq("id", userId)
       .single();
 
     if (profileError || !profile) {
-      return res.status(403).json({ error: 'Profil non trouvé' });
+      return res.status(403).json({ error: "Profil non trouvé" });
     }
 
     // Construire la requête selon le rôle
     let query = supabase
-      .from('subscriptions')
-      .select(`
+      .from("subscriptions")
+      .select(
+        `
         *,
         plan:plans(*)
-      `)
-      .in('statut', ['essai', 'actif'])
-      .order('created_at', { ascending: false })
+      `
+      )
+      .in("statut", ["essai", "actif"])
+      .order("created_at", { ascending: false })
       .limit(1);
 
-    if (profile.role === 'regie' || profile.role === 'locataire') {
-      query = query.eq('regie_id', profile.regie_id);
-    } else if (profile.role === 'entreprise' || profile.role === 'technicien') {
-      query = query.eq('entreprise_id', profile.entreprise_id);
-    } else if (profile.role === 'admin_jtec') {
-      return res.status(400).json({ error: 'Les administrateurs n\'ont pas d\'abonnement' });
+    if (profile.role === "regie" || profile.role === "locataire") {
+      query = query.eq("regie_id", profile.regie_id);
+    } else if (profile.role === "entreprise" || profile.role === "technicien") {
+      query = query.eq("entreprise_id", profile.entreprise_id);
+    } else if (profile.role === "admin_jtec") {
+      return res
+        .status(400)
+        .json({ error: "Les administrateurs n'ont pas d'abonnement" });
     }
 
     const { data: subscription, error } = await query.maybeSingle();
 
     if (error) {
-      console.error('Erreur getCurrentSubscription:', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération de l\'abonnement' });
+      console.error("Erreur getCurrentSubscription:", error);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de la récupération de l'abonnement" });
     }
 
     if (!subscription) {
-      return res.status(404).json({ error: 'Aucun abonnement actif trouvé' });
+      return res.status(404).json({ error: "Aucun abonnement actif trouvé" });
     }
 
     return res.json({ subscription });
-
   } catch (error) {
-    console.error('Erreur getCurrentSubscription:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur getCurrentSubscription:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -373,39 +411,40 @@ export async function changePlan(req, res) {
     const userId = req.user.id;
 
     if (!new_plan_id) {
-      return res.status(400).json({ error: 'new_plan_id est requis' });
+      return res.status(400).json({ error: "new_plan_id est requis" });
     }
 
     // Récupérer l'abonnement actuel
     const { data: subscription, error: subError } = await supabase
-      .from('subscriptions')
-      .select('*, plan:plans(*)')
-      .eq('id', id)
+      .from("subscriptions")
+      .select("*, plan:plans(*)")
+      .eq("id", id)
       .single();
 
     if (subError || !subscription) {
-      return res.status(404).json({ error: 'Abonnement non trouvé' });
+      return res.status(404).json({ error: "Abonnement non trouvé" });
     }
 
     // Récupérer le nouveau plan
     const { data: newPlan, error: planError } = await supabase
-      .from('plans')
-      .select('*')
-      .eq('id', new_plan_id)
+      .from("plans")
+      .select("*")
+      .eq("id", new_plan_id)
       .single();
 
     if (planError || !newPlan) {
-      return res.status(404).json({ error: 'Nouveau plan non trouvé' });
+      return res.status(404).json({ error: "Nouveau plan non trouvé" });
     }
 
     // Calculer le nouveau montant
-    const montantFacture = subscription.frequence_paiement === 'annuel' && newPlan.prix_annuel
-      ? newPlan.prix_annuel
-      : newPlan.prix_mensuel;
+    const montantFacture =
+      subscription.frequence_paiement === "annuel" && newPlan.prix_annuel
+        ? newPlan.prix_annuel
+        : newPlan.prix_mensuel;
 
     // Mettre à jour l'abonnement
     const { data: updatedSubscription, error: updateError } = await supabase
-      .from('subscriptions')
+      .from("subscriptions")
       .update({
         plan_id: new_plan_id,
         montant_facture: montantFacture,
@@ -413,42 +452,43 @@ export async function changePlan(req, res) {
           ...(subscription.historique || []),
           {
             date: new Date().toISOString(),
-            action: 'changement_plan',
+            action: "changement_plan",
             ancien_plan_id: subscription.plan_id,
-            nouveau_plan_id: new_plan_id
-          }
-        ]
+            nouveau_plan_id: new_plan_id,
+          },
+        ],
       })
-      .eq('id', id)
-      .select('*, plan:plans(*)')
+      .eq("id", id)
+      .select("*, plan:plans(*)")
       .single();
 
     if (updateError) {
-      console.error('Erreur changePlan:', updateError);
-      return res.status(500).json({ error: 'Erreur lors du changement de plan' });
+      console.error("Erreur changePlan:", updateError);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors du changement de plan" });
     }
 
     // Mettre à jour la régie ou entreprise
     if (subscription.regie_id) {
       await supabase
-        .from('regies')
+        .from("regies")
         .update({ plan_id: new_plan_id })
-        .eq('id', subscription.regie_id);
+        .eq("id", subscription.regie_id);
     } else if (subscription.entreprise_id) {
       await supabase
-        .from('entreprises')
+        .from("entreprises")
         .update({ plan_id: new_plan_id })
-        .eq('id', subscription.entreprise_id);
+        .eq("id", subscription.entreprise_id);
     }
 
-    return res.json({ 
-      message: 'Plan changé avec succès',
-      subscription: updatedSubscription 
+    return res.json({
+      message: "Plan changé avec succès",
+      subscription: updatedSubscription,
     });
-
   } catch (error) {
-    console.error('Erreur changePlan:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur changePlan:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -463,59 +503,60 @@ export async function cancelSubscription(req, res) {
 
     // Récupérer l'abonnement
     const { data: subscription, error: subError } = await supabase
-      .from('subscriptions')
-      .select('*')
-      .eq('id', id)
+      .from("subscriptions")
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (subError || !subscription) {
-      return res.status(404).json({ error: 'Abonnement non trouvé' });
+      return res.status(404).json({ error: "Abonnement non trouvé" });
     }
 
     // Annuler l'abonnement
     const { data: cancelledSubscription, error: updateError } = await supabase
-      .from('subscriptions')
+      .from("subscriptions")
       .update({
-        statut: 'annule',
+        statut: "annule",
         date_annulation: new Date().toISOString(),
         historique: [
           ...(subscription.historique || []),
           {
             date: new Date().toISOString(),
-            action: 'annulation'
-          }
-        ]
+            action: "annulation",
+          },
+        ],
       })
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
     if (updateError) {
-      console.error('Erreur cancelSubscription:', updateError);
-      return res.status(500).json({ error: 'Erreur lors de l\'annulation de l\'abonnement' });
+      console.error("Erreur cancelSubscription:", updateError);
+      return res
+        .status(500)
+        .json({ error: "Erreur lors de l'annulation de l'abonnement" });
     }
 
     // Mettre à jour la régie ou entreprise
     if (subscription.regie_id) {
       await supabase
-        .from('regies')
+        .from("regies")
         .update({ subscription_actif: false })
-        .eq('id', subscription.regie_id);
+        .eq("id", subscription.regie_id);
     } else if (subscription.entreprise_id) {
       await supabase
-        .from('entreprises')
+        .from("entreprises")
         .update({ subscription_actif: false })
-        .eq('id', subscription.entreprise_id);
+        .eq("id", subscription.entreprise_id);
     }
 
-    return res.json({ 
-      message: 'Abonnement annulé avec succès',
-      subscription: cancelledSubscription 
+    return res.json({
+      message: "Abonnement annulé avec succès",
+      subscription: cancelledSubscription,
     });
-
   } catch (error) {
-    console.error('Erreur cancelSubscription:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur cancelSubscription:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -529,38 +570,45 @@ export async function checkLimit(req, res) {
     const userId = req.user.id;
 
     // Types de limites valides
-    const validLimits = ['immeubles', 'logements', 'locataires', 'tickets', 'missions', 'techniciens'];
+    const validLimits = [
+      "immeubles",
+      "logements",
+      "locataires",
+      "tickets",
+      "missions",
+      "techniciens",
+    ];
     if (!validLimits.includes(limit_type)) {
-      return res.status(400).json({ error: 'Type de limite invalide' });
+      return res.status(400).json({ error: "Type de limite invalide" });
     }
 
     // Récupérer le profil utilisateur
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('role, regie_id, entreprise_id')
-      .eq('id', userId)
+      .from("profiles")
+      .select("role, regie_id, entreprise_id")
+      .eq("id", userId)
       .single();
 
     if (profileError || !profile) {
-      return res.status(403).json({ error: 'Profil non trouvé' });
+      return res.status(403).json({ error: "Profil non trouvé" });
     }
 
     // Récupérer l'abonnement actif
     let query = supabase
-      .from('subscriptions')
-      .select('*, plan:plans(*)')
-      .in('statut', ['essai', 'actif']);
+      .from("subscriptions")
+      .select("*, plan:plans(*)")
+      .in("statut", ["essai", "actif"]);
 
-    if (profile.role === 'regie' || profile.role === 'locataire') {
-      query = query.eq('regie_id', profile.regie_id);
-    } else if (profile.role === 'entreprise' || profile.role === 'technicien') {
-      query = query.eq('entreprise_id', profile.entreprise_id);
+    if (profile.role === "regie" || profile.role === "locataire") {
+      query = query.eq("regie_id", profile.regie_id);
+    } else if (profile.role === "entreprise" || profile.role === "technicien") {
+      query = query.eq("entreprise_id", profile.entreprise_id);
     }
 
     const { data: subscription, error } = await query.maybeSingle();
 
     if (error || !subscription) {
-      return res.status(404).json({ error: 'Aucun abonnement actif trouvé' });
+      return res.status(404).json({ error: "Aucun abonnement actif trouvé" });
     }
 
     // Récupérer la limite et l'usage actuel
@@ -568,34 +616,34 @@ export async function checkLimit(req, res) {
     let usage = 0;
 
     switch (limit_type) {
-      case 'immeubles':
+      case "immeubles":
         limit = subscription.plan.max_immeubles;
         usage = subscription.usage_immeubles;
         break;
-      case 'logements':
+      case "logements":
         limit = subscription.plan.max_logements;
         usage = subscription.usage_logements;
         break;
-      case 'locataires':
+      case "locataires":
         limit = subscription.plan.max_locataires;
         usage = subscription.usage_locataires;
         break;
-      case 'tickets':
+      case "tickets":
         limit = subscription.plan.max_tickets_par_mois;
         usage = subscription.usage_tickets_mois_actuel;
         break;
-      case 'missions':
+      case "missions":
         limit = subscription.plan.max_missions_par_mois;
         usage = subscription.usage_missions_mois_actuel;
         break;
-      case 'techniciens':
+      case "techniciens":
         limit = subscription.plan.max_techniciens;
         // Compter les techniciens
         const { count } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .eq('entreprise_id', profile.entreprise_id)
-          .eq('role', 'technicien');
+          .from("profiles")
+          .select("*", { count: "exact", head: true })
+          .eq("entreprise_id", profile.entreprise_id)
+          .eq("role", "technicien");
         usage = count || 0;
         break;
     }
@@ -606,15 +654,14 @@ export async function checkLimit(req, res) {
 
     return res.json({
       limit_type,
-      limit: isUnlimited ? 'illimité' : limit,
+      limit: isUnlimited ? "illimité" : limit,
       usage,
       remaining,
       can_add: canAdd,
-      is_unlimited: isUnlimited
+      is_unlimited: isUnlimited,
     });
-
   } catch (error) {
-    console.error('Erreur checkLimit:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur checkLimit:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }

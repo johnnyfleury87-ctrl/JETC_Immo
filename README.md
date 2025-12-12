@@ -9,9 +9,11 @@ Plateforme complète de gestion des interventions techniques pour les régies im
 ## 📋 Résumé du Projet
 
 ### 🎯 Objectif
+
 SaaS multi-tenant pour la gestion complète du cycle de vie des interventions techniques dans l'immobilier résidentiel.
 
 ### 🏗️ Architecture
+
 - **Backend:** Node.js + Express (115 routes API RESTful)
 - **Base de données:** PostgreSQL via Supabase (17 tables + 9 vues SQL)
 - **Authentification:** Supabase Auth (JWT)
@@ -21,6 +23,7 @@ SaaS multi-tenant pour la gestion complète du cycle de vie des interventions te
 - **Logs:** Audit trail complet immutable
 
 ### 👥 Rôles Utilisateurs
+
 - **Locataire:** Créer des tickets, suivre les interventions
 - **Régie:** Gérer immeubles/logements, diffuser tickets, valider factures
 - **Entreprise:** Accepter tickets, créer missions, gérer techniciens
@@ -112,48 +115,56 @@ JETC_Immo/
 ## 🚀 Étapes Complétées
 
 ### ✅ Étape 0 - Initialisation
+
 - Structure projet créée
 - Configuration Supabase
 - Clients frontend/backend
 - Mode DEMO/PRO
 
 ### ✅ Étape 1 - Authentification & Profils
+
 - Inscription/Connexion (JWT)
 - Table `profiles` avec rôles
 - Middleware `authenticateUser`
 - **2 routes API**
 
 ### ✅ Étape 2 - Régies
+
 - CRUD régies immobilières
 - Liaison profiles ↔ regies
 - RLS par régie
 - **4 routes API**
 
 ### ✅ Étape 3 - Entreprises
+
 - CRUD entreprises prestataires
 - Spécialités, zones, tarifs
 - RLS par entreprise
 - **4 routes API**
 
 ### ✅ Étape 4 - Immeubles
+
 - CRUD immeubles par régie
 - Adresse, nb étages/logements
 - Cascade delete
 - **5 routes API**
 
 ### ✅ Étape 5 - Logements
+
 - CRUD logements par immeuble
 - Type, superficie, loyer
 - Filtrage par immeuble
 - **5 routes API**
 
 ### ✅ Étape 6 - Locataires
+
 - CRUD locataires par logement
 - Dates entrée/sortie
 - Soft delete
 - **5 routes API**
 
 ### ✅ Étape 7 - Tickets
+
 - Création tickets interventions
 - Catégories (Plomberie, Électricité, etc.)
 - Priorités (basse → urgente)
@@ -161,6 +172,7 @@ JETC_Immo/
 - **6 routes API**
 
 ### ✅ Étape 8 - Missions
+
 - Acceptation tickets par entreprises
 - Planification interventions
 - Assignation techniciens
@@ -168,6 +180,7 @@ JETC_Immo/
 - **6 routes API**
 
 ### ✅ Étape 9 - Techniciens & Interventions
+
 - CRUD techniciens par entreprise
 - Gestion interventions temps réel
 - Start/Pause/Complete
@@ -176,6 +189,7 @@ JETC_Immo/
 - **6 + 7 = 13 routes API**
 
 ### ✅ Étape 10 - Facturation
+
 - Génération factures depuis missions
 - Numéro auto-incrémenté `FAC-2024-00001`
 - TVA, dates échéance
@@ -183,6 +197,7 @@ JETC_Immo/
 - **6 routes API**
 
 ### ✅ Étape 11 - Messagerie
+
 - Conversations entre utilisateurs
 - Threading (réponses)
 - Contexte (ticket/mission/facture)
@@ -191,6 +206,7 @@ JETC_Immo/
 - **8 routes API**
 
 ### ✅ Étape 12 - Notifications
+
 - 16 types d'événements
 - Priorités (basse → urgente)
 - Canaux (in_app, email, push)
@@ -199,6 +215,7 @@ JETC_Immo/
 - **8 routes API**
 
 ### ✅ Étape 13 - Abonnements & Modules Payants
+
 - Table `plans` (prix, limites)
 - Table `subscriptions` (statut, usage)
 - Fonction `check_plan_limit()`
@@ -207,6 +224,7 @@ JETC_Immo/
 - **9 routes API**
 
 ### ✅ Étape 14 - Dashboard Admin JTEC
+
 - 9 vues SQL analytiques
 - Stats globales (MRR, entités actives)
 - Top 50 régies/entreprises
@@ -216,6 +234,7 @@ JETC_Immo/
 - **13 routes API**
 
 ### ✅ Étape 15 - UI/UX Avancé (Backend)
+
 - **Préférences utilisateur** (thème, langue, widgets)
 - **Paramètres application** (par entité)
 - **Webhooks** (intégrations externes, HMAC, retry)
@@ -223,6 +242,7 @@ JETC_Immo/
 - **21 routes API**
 
 ### ✅ Étape 16 - Documentation & Déploiement
+
 - Documentation API complète ([docs/API.md](docs/API.md))
 - Guide déploiement ([docs/DEPLOYMENT.md](docs/DEPLOYMENT.md))
 - Scripts SQL setup
@@ -233,16 +253,16 @@ JETC_Immo/
 
 ## 📊 Statistiques Finales
 
-| Catégorie | Nombre |
-|-----------|--------|
-| **Routes API** | **115** |
-| **Tables SQL** | **17** |
-| **Vues SQL** | **9** |
-| **Politiques RLS** | **26** |
-| **Fonctions SQL** | **2** |
-| **Buckets Storage** | **3** |
-| **Fichiers API** | **20** |
-| **Lignes SQL** | **~3000** |
+| Catégorie             | Nombre    |
+| --------------------- | --------- |
+| **Routes API**        | **115**   |
+| **Tables SQL**        | **17**    |
+| **Vues SQL**          | **9**     |
+| **Politiques RLS**    | **26**    |
+| **Fonctions SQL**     | **2**     |
+| **Buckets Storage**   | **3**     |
+| **Fichiers API**      | **20**    |
+| **Lignes SQL**        | **~3000** |
 | **Lignes JavaScript** | **~8000** |
 
 ---
@@ -250,17 +270,20 @@ JETC_Immo/
 ## ⚙️ Installation
 
 ### 1. Prérequis
+
 - **Node.js** v18+
 - **Compte Supabase** (gratuit ou pro)
 - **Git**
 
 ### 2. Cloner le projet
+
 ```bash
 git clone https://github.com/johnnyfleury87-ctrl/JETC_Immo.git
 cd JETC_Immo
 ```
 
 ### 3. Installer les dépendances
+
 ```bash
 npm install
 ```
@@ -268,16 +291,19 @@ npm install
 ### 4. Configuration Supabase
 
 #### a) Créer un projet Supabase
+
 - Aller sur [supabase.com](https://supabase.com)
 - Créer un nouveau projet
 - Noter l'URL et les clés API
 
 #### b) Configurer les variables d'environnement
+
 ```bash
 cp .env.example .env.local
 ```
 
 Éditer `.env.local`:
+
 ```env
 SUPABASE_URL=https://xxxxx.supabase.co
 SUPABASE_ANON_KEY=eyJhbGc...
@@ -287,6 +313,7 @@ PORT=3000
 ```
 
 #### c) Exécuter les scripts SQL (dans l'ordre)
+
 Via l'éditeur SQL Supabase:
 
 1. **Schema:**
@@ -307,6 +334,7 @@ Via l'éditeur SQL Supabase:
    - `supabase/demo/seed_demo.sql`
 
 ### 5. Démarrer le serveur
+
 ```bash
 npm run dev
 ```
@@ -314,6 +342,7 @@ npm run dev
 Le serveur démarre sur `http://localhost:3000`
 
 ### 6. Tester l'API
+
 ```bash
 # Health check
 curl http://localhost:3000/api/health
@@ -335,12 +364,15 @@ curl -X POST http://localhost:3000/api/auth/register \
 ## 📚 Documentation
 
 ### API REST
+
 Documentation complète des 115 endpoints: [docs/API.md](docs/API.md)
 
 ### Déploiement Production
+
 Guide étape par étape: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 
 ### Collection Postman
+
 Importer `docs/JETC_Immo.postman_collection.json` pour tester l'API.
 
 ---
@@ -348,22 +380,28 @@ Importer `docs/JETC_Immo.postman_collection.json` pour tester l'API.
 ## 🔒 Sécurité
 
 ### Row Level Security (RLS)
+
 Toutes les tables sont protégées par des politiques RLS:
+
 - **Régie** voit uniquement ses immeubles/logements/locataires
 - **Entreprise** voit uniquement ses missions/techniciens
 - **Locataire** voit uniquement ses tickets
 - **Admin** accès global pour supervision
 
 ### Authentification
+
 JWT Supabase avec refresh tokens automatiques.
 
 ### Webhooks HMAC
+
 Signature SHA-256 des payloads pour sécuriser les intégrations.
 
 ### Audit Trail
+
 Table `logs_activite` immuable pour traçabilité complète.
 
 ### Storage
+
 Buckets privés avec RLS sur les objets (photos interventions).
 
 ---
@@ -371,6 +409,7 @@ Buckets privés avec RLS sur les objets (photos interventions).
 ## 🧪 Tests
 
 ### Tests manuels
+
 ```bash
 # Créer un utilisateur régie
 curl -X POST http://localhost:3000/api/auth/register \
@@ -396,6 +435,7 @@ curl -X POST http://localhost:3000/api/immeubles \
 ```
 
 ### Tests automatisés (à venir)
+
 - Jest pour tests unitaires
 - Supertest pour tests d'intégration API
 - Coverage > 80%
@@ -407,6 +447,7 @@ curl -X POST http://localhost:3000/api/immeubles \
 ### Options de déploiement
 
 #### 1. Railway (recommandé)
+
 ```bash
 railway login
 railway init
@@ -414,17 +455,20 @@ railway up
 ```
 
 #### 2. Render
+
 - Connecter le repo GitHub
 - Configurer les variables d'environnement
 - Deploy automatique
 
 #### 3. Fly.io
+
 ```bash
 flyctl launch
 flyctl deploy
 ```
 
 #### 4. VPS (Linux)
+
 ```bash
 # Installer Node.js
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
@@ -489,6 +533,7 @@ UNLICENSED - Propriété privée JTEC
 ## 📞 Support
 
 Pour toute assistance technique:
+
 1. Consulter [docs/API.md](docs/API.md)
 2. Consulter [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 3. Ouvrir une issue GitHub

@@ -30,6 +30,7 @@ Ce guide couvre le déploiement de l'API JETC_Immo en production.
 Dans l'éditeur SQL Supabase (Dashboard > SQL Editor), exécuter **dans l'ordre**:
 
 #### a) Schema et tables
+
 ```sql
 -- 1. Initialisation
 -- Copier/coller le contenu de: supabase/schema/00_init_schema.sql
@@ -78,15 +79,15 @@ Exécuter tous les fichiers de `supabase/policies/` dans l'ordre numérique:
 
 ```sql
 -- Vérifier les tables
-SELECT table_name FROM information_schema.tables 
-WHERE table_schema = 'public' 
+SELECT table_name FROM information_schema.tables
+WHERE table_schema = 'public'
 ORDER BY table_name;
 
 -- Devrait retourner 17 tables
 
 -- Vérifier les politiques RLS
-SELECT schemaname, tablename, policyname 
-FROM pg_policies 
+SELECT schemaname, tablename, policyname
+FROM pg_policies
 WHERE schemaname = 'public';
 
 -- Devrait retourner ~70+ politiques
@@ -108,22 +109,26 @@ SELECT * FROM storage.buckets;
 #### Étapes:
 
 1. **Installer Railway CLI:**
+
 ```bash
 npm install -g @railway/cli
 ```
 
 2. **Login:**
+
 ```bash
 railway login
 ```
 
 3. **Initialiser le projet:**
+
 ```bash
 cd JETC_Immo
 railway init
 ```
 
 4. **Configurer les variables d'environnement:**
+
 ```bash
 railway variables set SUPABASE_URL=https://xxxxx.supabase.co
 railway variables set SUPABASE_ANON_KEY=eyJhbGc...
@@ -133,11 +138,13 @@ railway variables set PORT=3000
 ```
 
 5. **Déployer:**
+
 ```bash
 railway up
 ```
 
 6. **Obtenir l'URL:**
+
 ```bash
 railway domain
 ```
@@ -166,6 +173,7 @@ Votre API sera disponible sur: `https://jetc-immo-production.up.railway.app`
    - **Plan:** Free (ou Starter pour production)
 
 5. Variables d'environnement:
+
 ```
 SUPABASE_URL=https://xxxxx.supabase.co
 SUPABASE_ANON_KEY=eyJhbGc...
@@ -187,16 +195,19 @@ Deploy automatique à chaque push sur `main`.
 #### Étapes:
 
 1. **Installer Fly CLI:**
+
 ```bash
 curl -L https://fly.io/install.sh | sh
 ```
 
 2. **Login:**
+
 ```bash
 flyctl auth login
 ```
 
 3. **Créer `fly.toml`:**
+
 ```toml
 app = "jetc-immo-api"
 
@@ -225,11 +236,13 @@ app = "jetc-immo-api"
 ```
 
 4. **Launch:**
+
 ```bash
 flyctl launch
 ```
 
 5. **Définir les secrets:**
+
 ```bash
 flyctl secrets set SUPABASE_URL=https://xxxxx.supabase.co
 flyctl secrets set SUPABASE_ANON_KEY=eyJhbGc...
@@ -237,6 +250,7 @@ flyctl secrets set SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...
 ```
 
 6. **Deploy:**
+
 ```bash
 flyctl deploy
 ```
@@ -250,16 +264,19 @@ flyctl deploy
 #### Étapes:
 
 1. **Connexion SSH:**
+
 ```bash
 ssh root@votre-serveur.com
 ```
 
 2. **Mettre à jour le système:**
+
 ```bash
 apt update && apt upgrade -y
 ```
 
 3. **Installer Node.js 18:**
+
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 apt-get install -y nodejs
@@ -267,11 +284,13 @@ node -v  # Vérifier la version
 ```
 
 4. **Installer Git:**
+
 ```bash
 apt-get install -y git
 ```
 
 5. **Créer un utilisateur dédié:**
+
 ```bash
 adduser jetc --disabled-password --gecos ""
 usermod -aG sudo jetc
@@ -279,6 +298,7 @@ su - jetc
 ```
 
 6. **Cloner le projet:**
+
 ```bash
 cd ~
 git clone https://github.com/johnnyfleury87-ctrl/JETC_Immo.git
@@ -286,16 +306,19 @@ cd JETC_Immo
 ```
 
 7. **Installer les dépendances:**
+
 ```bash
 npm install --production
 ```
 
 8. **Créer le fichier .env.local:**
+
 ```bash
 nano .env.local
 ```
 
 Contenu:
+
 ```env
 SUPABASE_URL=https://xxxxx.supabase.co
 SUPABASE_ANON_KEY=eyJhbGc...
@@ -305,11 +328,13 @@ PORT=3000
 ```
 
 9. **Installer PM2 (Process Manager):**
+
 ```bash
 sudo npm install -g pm2
 ```
 
 10. **Démarrer l'application:**
+
 ```bash
 pm2 start api/index.js --name jetc-immo
 pm2 save
@@ -317,22 +342,26 @@ pm2 startup  # Suivre les instructions affichées
 ```
 
 11. **Vérifier le statut:**
+
 ```bash
 pm2 status
 pm2 logs jetc-immo
 ```
 
 12. **Installer Nginx (reverse proxy):**
+
 ```bash
 sudo apt-get install -y nginx
 ```
 
 13. **Configurer Nginx:**
+
 ```bash
 sudo nano /etc/nginx/sites-available/jetc-immo
 ```
 
 Contenu:
+
 ```nginx
 server {
     listen 80;
@@ -353,6 +382,7 @@ server {
 ```
 
 14. **Activer la configuration:**
+
 ```bash
 sudo ln -s /etc/nginx/sites-available/jetc-immo /etc/nginx/sites-enabled/
 sudo nginx -t  # Vérifier la config
@@ -360,12 +390,14 @@ sudo systemctl restart nginx
 ```
 
 15. **Installer Certbot (SSL gratuit):**
+
 ```bash
 sudo apt-get install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d api.jetc-immo.fr
 ```
 
 16. **Configurer le firewall:**
+
 ```bash
 sudo ufw allow 22/tcp    # SSH
 sudo ufw allow 80/tcp    # HTTP
@@ -382,6 +414,7 @@ sudo ufw enable
 **IMPORTANT:** Ne JAMAIS commiter `.env.local` dans Git.
 
 Ajouter à `.gitignore`:
+
 ```
 .env.local
 .env.production
@@ -397,43 +430,45 @@ Ne l'exposer **QUE** côté backend/serveur.
 ### 3. CORS (si API publique)
 
 Modifier `api/index.js`:
+
 ```javascript
-import cors from 'cors';
+import cors from "cors";
 
-const allowedOrigins = [
-  'https://app.jetc-immo.fr',
-  'https://jetc-immo.fr'
-];
+const allowedOrigins = ["https://app.jetc-immo.fr", "https://jetc-immo.fr"];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Non autorisé par CORS'));
-    }
-  }
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Non autorisé par CORS"));
+      }
+    },
+  })
+);
 ```
 
 ### 4. Rate Limiting
 
 Installer `express-rate-limit`:
+
 ```bash
 npm install express-rate-limit
 ```
 
 Ajouter dans `api/index.js`:
+
 ```javascript
-import rateLimit from 'express-rate-limit';
+import rateLimit from "express-rate-limit";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Max 100 requêtes par IP
-  message: 'Trop de requêtes, réessayez plus tard'
+  message: "Trop de requêtes, réessayez plus tard",
 });
 
-app.use('/api/', limiter);
+app.use("/api/", limiter);
 ```
 
 ### 5. Helmet (sécurité headers)
@@ -443,7 +478,7 @@ npm install helmet
 ```
 
 ```javascript
-import helmet from 'helmet';
+import helmet from "helmet";
 app.use(helmet());
 ```
 
@@ -472,12 +507,13 @@ npm install @sentry/node
 ```
 
 Configurer dans `api/index.js`:
+
 ```javascript
 import * as Sentry from "@sentry/node";
 
 Sentry.init({
   dsn: "https://xxxxx@sentry.io/xxxxx",
-  environment: process.env.MODE || 'production'
+  environment: process.env.MODE || "production",
 });
 
 app.use(Sentry.Handlers.requestHandler());
@@ -487,6 +523,7 @@ app.use(Sentry.Handlers.errorHandler());
 ### 4. Uptime Monitoring
 
 Services gratuits:
+
 - [UptimeRobot](https://uptimerobot.com)
 - [Pingdom](https://pingdom.com)
 - [BetterUptime](https://betteruptime.com)
@@ -498,14 +535,17 @@ Configurer une alerte sur `https://api.jetc-immo.fr/api/health`
 ## 🔄 Mises à Jour
 
 ### Railway/Render
+
 Push sur `main` → Deploy automatique
 
 ### Fly.io
+
 ```bash
 flyctl deploy
 ```
 
 ### VPS
+
 ```bash
 ssh jetc@votre-serveur.com
 cd JETC_Immo
@@ -535,6 +575,7 @@ crontab -e
 ```
 
 Ajouter:
+
 ```cron
 0 2 * * * pg_dump "postgresql://..." > /backups/jetc_$(date +\%Y\%m\%d).sql
 ```

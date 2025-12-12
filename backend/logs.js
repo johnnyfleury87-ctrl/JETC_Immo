@@ -22,7 +22,7 @@ export async function createLog({
   methode_http,
   statut,
   code_erreur,
-  message_erreur
+  message_erreur,
 }) {
   try {
     const log = {
@@ -37,21 +37,19 @@ export async function createLog({
       user_agent,
       endpoint,
       methode_http,
-      statut: statut || 'success',
+      statut: statut || "success",
       code_erreur,
       message_erreur,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
-    const { error } = await supabaseServer
-      .from('logs_activite')
-      .insert(log);
+    const { error } = await supabaseServer.from("logs_activite").insert(log);
 
     if (error) {
-      console.error('Erreur création log:', error);
+      console.error("Erreur création log:", error);
     }
   } catch (error) {
-    console.error('Erreur création log:', error);
+    console.error("Erreur création log:", error);
   }
 }
 
@@ -65,9 +63,9 @@ export async function listLogs(req, res) {
 
     // Vérifier le rôle
     const { data: profile, error: profileError } = await supabaseServer
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
       .single();
 
     if (profileError) throw profileError;
@@ -80,42 +78,42 @@ export async function listLogs(req, res) {
       date_debut,
       date_fin,
       limit = 100,
-      page = 1
+      page = 1,
     } = req.query;
 
     let query = supabaseServer
-      .from('logs_activite')
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false });
+      .from("logs_activite")
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false });
 
     // Admin voit tous les logs, utilisateurs voient leurs propres logs
-    if (profile.role !== 'admin_jtec') {
-      query = query.eq('user_id', userId);
+    if (profile.role !== "admin_jtec") {
+      query = query.eq("user_id", userId);
     }
 
     // Filtres
     if (action) {
-      query = query.eq('action', action);
+      query = query.eq("action", action);
     }
 
     if (entite_type) {
-      query = query.eq('entite_type', entite_type);
+      query = query.eq("entite_type", entite_type);
     }
 
     if (entite_id) {
-      query = query.eq('entite_id', entite_id);
+      query = query.eq("entite_id", entite_id);
     }
 
     if (statut) {
-      query = query.eq('statut', statut);
+      query = query.eq("statut", statut);
     }
 
     if (date_debut) {
-      query = query.gte('created_at', date_debut);
+      query = query.gte("created_at", date_debut);
     }
 
     if (date_fin) {
-      query = query.lte('created_at', date_fin);
+      query = query.lte("created_at", date_fin);
     }
 
     // Pagination
@@ -135,13 +133,12 @@ export async function listLogs(req, res) {
         page: pageNum,
         limit: limitNum,
         total: count,
-        total_pages: Math.ceil(count / limitNum)
-      }
+        total_pages: Math.ceil(count / limitNum),
+      },
     });
-
   } catch (error) {
-    console.error('Erreur liste logs:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur liste logs:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -155,23 +152,24 @@ export async function getLog(req, res) {
     const { id } = req.params;
 
     const { data: log, error } = await supabaseServer
-      .from('logs_activite')
-      .select(`
+      .from("logs_activite")
+      .select(
+        `
         *,
         user:profiles(id, nom, prenom, email, role)
-      `)
-      .eq('id', id)
+      `
+      )
+      .eq("id", id)
       .single();
 
     if (error || !log) {
-      return res.status(404).json({ error: 'Log non trouvé' });
+      return res.status(404).json({ error: "Log non trouvé" });
     }
 
     return res.json({ log });
-
   } catch (error) {
-    console.error('Erreur récupération log:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur récupération log:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -185,25 +183,27 @@ export async function getLogsStats(req, res) {
 
     // Vérifier le rôle
     const { data: profile, error: profileError } = await supabaseServer
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
       .single();
 
-    if (profileError || profile.role !== 'admin_jtec') {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+    if (profileError || profile.role !== "admin_jtec") {
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
-    const { periode = '7' } = req.query;
+    const { periode = "7" } = req.query;
     const daysAgo = parseInt(periode);
     const dateDebut = new Date();
     dateDebut.setDate(dateDebut.getDate() - daysAgo);
 
     // Statistiques globales
     const { data: statsGlobales, error: statsError } = await supabaseServer
-      .from('logs_activite')
-      .select('action, statut')
-      .gte('created_at', dateDebut.toISOString());
+      .from("logs_activite")
+      .select("action, statut")
+      .gte("created_at", dateDebut.toISOString());
 
     if (statsError) throw statsError;
 
@@ -211,7 +211,7 @@ export async function getLogsStats(req, res) {
     const actionsCounts = {};
     const statutsCounts = { success: 0, error: 0, warning: 0 };
 
-    statsGlobales.forEach(log => {
+    statsGlobales.forEach((log) => {
       // Compter par action
       actionsCounts[log.action] = (actionsCounts[log.action] || 0) + 1;
 
@@ -223,23 +223,25 @@ export async function getLogsStats(req, res) {
 
     // Top utilisateurs actifs
     const { data: topUsers, error: usersError } = await supabaseServer
-      .from('logs_activite')
-      .select(`
+      .from("logs_activite")
+      .select(
+        `
         user_id,
         user:profiles(nom, prenom, email)
-      `)
-      .gte('created_at', dateDebut.toISOString());
+      `
+      )
+      .gte("created_at", dateDebut.toISOString());
 
     if (usersError) throw usersError;
 
     const usersCounts = {};
-    topUsers.forEach(log => {
+    topUsers.forEach((log) => {
       if (log.user_id) {
         if (!usersCounts[log.user_id]) {
           usersCounts[log.user_id] = {
             user_id: log.user_id,
             user: log.user,
-            count: 0
+            count: 0,
           };
         }
         usersCounts[log.user_id].count++;
@@ -255,12 +257,11 @@ export async function getLogsStats(req, res) {
       total_logs: statsGlobales.length,
       par_action: actionsCounts,
       par_statut: statutsCounts,
-      top_utilisateurs: topUsersArray
+      top_utilisateurs: topUsersArray,
     });
-
   } catch (error) {
-    console.error('Erreur stats logs:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur stats logs:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -274,13 +275,15 @@ export async function cleanupLogs(req, res) {
 
     // Vérifier le rôle admin
     const { data: profile, error: profileError } = await supabaseServer
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
       .single();
 
-    if (profileError || profile.role !== 'admin_jtec') {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+    if (profileError || profile.role !== "admin_jtec") {
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const { jours_retention = 90 } = req.body;
@@ -289,20 +292,19 @@ export async function cleanupLogs(req, res) {
     dateLimit.setDate(dateLimit.getDate() - parseInt(jours_retention));
 
     const { error, count } = await supabaseServer
-      .from('logs_activite')
-      .delete({ count: 'exact' })
-      .lt('created_at', dateLimit.toISOString());
+      .from("logs_activite")
+      .delete({ count: "exact" })
+      .lt("created_at", dateLimit.toISOString());
 
     if (error) throw error;
 
     return res.json({
       message: `Logs supprimés (plus de ${jours_retention} jours)`,
-      logs_supprimes: count
+      logs_supprimes: count,
     });
-
   } catch (error) {
-    console.error('Erreur cleanup logs:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur cleanup logs:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -316,28 +318,30 @@ export async function exportLogs(req, res) {
 
     // Vérifier le rôle
     const { data: profile, error: profileError } = await supabaseServer
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
       .single();
 
-    if (profileError || profile.role !== 'admin_jtec') {
-      return res.status(403).json({ error: 'Accès réservé aux administrateurs' });
+    if (profileError || profile.role !== "admin_jtec") {
+      return res
+        .status(403)
+        .json({ error: "Accès réservé aux administrateurs" });
     }
 
     const { date_debut, date_fin } = req.query;
 
     let query = supabaseServer
-      .from('logs_activite')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("logs_activite")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (date_debut) {
-      query = query.gte('created_at', date_debut);
+      query = query.gte("created_at", date_debut);
     }
 
     if (date_fin) {
-      query = query.lte('created_at', date_fin);
+      query = query.lte("created_at", date_fin);
     }
 
     const { data: logs, error } = await query;
@@ -346,37 +350,48 @@ export async function exportLogs(req, res) {
 
     // Générer le CSV
     const headers = [
-      'ID', 'Date', 'Utilisateur', 'Action', 'Entité Type', 'Entité ID',
-      'Description', 'Statut', 'IP', 'Endpoint', 'Méthode'
+      "ID",
+      "Date",
+      "Utilisateur",
+      "Action",
+      "Entité Type",
+      "Entité ID",
+      "Description",
+      "Statut",
+      "IP",
+      "Endpoint",
+      "Méthode",
     ];
 
-    const csvRows = [headers.join(',')];
+    const csvRows = [headers.join(",")];
 
-    logs.forEach(log => {
+    logs.forEach((log) => {
       const row = [
         log.id,
         log.created_at,
-        log.user_id || '',
-        log.action || '',
-        log.entite_type || '',
-        log.entite_id || '',
-        (log.description || '').replace(/,/g, ';'),
-        log.statut || '',
-        log.ip_address || '',
-        log.endpoint || '',
-        log.methode_http || ''
+        log.user_id || "",
+        log.action || "",
+        log.entite_type || "",
+        log.entite_id || "",
+        (log.description || "").replace(/,/g, ";"),
+        log.statut || "",
+        log.ip_address || "",
+        log.endpoint || "",
+        log.methode_http || "",
       ];
-      csvRows.push(row.join(','));
+      csvRows.push(row.join(","));
     });
 
-    const csv = csvRows.join('\n');
+    const csv = csvRows.join("\n");
 
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=logs_activite.csv');
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=logs_activite.csv"
+    );
     return res.send(csv);
-
   } catch (error) {
-    console.error('Erreur export logs:', error);
-    return res.status(500).json({ error: 'Erreur serveur' });
+    console.error("Erreur export logs:", error);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }

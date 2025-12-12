@@ -7,12 +7,14 @@ Ce dossier contient les scripts pour installer et configurer rapidement le proje
 ## 📦 Installation Locale
 
 ### Script automatique
+
 ```bash
 chmod +x setup.sh
 ./setup.sh
 ```
 
 ### Installation manuelle
+
 ```bash
 # 1. Installer les dépendances
 npm install
@@ -38,6 +40,7 @@ npm run dev
 Dans le **Dashboard Supabase > SQL Editor**, exécuter **dans l'ordre**:
 
 #### 1. Schema de base
+
 ```sql
 -- supabase/schema/00_init_schema.sql
 -- supabase/schema/01_tables.sql
@@ -48,6 +51,7 @@ Dans le **Dashboard Supabase > SQL Editor**, exécuter **dans l'ordre**:
 ```
 
 #### 2. Politiques RLS (dans l'ordre numérique)
+
 ```sql
 -- supabase/policies/10_policies_profiles.sql
 -- supabase/policies/11_policies_regies.sql
@@ -69,11 +73,13 @@ Dans le **Dashboard Supabase > SQL Editor**, exécuter **dans l'ordre**:
 ```
 
 #### 3. Storage
+
 ```sql
 -- supabase/storage/storage_buckets.sql
 ```
 
 #### 4. (Optionnel) Données de démo
+
 ```sql
 -- supabase/demo/seed_demo.sql
 ```
@@ -87,14 +93,16 @@ Utiliser `supabase/migration_complete.sql` si vous préférez un seul fichier (p
 ## ✅ Vérification
 
 ### Vérifier les tables
+
 ```sql
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
 ORDER BY table_name;
 ```
 
 **Attendu:** 17 tables
+
 - profiles
 - regies
 - entreprises
@@ -115,13 +123,15 @@ ORDER BY table_name;
 - logs_activite
 
 ### Vérifier les vues
+
 ```sql
-SELECT table_name 
-FROM information_schema.views 
+SELECT table_name
+FROM information_schema.views
 WHERE table_schema = 'public';
 ```
 
 **Attendu:** 9 vues
+
 - vue_stats_globales
 - vue_abonnements_par_plan
 - vue_tickets_par_statut
@@ -133,9 +143,10 @@ WHERE table_schema = 'public';
 - vue_abonnements_expirant
 
 ### Vérifier RLS
+
 ```sql
-SELECT schemaname, tablename, policyname 
-FROM pg_policies 
+SELECT schemaname, tablename, policyname
+FROM pg_policies
 WHERE schemaname = 'public'
 ORDER BY tablename, policyname;
 ```
@@ -143,16 +154,19 @@ ORDER BY tablename, policyname;
 **Attendu:** ~70+ politiques RLS
 
 ### Vérifier les buckets Storage
+
 ```sql
 SELECT * FROM storage.buckets;
 ```
 
 **Attendu:** 3 buckets
+
 - signatures
 - photos
 - documents
 
 ### Test API
+
 ```bash
 # Health check
 curl http://localhost:3000/api/health
@@ -188,18 +202,22 @@ Le serveur démarre sur `http://localhost:3000`
 ## 🐛 Résolution de problèmes
 
 ### "Cannot find module"
+
 ```bash
 rm -rf node_modules package-lock.json
 npm install
 ```
 
 ### "Database connection failed"
+
 Vérifier dans `.env.local`:
+
 - `SUPABASE_URL` est correct
 - `SUPABASE_SERVICE_ROLE_KEY` est correct
 - Le projet Supabase est actif
 
 ### "Port 3000 already in use"
+
 ```bash
 # Trouver le processus
 lsof -i :3000
@@ -212,6 +230,7 @@ PORT=3001 npm run dev
 ```
 
 ### Migrations SQL échouent
+
 - Vérifier que vous êtes dans le bon projet Supabase
 - Exécuter les fichiers dans l'ordre exact
 - Si erreur "already exists", ignorer et continuer

@@ -3,7 +3,7 @@ import { supabaseServer } from "../_supabase.js";
 /**
  * POST /api/auth/login
  * Connexion d'un utilisateur existant
- * 
+ *
  * Body attendu :
  * {
  *   email: string,
@@ -22,10 +22,11 @@ export async function login(req, res) {
     }
 
     // Connexion via Supabase Auth
-    const { data: authData, error: authError } = await supabaseServer.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data: authData, error: authError } =
+      await supabaseServer.auth.signInWithPassword({
+        email,
+        password,
+      });
 
     if (authError) {
       console.error("Erreur de connexion:", authError);
@@ -69,7 +70,6 @@ export async function login(req, res) {
         is_demo: profileData.is_demo,
       },
     });
-
   } catch (error) {
     console.error("Erreur serveur lors de la connexion:", error);
     return res.status(500).json({
