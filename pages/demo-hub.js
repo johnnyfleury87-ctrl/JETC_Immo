@@ -361,7 +361,7 @@ export default function DemoHub() {
             tester toutes les fonctionnalités !
           </p>
           <Button
-            onClick={() => router.push("/")}
+            onClick={() => window.location.href = "/"}
             style={{
               background: "transparent",
               border: "2px solid white",
