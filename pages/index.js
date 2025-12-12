@@ -1,9 +1,22 @@
 import { useRouter } from "next/router";
 import Card from "../components/UI/Card";
 import Button from "../components/UI/Button";
+import { useDemoMode } from "../context/DemoModeContext";
 
 export default function HomePage() {
   const router = useRouter();
+  const { enableDemoMode } = useDemoMode();
+
+  const handleDemoStart = () => {
+    // Activer le mode DEMO
+    enableDemoMode();
+
+    // S'assurer que le localStorage est écrit immédiatement
+    localStorage.setItem("jetc_demo_mode", "true");
+
+    // Navigation vers l'inscription
+    router.push("/register");
+  };
 
   return (
     <div
@@ -73,7 +86,7 @@ export default function HomePage() {
           Connectez régies, entreprises et techniciens sur une seule plateforme.
         </p>
         <Button
-          onClick={() => router.push("/register")}
+          onClick={handleDemoStart}
           style={{
             fontSize: "1.2rem",
             padding: "1rem 2.5rem",
