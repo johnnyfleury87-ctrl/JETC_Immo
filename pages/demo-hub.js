@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDemoMode } from "../context/DemoModeContext";
+import { getDemoProfileByRole } from "../lib/session";
 import Card from "../components/UI/Card";
 import Button from "../components/UI/Button";
 
@@ -79,8 +80,33 @@ export default function DemoHub() {
   ];
 
   const handleRoleSelect = (role) => {
+    // Changer le rôle DEMO
     changeDemoRole(role.id);
-    router.push(role.path);
+    
+    // Forcer la mise à jour synchrone du localStorage pour garantir la cohérence
+    if (typeof window !== "undefined") {
+      localStorage.setItem("jetc_demo_role", role.id);
+      localStorage.setItem("role", role.id);
+      
+      // Mettre à jour le profil DEMO immédiatement
+      const profile = getDemoProfileByRole(role.id);
+      localStorage.setItem("profile", JSON.stringify(profile));
+      
+      // Créer/mettre à jour la session DEMO
+      localStorage.setItem(
+        "session",
+        JSON.stringify({
+          token: "demo_token_" + Date.now(),
+          role: role.id,
+          user: profile,
+        })
+      );
+    }
+    
+    // Navigation vers le dashboard (avec un léger délai pour garantir la mise à jour)
+    setTimeout(() => {
+      router.push(role.path);
+    }, 50);
   };
 
   return (

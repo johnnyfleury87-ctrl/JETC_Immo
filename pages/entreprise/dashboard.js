@@ -20,9 +20,18 @@ export default function EntrepriseDashboard() {
     const localProfile = getProfileLocal();
     setProfile(localProfile);
 
-    // Rediriger si pas entreprise
-    if (localProfile?.role !== "entreprise") {
+    // Rediriger si pas entreprise (sauf en mode DEMO où on est plus tolérant)
+    if (!demoMode && localProfile?.role !== "entreprise") {
       router.push("/");
+    }
+    
+    // En mode DEMO, si le profil n'a pas encore le bon rôle, le recharger après un délai
+    if (demoMode && localProfile?.role !== "entreprise") {
+      const timer = setTimeout(() => {
+        const updatedProfile = getProfileLocal();
+        setProfile(updatedProfile);
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [router]);
 

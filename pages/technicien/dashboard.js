@@ -20,9 +20,18 @@ export default function TechnicienDashboard() {
     const localProfile = getProfileLocal();
     setProfile(localProfile);
 
-    // Rediriger si pas technicien
-    if (localProfile?.role !== "technicien") {
+    // Rediriger si pas technicien (sauf en mode DEMO où on est plus tolérant)
+    if (!demoMode && localProfile?.role !== "technicien") {
       router.push("/");
+    }
+    
+    // En mode DEMO, si le profil n'a pas encore le bon rôle, le recharger après un délai
+    if (demoMode && localProfile?.role !== "technicien") {
+      const timer = setTimeout(() => {
+        const updatedProfile = getProfileLocal();
+        setProfile(updatedProfile);
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [router]);
 
