@@ -10,7 +10,6 @@ export default function AbonnementPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [subscription, setSubscription] = useState(null);
-  const [user, setUser] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview"); // overview, plans, invoices
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -98,8 +97,7 @@ export default function AbonnementPage() {
 
     const loadData = async () => {
       try {
-        const profile = await getProfile();
-        setUser(profile);
+        await getProfile();
 
         try {
           const subData = await apiFetch("/billing/subscription");

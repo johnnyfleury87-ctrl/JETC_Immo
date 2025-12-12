@@ -31,7 +31,7 @@ export default function OnboardingPlan() {
       period: "/mois",
       description: "Idéal pour démarrer",
       features: [
-        { text: "Jusqu'à 50 logements", included: true },
+        { text: "Jusqu&apos;à 50 logements", included: true },
         { text: "Gestion des tickets", included: true },
         { text: "5 entreprises partenaires", included: true },
         { text: "Support email (48h)", included: true },
@@ -49,11 +49,11 @@ export default function OnboardingPlan() {
       period: "/mois",
       description: "Le plus populaire",
       features: [
-        { text: "Jusqu'à 200 logements", included: true },
+        { text: "Jusqu&apos;à 200 logements", included: true },
         { text: "Gestion complète", included: true },
         { text: "Entreprises illimitées", included: true },
         { text: "Support prioritaire (24h)", included: true },
-        { text: "Jusqu'à 5 utilisateurs", included: true },
+        { text: "Jusqu&apos;à 5 utilisateurs", included: true },
         { text: "Analytics avancés", included: true },
       ],
       color: "#4f46e5",
@@ -201,7 +201,7 @@ export default function OnboardingPlan() {
             }}
           >
             <span style={{ fontSize: "1.5rem" }}>🎁</span>
-            <span>14 jours d'essai gratuit inclus</span>
+            <span>14 jours d&apos;essai gratuit inclus</span>
           </div>
         </Card>
 

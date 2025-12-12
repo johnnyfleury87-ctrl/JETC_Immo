@@ -13,7 +13,7 @@ export default function PricingPreview() {
       period: "/mois",
       description: "Pour les petites régies débutantes",
       features: [
-        "Jusqu'à 50 logements",
+        "Jusqu&apos;à 50 logements",
         "Gestion des tickets",
         "5 entreprises partenaires",
         "Support email",
@@ -28,7 +28,7 @@ export default function PricingPreview() {
       period: "/mois",
       description: "Pour les régies en croissance",
       features: [
-        "Jusqu'à 200 logements",
+        "Jusqu&apos;à 200 logements",
         "Gestion complète",
         "Entreprises illimitées",
         "Analytics avancés",
@@ -285,9 +285,9 @@ export default function PricingPreview() {
           }}
         >
           <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: "1.6" }}>
-            💡 <strong>Commission de 2%</strong> sur les factures d'intervention
+            💡 <strong>Commission de 2%</strong> sur les factures d&apos;intervention
             (prélevée sur la régie). Modules optionnels disponibles pour les
-            entreprises souhaitant des outils d'organisation internes.
+            entreprises souhaitant des outils d&apos;organisation internes.
           </p>
         </div>
       </div>

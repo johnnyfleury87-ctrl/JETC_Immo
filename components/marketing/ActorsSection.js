@@ -92,7 +92,7 @@ export default function ActorsSection() {
             lineHeight: "1.6",
           }}
         >
-          JETC IMMO connecte l'ensemble de l'écosystème immobilier sur une plateforme
+          JETC IMMO connecte l&apos;ensemble de l&apos;écosystème immobilier sur une plateforme
           unique et intuitive.
         </p>
       </div>

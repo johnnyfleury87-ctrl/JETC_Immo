@@ -23,7 +23,7 @@ export default function PricingPage() {
       period: "/mois",
       description: "Pour les petites régies qui débutent",
       features: [
-        { text: "Jusqu'à 50 logements", included: true },
+        { text: "Jusqu&apos;à 50 logements", included: true },
         { text: "Gestion des tickets", included: true },
         { text: "5 entreprises partenaires max", included: true },
         { text: "Dashboard basique", included: true },
@@ -44,12 +44,12 @@ export default function PricingPage() {
       period: "/mois",
       description: "Pour les régies en pleine croissance",
       features: [
-        { text: "Jusqu'à 200 logements", included: true },
+        { text: "Jusqu&apos;à 200 logements", included: true },
         { text: "Gestion complète des tickets", included: true },
         { text: "Entreprises partenaires illimitées", included: true },
         { text: "Dashboard analytique avancé", included: true },
         { text: "Support prioritaire (24h)", included: true },
-        { text: "Jusqu'à 5 utilisateurs", included: true },
+        { text: "Jusqu&apos;à 5 utilisateurs", included: true },
         { text: "Exports et rapports personnalisés", included: true },
         { text: "Notifications SMS", included: true },
       ],
@@ -366,9 +366,9 @@ export default function PricingPage() {
           }}
         >
           <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: "1.6" }}>
-            💡 <strong>Commission de 2%</strong> sur les factures d'intervention
+            💡 <strong>Commission de 2%</strong> sur les factures d&apos;intervention
             (prélevée sur la régie). Les entreprises de maintenance bénéficient
-            d'un accès gratuit pour la réception et gestion des tickets.
+            d&apos;un accès gratuit pour la réception et gestion des tickets.
           </p>
         </div>
       </section>

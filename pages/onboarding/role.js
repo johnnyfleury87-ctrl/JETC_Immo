@@ -268,7 +268,7 @@ export default function OnboardingRole() {
           }}
         >
           <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: "1.6" }}>
-            💡 <strong>Besoin d'aide ?</strong> Vous pourrez toujours changer de rôle plus tard depuis vos paramètres
+            💡 <strong>Besoin d&apos;aide ?</strong> Vous pourrez toujours changer de rôle plus tard depuis vos paramètres
           </p>
         </div>
       </Card>
