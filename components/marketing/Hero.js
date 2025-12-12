@@ -1,12 +1,26 @@
 import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
 import Button from "../UI/Button";
 import { useDemoMode } from "../../context/DemoModeContext";
 import { getDemoProfileByRole } from "../../lib/session";
+import { canUseDemo } from "../../lib/demoAccess";
+import { getProfile } from "../../lib/auth";
 import PartnersLogo from "./PartnersLogo";
 
 export default function Hero() {
   const router = useRouter();
   const { enableDemoMode } = useDemoMode();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      const user = await getProfile();
+      setProfile(user);
+      setLoading(false);
+    };
+    loadProfile();
+  }, []);
 
   const handleDemoStart = () => {
     // Activer le mode DEMO
@@ -103,21 +117,24 @@ export default function Hero() {
             flexWrap: "wrap",
           }}
         >
-          <Button
-            onClick={handleDemoStart}
-            style={{
-              fontSize: "1.2rem",
-              padding: "1.2rem 3rem",
-              background: "white",
-              color: "var(--primary)",
-              fontWeight: "700",
-              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
-              border: "none",
-            }}
-            className="hover-bounce"
-          >
-            🚀 Commencer en mode DEMO
-          </Button>
+          {/* Bouton DEMO visible uniquement pour visiteurs non connectés */}
+          {!loading && canUseDemo(profile) && (
+            <Button
+              onClick={handleDemoStart}
+              style={{
+                fontSize: "1.2rem",
+                padding: "1.2rem 3rem",
+                background: "white",
+                color: "var(--primary)",
+                fontWeight: "700",
+                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+                border: "none",
+              }}
+              className="hover-bounce"
+            >
+              🚀 Commencer en mode DEMO
+            </Button>
+          )}
 
           <Button
             onClick={() => router.push("/pricing")}

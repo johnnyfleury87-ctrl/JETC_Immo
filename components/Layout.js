@@ -2,9 +2,22 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import UserBadge from "./UserBadge";
 import { useTheme } from "../context/ThemeContext";
+import { canUseDemo } from "../lib/demoAccess";
+import { getProfile } from "../lib/auth";
 
 export default function Layout({ children }) {
   const { theme, setTheme } = useTheme();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      const user = await getProfile();
+      setProfile(user);
+      setLoading(false);
+    };
+    loadProfile();
+  }, []);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--background)" }}>
@@ -162,6 +175,26 @@ export default function Layout({ children }) {
           >
             📝 Inscription
           </Link>
+          
+          {/* Bouton MODE DEMO visible uniquement pour visiteurs non connectés */}
+          {!loading && canUseDemo(profile) && (
+            <Link
+              href="/demo-hub"
+              style={{
+                color: "white",
+                textDecoration: "none",
+                padding: "0.5rem 1rem",
+                borderRadius: "6px",
+                transition: "all 0.2s ease",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                fontWeight: "600",
+              }}
+              className="hover-glow"
+            >
+              🎭 Mode démo
+            </Link>
+          )}
+          
           <Link
             href="/locataire/tickets"
             style={{
