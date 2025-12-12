@@ -9,8 +9,13 @@ import { saveProfile } from "../../lib/session";
 export default function EntrepriseMissions() {
   const [missions, setMissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
+    // Vérifier mode DEMO
+    const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+    setIsDemoMode(demoMode);
+
     const loadProfile = async () => {
       try {
         const profile = await getProfile();
@@ -37,6 +42,25 @@ export default function EntrepriseMissions() {
   return (
     <Layout>
       <Card>
+        {/* Badge MODE DEMO */}
+        {isDemoMode && (
+          <div
+            style={{
+              background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)",
+              color: "white",
+              padding: "0.8rem 1.2rem",
+              borderRadius: "8px",
+              marginBottom: "1.5rem",
+              textAlign: "center",
+              fontSize: "0.9rem",
+              fontWeight: "600",
+              boxShadow: "0 4px 12px rgba(249, 115, 22, 0.3)",
+            }}
+          >
+            🎭 MODE DÉMONSTRATION • Utilisez le dashboard pour voir les données DEMO complètes
+          </div>
+        )}
+
         <h1 className="page-title">🔧 Missions disponibles</h1>
 
         {loading ? (

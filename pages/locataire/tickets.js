@@ -10,6 +10,7 @@ import { saveProfile } from "../../lib/session";
 export default function LocataireTickets() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [titre, setTitre] = useState("");
   const [description, setDescription] = useState("");
@@ -18,6 +19,10 @@ export default function LocataireTickets() {
   const [uploadedFileName, setUploadedFileName] = useState("");
 
   useEffect(() => {
+    // Vérifier mode DEMO
+    const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+    setIsDemoMode(demoMode);
+
     const loadProfile = async () => {
       try {
         const profile = await getProfile();
@@ -80,6 +85,25 @@ export default function LocataireTickets() {
   return (
     <Layout>
       <Card>
+        {/* Badge MODE DEMO */}
+        {isDemoMode && (
+          <div
+            style={{
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "white",
+              padding: "0.8rem 1.2rem",
+              borderRadius: "8px",
+              marginBottom: "1.5rem",
+              textAlign: "center",
+              fontSize: "0.9rem",
+              fontWeight: "600",
+              boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
+            }}
+          >
+            🎭 MODE DÉMONSTRATION • Les créations de tickets sont simulées, aucune donnée réelle n'est enregistrée
+          </div>
+        )}
+
         <h1 className="page-title">🎫 Mes tickets</h1>
 
         <Button onClick={() => setShowForm(!showForm)}>

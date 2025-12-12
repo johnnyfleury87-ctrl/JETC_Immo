@@ -10,8 +10,13 @@ import { saveProfile } from "../../lib/session";
 export default function TechnicienMissions() {
   const [missions, setMissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
+    // Vérifier mode DEMO
+    const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
+    setIsDemoMode(demoMode);
+
     const loadProfile = async () => {
       try {
         const profile = await getProfile();
@@ -38,6 +43,25 @@ export default function TechnicienMissions() {
   return (
     <Layout>
       <Card>
+        {/* Badge MODE DEMO */}
+        {isDemoMode && (
+          <div
+            style={{
+              background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+              color: "white",
+              padding: "0.8rem 1.2rem",
+              borderRadius: "8px",
+              marginBottom: "1.5rem",
+              textAlign: "center",
+              fontSize: "0.9rem",
+              fontWeight: "600",
+              boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
+            }}
+          >
+            🎭 MODE DÉMONSTRATION • Utilisez le dashboard pour voir les données DEMO complètes
+          </div>
+        )}
+
         <h1 className="page-title">⚙️ Mes missions</h1>
 
         {loading ? (
