@@ -234,7 +234,6 @@ export default function DemoLocataireDashboard() {
             ← Retour au hub DEMO
           </button>
         </div>
-      </Card>
     </DemoLayout>
   );
 }

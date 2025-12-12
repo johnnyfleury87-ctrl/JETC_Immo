@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Layout from "../../../components/Layout";
+import DemoLayout from "../../../components/demo/DemoLayout";
 import Card from "../../../components/UI/Card";
 
 export default function DemoTechnicienDashboard() {
@@ -38,203 +38,175 @@ export default function DemoTechnicienDashboard() {
   ]);
 
   return (
-    <Layout>
-      <Card>
-        {/* Badge MODE DÉMONSTRATION */}
-        <div
+    <DemoLayout role="technicien" activePage="/demo/technicien/dashboard">
+      <h1 style={{ marginBottom: "1.5rem", color: "#2c3e50" }}>🔧 Dashboard Technicien</h1>
+
+      <div style={{
+        backgroundColor: "#fff3cd",
+        padding: "1rem",
+        borderRadius: "5px",
+        marginBottom: "1.5rem",
+        borderLeft: "4px solid #ffc107"
+      }}>
+        <strong>ℹ️ Mode Démo :</strong> Aperçu fictif du tableau de bord technicien.
+      </div>
+
+      {/* KPIs */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "1rem",
+          marginBottom: "2rem",
+        }}
+      >
+        <Card
           style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "white",
-            padding: "1rem 1.5rem",
-            borderRadius: "8px",
-            marginBottom: "1.5rem",
             textAlign: "center",
-            fontSize: "1rem",
-            fontWeight: "700",
-            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
+            background: "linear-gradient(135deg, #FF9800 0%, #F57C00 100%)",
+            color: "white",
           }}
         >
-          🎭 MODE DÉMONSTRATION • Données fictives
-        </div>
-
-        <h1 className="page-title">🔧 Dashboard DEMO – Technicien</h1>
-
-        {/* KPIs */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "1rem",
-            marginBottom: "2rem",
-          }}
-        >
-          <Card
-            style={{
-              textAlign: "center",
-              background: "linear-gradient(135deg, #FF9800 0%, #F57C00 100%)",
-              color: "white",
-            }}
-          >
-            <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
-              {overview.missionsAVenir}
-            </h2>
-            <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
-              📅 Missions à venir
-            </p>
-          </Card>
-
-          <Card
-            style={{
-              textAlign: "center",
-              background: "linear-gradient(135deg, #4CAF50 0%, #388E3C 100%)",
-              color: "white",
-            }}
-          >
-            <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
-              {overview.missionsEnCours}
-            </h2>
-            <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
-              🚀 En cours
-            </p>
-          </Card>
-
-          <Card
-            style={{
-              textAlign: "center",
-              background: "linear-gradient(135deg, #2196F3 0%, #1976D2 100%)",
-              color: "white",
-            }}
-          >
-            <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
-              {overview.missionsCompletees}
-            </h2>
-            <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
-              ✅ Complétées
-            </p>
-          </Card>
-
-          <Card
-            style={{
-              textAlign: "center",
-              background: "linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)",
-              color: "white",
-            }}
-          >
-            <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
-              {overview.tauxReussite}%
-            </h2>
-            <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
-              ⭐ Taux de réussite
-            </p>
-          </Card>
-        </div>
-
-        {/* Liste missions */}
-        <Card style={{ marginBottom: "2rem" }}>
-          <h2 style={{ marginBottom: "1rem" }}>📋 Mes missions</h2>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr
-                  style={{
-                    background: "var(--background)",
-                    borderBottom: "2px solid var(--primary)",
-                  }}
-                >
-                  <th style={{ padding: "0.75rem", textAlign: "left" }}>
-                    Titre
-                  </th>
-                  <th style={{ padding: "0.75rem", textAlign: "left" }}>
-                    Adresse
-                  </th>
-                  <th style={{ padding: "0.75rem", textAlign: "center" }}>
-                    Date
-                  </th>
-                  <th style={{ padding: "0.75rem", textAlign: "center" }}>
-                    Statut
-                  </th>
-                  <th style={{ padding: "0.75rem", textAlign: "center" }}>
-                    Priorité
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {missions.map((mission) => (
-                  <tr
-                    key={mission.id}
-                    style={{ borderBottom: "1px solid rgba(0,0,0,0.1)" }}
-                  >
-                    <td style={{ padding: "0.75rem" }}>{mission.titre}</td>
-                    <td style={{ padding: "0.75rem" }}>📍 {mission.adresse}</td>
-                    <td style={{ padding: "0.75rem", textAlign: "center" }}>
-                      {new Date(mission.date).toLocaleDateString()}
-                    </td>
-                    <td style={{ padding: "0.75rem", textAlign: "center" }}>
-                      <span
-                        style={{
-                          background:
-                            mission.statut === "en_cours"
-                              ? "var(--green)"
-                              : "var(--orange)",
-                          color: "white",
-                          padding: "0.25rem 0.5rem",
-                          borderRadius: "4px",
-                          fontWeight: "600",
-                        }}
-                      >
-                        {mission.statut === "en_cours"
-                          ? "En cours"
-                          : "Planifiée"}
-                      </span>
-                    </td>
-                    <td style={{ padding: "0.75rem", textAlign: "center" }}>
-                      <span
-                        style={{
-                          background:
-                            mission.priorite === "haute"
-                              ? "var(--red)"
-                              : mission.priorite === "moyenne"
-                                ? "var(--orange)"
-                                : "var(--blue)",
-                          color: "white",
-                          padding: "0.25rem 0.5rem",
-                          borderRadius: "4px",
-                          fontWeight: "600",
-                        }}
-                      >
-                        {mission.priorite === "haute"
-                          ? "🔴 Haute"
-                          : mission.priorite === "moyenne"
-                            ? "🟠 Moyenne"
-                            : "🔵 Normale"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
+            {overview.missionsAVenir}
+          </h2>
+          <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
+            📅 Missions à venir
+          </p>
         </Card>
 
-        {/* Bouton retour hub */}
-        <div style={{ marginTop: "2rem", textAlign: "center" }}>
-          <button
-            onClick={() => (window.location.href = "/demo-hub")}
-            style={{
-              background: "var(--primary)",
-              color: "white",
-              padding: "0.75rem 1.5rem",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "1rem",
-              fontWeight: "600",
-              cursor: "pointer",
-            }}
-          >
-            ← Retour au hub DEMO
-          </button>
+        <Card
+          style={{
+            textAlign: "center",
+            background: "linear-gradient(135deg, #4CAF50 0%, #388E3C 100%)",
+            color: "white",
+          }}
+        >
+          <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
+            {overview.missionsEnCours}
+          </h2>
+          <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
+            🚀 En cours
+          </p>
+        </Card>
+
+        <Card
+          style={{
+            textAlign: "center",
+            background: "linear-gradient(135deg, #2196F3 0%, #1976D2 100%)",
+            color: "white",
+          }}
+        >
+          <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
+            {overview.missionsCompletees}
+          </h2>
+          <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
+            ✅ Complétées
+          </p>
+        </Card>
+
+        <Card
+          style={{
+            textAlign: "center",
+            background: "linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)",
+            color: "white",
+          }}
+        >
+          <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
+            {overview.tauxReussite}%
+          </h2>
+          <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
+            ⭐ Taux de réussite
+          </p>
+        </Card>
+      </div>
+
+      {/* Liste missions */}
+      <Card style={{ marginBottom: "2rem" }}>
+        <h2 style={{ marginBottom: "1rem" }}>📋 Mes missions</h2>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr
+                style={{
+                  background: "var(--background)",
+                  borderBottom: "2px solid var(--primary)",
+                }}
+              >
+                <th style={{ padding: "0.75rem", textAlign: "left" }}>
+                  Titre
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "left" }}>
+                  Adresse
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "center" }}>
+                  Date
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "center" }}>
+                  Statut
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "center" }}>
+                  Priorité
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {missions.map((mission) => (
+                <tr
+                  key={mission.id}
+                  style={{ borderBottom: "1px solid rgba(0,0,0,0.1)" }}
+                >
+                  <td style={{ padding: "0.75rem" }}>{mission.titre}</td>
+                  <td style={{ padding: "0.75rem" }}>📍 {mission.adresse}</td>
+                  <td style={{ padding: "0.75rem", textAlign: "center" }}>
+                    {new Date(mission.date).toLocaleDateString()}
+                  </td>
+                  <td style={{ padding: "0.75rem", textAlign: "center" }}>
+                    <span
+                      style={{
+                        background:
+                          mission.statut === "en_cours"
+                            ? "var(--green)"
+                            : "var(--orange)",
+                        color: "white",
+                        padding: "0.25rem 0.5rem",
+                        borderRadius: "4px",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {mission.statut === "en_cours"
+                        ? "En cours"
+                        : "Planifiée"}
+                    </span>
+                  </td>
+                  <td style={{ padding: "0.75rem", textAlign: "center" }}>
+                    <span
+                      style={{
+                        background:
+                          mission.priorite === "haute"
+                            ? "var(--red)"
+                            : mission.priorite === "moyenne"
+                              ? "var(--orange)"
+                              : "var(--blue)",
+                        color: "white",
+                        padding: "0.25rem 0.5rem",
+                        borderRadius: "4px",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {mission.priorite === "haute"
+                        ? "🔴 Haute"
+                        : mission.priorite === "moyenne"
+                          ? "🟠 Moyenne"
+                          : "🔵 Normale"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </Card>
-    </Layout>
+    </DemoLayout>
   );
 }
