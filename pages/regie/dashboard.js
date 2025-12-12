@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import Layout from "../../components/Layout";
 import Card from "../../components/UI/Card";
 import HeatmapImmeubles from "../../components/charts/HeatmapImmeubles";
 import PieCategories from "../../components/charts/PieCategories";
 import { requireRole } from "../../lib/roleGuard";
 import { getProfile, apiFetch } from "../../lib/api";
-import { saveProfile } from "../../lib/session";
+import { saveProfile, getProfileLocal } from "../../lib/session";
 
 export default function RegieDashboard() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const [profile, setProfile] = useState(null);
   const [overview, setOverview] = useState({
     ticketsOuverts: 0,
     ticketsAttenteDiffusion: 0,
@@ -27,10 +30,40 @@ export default function RegieDashboard() {
     const demoMode = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
     setIsDemoMode(demoMode);
 
+    // EN MODE DEMO : charger profil local et données mockées
+    if (demoMode) {
+      const localProfile = getProfileLocal();
+      setProfile(localProfile);
+      
+      // Ne pas rediriger en mode DEMO, tolérant sur le rôle
+      if (localProfile?.role !== "regie") {
+        // Recharger le profil après un délai si pas encore le bon rôle
+        const timer = setTimeout(() => {
+          const updatedProfile = getProfileLocal();
+          setProfile(updatedProfile);
+        }, 100);
+        
+        // Cleanup
+        setTimeout(() => clearTimeout(timer), 200);
+      }
+      
+      // Charger données DEMO mockées
+      setOverview({
+        ticketsOuverts: 8,
+        ticketsAttenteDiffusion: 3,
+        missionsEnCours: 5,
+        logementsActifs: 24,
+      });
+      setLoading(false);
+      return;
+    }
+
+    // EN MODE PRODUCTION : comportement normal
     const loadProfile = async () => {
       try {
         const profile = await getProfile();
         saveProfile(profile);
+        setProfile(profile);
       } catch (error) {
         console.error("Erreur chargement profil", error);
       }
@@ -78,7 +111,7 @@ export default function RegieDashboard() {
       }
     };
     loadData();
-  }, []);
+  }, [router]);
 
   if (loading) {
     return (
