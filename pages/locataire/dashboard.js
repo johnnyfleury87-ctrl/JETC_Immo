@@ -21,10 +21,8 @@ export default function LocataireDashboard() {
       return;
     }
     
-    // MODE PRODUCTION : Rediriger si pas locataire
-    if (localProfile?.role !== "locataire") {
-      router.push("/");
-    }
+    // MODE PRODUCTION : Charger les données réelles
+    // Note: Pas de redirection automatique, l'auth est gérée par requireRole si nécessaire
   }, [router]);
 
   // Données DEMO mockées

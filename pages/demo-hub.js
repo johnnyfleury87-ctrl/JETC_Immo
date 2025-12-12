@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDemoMode } from "../context/DemoModeContext";
 import { enterDemoRole } from "../lib/session";
@@ -7,18 +6,10 @@ import Button from "../components/UI/Button";
 
 export default function DemoHub() {
   const router = useRouter();
-  const { demoMode, demoProfile, changeDemoRole } = useDemoMode();
+  const { demoProfile, changeDemoRole } = useDemoMode();
 
-  useEffect(() => {
-    // Rediriger vers l'accueil si pas en mode DEMO
-    if (!demoMode) {
-      router.push("/");
-    }
-  }, [demoMode, router]);
-
-  if (!demoMode) {
-    return null;
-  }
+  // Plus de redirection automatique - le hub est accessible directement
+  // Si l'utilisateur veut activer le MODE DEMO, il clique sur un rôle
 
   const roles = [
     {
