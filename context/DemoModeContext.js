@@ -1,10 +1,12 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { getDemoProfileByRole } from "../lib/session";
 
 const DemoModeContext = createContext();
 
 export function DemoModeProvider({ children }) {
   const [demoMode, setDemoMode] = useState(false);
-  const [demoRole, setDemoRole] = useState("locataire");
+  const [demoRole, setDemoRole] = useState("regie");
+  const [demoProfile, setDemoProfile] = useState(null);
 
   // Charger l'état du localStorage au montage
   useEffect(() => {
@@ -13,9 +15,10 @@ export function DemoModeProvider({ children }) {
 
     if (storedMode === "true") {
       setDemoMode(true);
-    }
-
-    if (storedRole) {
+      const role = storedRole || "regie";
+      setDemoRole(role);
+      setDemoProfile(getDemoProfileByRole(role));
+    } else if (storedRole) {
       setDemoRole(storedRole);
     }
   }, []);
@@ -23,7 +26,18 @@ export function DemoModeProvider({ children }) {
   // Sauvegarder dans localStorage à chaque changement
   useEffect(() => {
     localStorage.setItem("jetc_demo_mode", demoMode ? "true" : "false");
-  }, [demoMode]);
+    
+    // Mettre à jour le profil DEMO si mode actif
+    if (demoMode) {
+      const profile = getDemoProfileByRole(demoRole);
+      setDemoProfile(profile);
+      
+      // Sauvegarder le profil dans localStorage pour compatibilité
+      localStorage.setItem("profile", JSON.stringify(profile));
+    } else {
+      setDemoProfile(null);
+    }
+  }, [demoMode, demoRole]);
 
   useEffect(() => {
     localStorage.setItem("jetc_demo_role", demoRole);
@@ -35,14 +49,23 @@ export function DemoModeProvider({ children }) {
 
   const enableDemoMode = () => {
     setDemoMode(true);
+    const profile = getDemoProfileByRole(demoRole);
+    setDemoProfile(profile);
   };
 
   const disableDemoMode = () => {
     setDemoMode(false);
+    setDemoProfile(null);
+    localStorage.removeItem("profile");
   };
 
   const changeDemoRole = (role) => {
     setDemoRole(role);
+    
+    // Mettre à jour le profil DEMO
+    const profile = getDemoProfileByRole(role);
+    setDemoProfile(profile);
+    
     // Mettre à jour aussi le localStorage de session pour compatibilité
     if (typeof window !== "undefined") {
       const sessionData = localStorage.getItem("session");
@@ -71,6 +94,9 @@ export function DemoModeProvider({ children }) {
           })
         );
       }
+      
+      // Sauvegarder le profil
+      localStorage.setItem("profile", JSON.stringify(profile));
     }
   };
 
@@ -79,6 +105,7 @@ export function DemoModeProvider({ children }) {
       value={{
         demoMode,
         demoRole,
+        demoProfile,
         toggleDemoMode,
         enableDemoMode,
         disableDemoMode,
