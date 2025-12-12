@@ -1,12 +1,9 @@
-import { useRouter } from "next/router";
 import { useDemoMode } from "../context/DemoModeContext";
-import { enterDemoRole } from "../lib/session";
 import Card from "../components/UI/Card";
 import Button from "../components/UI/Button";
 
 export default function DemoHub() {
-  const router = useRouter();
-  const { demoProfile, changeDemoRole } = useDemoMode();
+  const { demoProfile } = useDemoMode();
 
   // Plus de redirection automatique - le hub est accessible directement
   // Si l'utilisateur veut activer le MODE DEMO, il clique sur un rôle
@@ -71,23 +68,15 @@ export default function DemoHub() {
   ];
 
   const handleRoleSelect = (role) => {
-    // Changer le rôle DEMO via le contexte
-    changeDemoRole(role.id);
+    console.log("🎯 Navigation DIRECTE vers:", role.path);
     
-    // Initialiser COMPLÈTEMENT l'état DEMO de manière SYNCHRONE
-    const success = enterDemoRole(role.id, role.path);
+    // Initialiser le MODE DEMO dans localStorage
+    localStorage.setItem("jetc_demo_mode", "true");
+    localStorage.setItem("jetc_demo_role", role.id);
+    localStorage.setItem("role", role.id);
     
-    if (!success) {
-      console.error("❌ Échec de l'initialisation DEMO");
-      alert("Erreur lors de l'activation du mode DEMO. Veuillez réessayer.");
-      return;
-    }
-    
-    // Navigation vers le dashboard après initialisation complète
-    console.log("🎯 Navigation vers:", role.path);
-    setTimeout(() => {
-      router.push(role.path);
-    }, 100); // 100ms pour garantir l'écriture localStorage
+    // Navigation DIRECTE - aucune logique complexe
+    window.location.href = role.path;
   };
 
   return (
