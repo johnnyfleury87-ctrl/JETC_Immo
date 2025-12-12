@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import Button from "../UI/Button";
 import { useDemoMode } from "../../context/DemoModeContext";
+import { getDemoProfileByRole } from "../../lib/session";
 import PartnersLogo from "./PartnersLogo";
 
 export default function Hero() {
@@ -13,9 +14,26 @@ export default function Hero() {
 
     // S'assurer que le localStorage est écrit immédiatement
     localStorage.setItem("jetc_demo_mode", "true");
+    localStorage.setItem("jetc_demo_role", "regie");
+    
+    // Créer la session DEMO avec profil régie
+    const demoProfile = getDemoProfileByRole("regie");
+    localStorage.setItem("profile", JSON.stringify(demoProfile));
+    localStorage.setItem("token", "demo_token_" + Date.now());
+    localStorage.setItem("role", "regie");
+    
+    // Créer une session complète
+    localStorage.setItem(
+      "session",
+      JSON.stringify({
+        token: "demo_token_" + Date.now(),
+        role: "regie",
+        user: demoProfile,
+      })
+    );
 
-    // Navigation vers l'inscription
-    router.push("/register");
+    // Redirection vers le hub DEMO
+    router.push("/demo-hub");
   };
 
   return (
