@@ -59,7 +59,8 @@ export default function Layout({ children }) {
                 src="/branding/jetc/logo.png"
                 alt="JETC IMMO"
                 style={{
-                  height: "45px",
+                  height: "clamp(40px, 8vw, 56px)",
+                  width: "auto",
                   objectFit: "contain",
                 }}
                 onError={(e) => {
