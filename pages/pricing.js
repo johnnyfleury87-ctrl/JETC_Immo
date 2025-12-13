@@ -2,17 +2,9 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import Button from "../components/UI/Button";
 import Card from "../components/UI/Card";
-import { useDemoMode } from "../context/DemoModeContext";
 
 export default function PricingPage() {
   const router = useRouter();
-  const { enableDemoMode } = useDemoMode();
-
-  const handleStartDemo = () => {
-    enableDemoMode();
-    localStorage.setItem("jetc_demo_mode", "true");
-    router.push("/register");
-  };
 
   const plans = [
     {
@@ -119,12 +111,7 @@ export default function PricingPage() {
             ← Accueil
           </Button>
           <Button
-            onClick={() => {
-              const isDemo = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
-              if (!isDemo) {
-                router.push("/login");
-              }
-            }}
+            onClick={() => router.push("/login")}
             style={{ background: "white", color: "var(--primary)" }}
             className="hover-bounce"
           >
@@ -375,59 +362,6 @@ export default function PricingPage() {
             (prélevée sur la régie). Les entreprises de maintenance bénéficient
             d&apos;un accès gratuit pour la réception et gestion des tickets.
           </p>
-        </div>
-      </section>
-
-      {/* CTA Demo */}
-      <section
-        style={{
-          padding: "4rem 2rem",
-          background: "linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "800px",
-            margin: "0 auto",
-            textAlign: "center",
-          }}
-        >
-          <h2
-            className="slide-up"
-            style={{
-              fontSize: "2.5rem",
-              marginBottom: "1rem",
-              color: "var(--primary)",
-              fontWeight: "700",
-            }}
-          >
-            Pas encore sûr ? Essayez notre mode DEMO
-          </h2>
-          <p
-            className="slide-up stagger-1"
-            style={{
-              fontSize: "1.2rem",
-              opacity: 0.8,
-              marginBottom: "2rem",
-              lineHeight: "1.6",
-            }}
-          >
-            Testez toutes les fonctionnalités de JETC IMMO gratuitement, sans
-            créer de compte. Naviguez entre tous les rôles et explorez la
-            plateforme en profondeur.
-          </p>
-          <Button
-            onClick={handleStartDemo}
-            style={{
-              fontSize: "1.2rem",
-              padding: "1.2rem 3rem",
-              background: "var(--primary)",
-              fontWeight: "700",
-            }}
-            className="hover-bounce"
-          >
-            🚀 Lancer le mode DEMO
-          </Button>
         </div>
       </section>
 

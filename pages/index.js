@@ -46,12 +46,7 @@ export default function HomePage() {
             💰 Tarifs
           </Button>
           <Button
-            onClick={() => {
-              const isDemo = typeof window !== "undefined" && localStorage.getItem("jetc_demo_mode") === "true";
-              if (!isDemo) {
-                router.push("/login");
-              }
-            }}
+            onClick={() => router.push("/login")}
             style={{ background: "white", color: "var(--primary)" }}
             className="hover-bounce"
           >
