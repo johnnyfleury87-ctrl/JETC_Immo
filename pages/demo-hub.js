@@ -198,7 +198,11 @@ function DemoHub() {
               e.currentTarget.style.transform = "translateY(0)";
               e.currentTarget.style.boxShadow = "var(--shadow)";
             }}
-            onClick={() => window.location.href = "/demo/regie/dashboard"}
+            onClick={() => {
+              localStorage.setItem("jetc_demo_mode", "true");
+              localStorage.setItem("jetc_demo_role", "regie");
+              window.location.href = "/demo/regie/dashboard";
+            }}
           >
             <div
               style={{
@@ -244,6 +248,8 @@ function DemoHub() {
               }}
               onClick={(e) => {
                 e.stopPropagation();
+                localStorage.setItem("jetc_demo_mode", "true");
+                localStorage.setItem("jetc_demo_role", "regie");
                 window.location.href = "/demo/regie/dashboard";
               }}
             >
@@ -268,7 +274,11 @@ function DemoHub() {
               e.currentTarget.style.transform = "translateY(0)";
               e.currentTarget.style.boxShadow = "var(--shadow)";
             }}
-            onClick={() => window.location.href = "/demo/entreprise/dashboard"}
+            onClick={() => {
+              localStorage.setItem("jetc_demo_mode", "true");
+              localStorage.setItem("jetc_demo_role", "entreprise");
+              window.location.href = "/demo/entreprise/dashboard";
+            }}
           >
             <div
               style={{
@@ -314,6 +324,8 @@ function DemoHub() {
               }}
               onClick={(e) => {
                 e.stopPropagation();
+                localStorage.setItem("jetc_demo_mode", "true");
+                localStorage.setItem("jetc_demo_role", "entreprise");
                 window.location.href = "/demo/entreprise/dashboard";
               }}
             >
@@ -338,7 +350,11 @@ function DemoHub() {
               e.currentTarget.style.transform = "translateY(0)";
               e.currentTarget.style.boxShadow = "var(--shadow)";
             }}
-            onClick={() => window.location.href = "/demo/technicien/dashboard"}
+            onClick={() => {
+              localStorage.setItem("jetc_demo_mode", "true");
+              localStorage.setItem("jetc_demo_role", "technicien");
+              window.location.href = "/demo/technicien/dashboard";
+            }}
           >
             <div
               style={{
@@ -384,6 +400,8 @@ function DemoHub() {
               }}
               onClick={(e) => {
                 e.stopPropagation();
+                localStorage.setItem("jetc_demo_mode", "true");
+                localStorage.setItem("jetc_demo_role", "technicien");
                 window.location.href = "/demo/technicien/dashboard";
               }}
             >
@@ -408,7 +426,11 @@ function DemoHub() {
               e.currentTarget.style.transform = "translateY(0)";
               e.currentTarget.style.boxShadow = "var(--shadow)";
             }}
-            onClick={() => window.location.href = "/demo/locataire/dashboard"}
+            onClick={() => {
+              localStorage.setItem("jetc_demo_mode", "true");
+              localStorage.setItem("jetc_demo_role", "locataire");
+              window.location.href = "/demo/locataire/dashboard";
+            }}
           >
             <div
               style={{
@@ -454,6 +476,8 @@ function DemoHub() {
               }}
               onClick={(e) => {
                 e.stopPropagation();
+                localStorage.setItem("jetc_demo_mode", "true");
+                localStorage.setItem("jetc_demo_role", "locataire");
                 window.location.href = "/demo/locataire/dashboard";
               }}
             >
