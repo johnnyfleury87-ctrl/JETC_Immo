@@ -327,7 +327,7 @@ export default function PricingPage() {
               </ul>
 
               <Button
-                onClick={() => router.push("/register")}
+                onClick={() => router.push(`/demande-adhesion?plan=${plan.name}`)}
                 style={{
                   width: "100%",
                   padding: "1rem",

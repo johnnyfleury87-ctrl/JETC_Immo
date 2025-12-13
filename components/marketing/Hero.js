@@ -117,10 +117,10 @@ export default function Hero() {
             flexWrap: "wrap",
           }}
         >
-          {/* Bouton DEMO visible uniquement pour visiteurs non connectés */}
-          {!loading && canUseDemo(profile) && (
+          {/* Bouton principal : Demande d'adhésion */}
+          {!loading && !profile && (
             <Button
-              onClick={handleDemoStart}
+              onClick={() => router.push("/demande-adhesion")}
               style={{
                 fontSize: "1.2rem",
                 padding: "1.2rem 3rem",
@@ -132,7 +132,26 @@ export default function Hero() {
               }}
               className="hover-bounce"
             >
-              🚀 Commencer en mode DEMO
+              🚀 Commencer maintenant
+            </Button>
+          )}
+
+          {/* Bouton DEMO visible uniquement pour visiteurs non connectés */}
+          {!loading && canUseDemo(profile) && (
+            <Button
+              onClick={handleDemoStart}
+              style={{
+                fontSize: "1.2rem",
+                padding: "1.2rem 3rem",
+                background: "rgba(255, 255, 255, 0.15)",
+                color: "white",
+                fontWeight: "700",
+                border: "2px solid white",
+                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.1)",
+              }}
+              className="hover-glow"
+            >
+              🎭 Essayer le DEMO
             </Button>
           )}
 
@@ -149,7 +168,7 @@ export default function Hero() {
             }}
             className="hover-glow"
           >
-            💎 Voir les offres
+            💎 Voir les tarifs
           </Button>
         </div>
 

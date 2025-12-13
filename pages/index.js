@@ -379,6 +379,75 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Call to Action Final */}
+      <section
+        style={{
+          padding: "5rem 2rem",
+          background: "linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)",
+          color: "white",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+          <h2
+            style={{
+              fontSize: "2.5rem",
+              fontWeight: "700",
+              marginBottom: "1.5rem",
+            }}
+          >
+            Prêt à transformer votre gestion immobilière ?
+          </h2>
+          <p
+            style={{
+              fontSize: "1.2rem",
+              marginBottom: "2.5rem",
+              opacity: 0.95,
+            }}
+          >
+            Rejoignez les régies qui font confiance à JETC IMMO pour gérer leurs interventions
+          </p>
+          <div
+            style={{
+              display: "flex",
+              gap: "1.5rem",
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <Button
+              onClick={() => router.push("/demande-adhesion")}
+              style={{
+                fontSize: "1.2rem",
+                padding: "1.2rem 3rem",
+                background: "white",
+                color: "var(--primary)",
+                fontWeight: "700",
+                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+                border: "none",
+              }}
+              className="hover-bounce"
+            >
+              🚀 Faire une demande d'adhésion
+            </Button>
+            <Button
+              onClick={() => router.push("/pricing")}
+              style={{
+                fontSize: "1.2rem",
+                padding: "1.2rem 3rem",
+                background: "transparent",
+                color: "white",
+                fontWeight: "700",
+                border: "2px solid white",
+              }}
+              className="hover-glow"
+            >
+              💰 Voir les tarifs
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer
         style={{
@@ -469,7 +538,7 @@ export default function HomePage() {
               🔐 Connexion
             </Link>
             <Link
-              href="/register"
+              href="/demande-adhesion"
               style={{
                 color: "white",
                 textDecoration: "none",
@@ -486,7 +555,7 @@ export default function HomePage() {
                 e.target.style.transform = "translateY(0)";
               }}
             >
-              ✍️ Inscription
+              📝 Demande d'adhésion
             </Link>
           </div>
 
