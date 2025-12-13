@@ -39,11 +39,10 @@ export default function Layout({ children }) {
           }}
         >
           <Link href="/" style={{ textDecoration: "none" }}>
-            <h1
+            <div
               style={{
-                margin: 0,
-                fontSize: "1.5rem",
-                color: "var(--accent)",
+                display: "flex",
+                alignItems: "center",
                 cursor: "pointer",
                 transition: "transform 0.2s ease, opacity 0.2s ease",
               }}
@@ -56,8 +55,29 @@ export default function Layout({ children }) {
                 e.currentTarget.style.opacity = "1";
               }}
             >
-              🏢 JETC IMMO
-            </h1>
+              <img
+                src="/branding/jetc/logo.png"
+                alt="JETC IMMO"
+                style={{
+                  height: "45px",
+                  objectFit: "contain",
+                }}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+              <h1
+                style={{
+                  display: "none",
+                  margin: 0,
+                  fontSize: "1.5rem",
+                  color: "var(--accent)",
+                }}
+              >
+                🏢 JETC IMMO
+              </h1>
+            </div>
           </Link>
 
           <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>

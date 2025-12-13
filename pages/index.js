@@ -72,7 +72,7 @@ export default function HomePage() {
           onClick={() => router.push("/")}
         >
           <img 
-            src="/branding/jetc/logo.svg" 
+            src="/branding/jetc/logo.png" 
             alt="JETC IMMO" 
             style={{ 
               height: "45px",
@@ -215,7 +215,7 @@ export default function HomePage() {
               className="hover-lift"
             >
               <img
-                src="/branding/jetc/logo.svg"
+                src="/branding/jetc/logo.png"
                 alt="JETC IMMO"
                 style={{
                   height: "60px",
@@ -389,12 +389,13 @@ export default function HomePage() {
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "3rem" }}>
             <img
-              src="/branding/jetc/logo-white.svg"
+              src="/branding/jetc/logo.png"
               alt="JETC IMMO"
               style={{
                 height: "50px",
                 marginBottom: "1rem",
                 objectFit: "contain",
+                filter: "brightness(0) invert(1)",
               }}
               onError={(e) => {
                 e.target.style.display = 'none';
