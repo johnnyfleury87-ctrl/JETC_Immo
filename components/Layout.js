@@ -149,32 +149,37 @@ export default function Layout({ children }) {
             flexWrap: "wrap",
           }}
         >
-          <Link
-            href="/login"
-            style={{
-              color: "white",
-              textDecoration: "none",
-              padding: "0.5rem 1rem",
-              borderRadius: "6px",
-              transition: "all 0.2s ease",
-            }}
+          {/* Connexion et Inscription : visibles uniquement si non-connecté */}
+          {!loading && !profile && (
+            <>
+              <Link
+                href="/login"
+                style={{
+                  color: "white",
+                  textDecoration: "none",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "6px",
+                  transition: "all 0.2s ease",
+                }}
                 className="hover-glow"
               >
                 Connexion
               </Link>
-          <Link
-            href="/register"
-            style={{
-              color: "white",
-              textDecoration: "none",
-              padding: "0.5rem 1rem",
-              borderRadius: "6px",
-              transition: "all 0.2s ease",
-            }}
-            className="hover-glow"
-          >
-            📝 Inscription
-          </Link>
+              <Link
+                href="/register"
+                style={{
+                  color: "white",
+                  textDecoration: "none",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "6px",
+                  transition: "all 0.2s ease",
+                }}
+                className="hover-glow"
+              >
+                📝 Inscription
+              </Link>
+            </>
+          )}
           
           {/* Bouton MODE DEMO visible uniquement pour visiteurs non connectés */}
           {!loading && canUseDemo(profile) && (
