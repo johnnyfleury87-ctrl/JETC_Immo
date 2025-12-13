@@ -4,7 +4,7 @@ import Button from "../UI/Button";
 import { useDemoMode } from "../../context/DemoModeContext";
 import { getDemoProfileByRole } from "../../lib/session";
 import { canUseDemo } from "../../lib/demoAccess";
-import { getProfile } from "../../lib/auth";
+import { getProfile } from "../../lib/api";
 import PartnersLogo from "./PartnersLogo";
 
 export default function Hero() {

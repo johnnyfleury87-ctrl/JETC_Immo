@@ -3,7 +3,7 @@ import Link from "next/link";
 import UserBadge from "./UserBadge";
 import { useTheme } from "../context/ThemeContext";
 import { canUseDemo } from "../lib/demoAccess";
-import { getProfile } from "../lib/auth";
+import { getProfile } from "../lib/api";
 
 export default function Layout({ children }) {
   const { theme, setTheme } = useTheme();
