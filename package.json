@@ -9,7 +9,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "format": "prettier --write \"**/*.{js,jsx,json,md,css}\"",
-    "prepare": "husky"
+    "prepare": "node -e \"if (process.env.CI !== 'true') require('child_process').execSync('husky', {stdio: 'inherit'})\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.87.1",
