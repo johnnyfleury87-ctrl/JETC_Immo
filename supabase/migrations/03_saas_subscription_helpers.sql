@@ -347,8 +347,12 @@ SELECT
     )::text || '/' || p.max_logements::text
   END AS logements_display,
   
-  -- Entreprises partenaires
-  (SELECT COUNT(DISTINCT e.id) FROM entreprises e WHERE e.regie_id = r.id) AS entreprises_actives,
+  -- Entreprises partenaires (via missions → tickets → regies)
+  (SELECT COUNT(DISTINCT m.entreprise_id) 
+   FROM missions m 
+   JOIN tickets t ON t.id = m.ticket_id 
+   WHERE t.regie_id = r.id
+  ) AS entreprises_actives,
   p.max_entreprises_partenaires AS entreprises_limite,
   
   -- Dates

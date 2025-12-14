@@ -273,4 +273,8 @@ FROM subscriptions s
 WHERE s.regie_id IS NOT NULL
 LIMIT 10;
 
-RAISE NOTICE '✓ Migration 02_saas_owner_tracking.sql terminée avec succès';
+-- Message de confirmation de fin de migration
+DO $$
+BEGIN
+  RAISE NOTICE '✓ Migration 02_saas_owner_tracking.sql terminée avec succès';
+END $$;
