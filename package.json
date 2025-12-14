@@ -9,7 +9,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "format": "prettier --write \"**/*.{js,jsx,json,md,css}\"",
-    "prepare": "node -e \"if (process.env.CI !== 'true') require('child_process').execSync('husky', {stdio: 'inherit'})\""
+    "prepare": "node -e \"const fs=require('fs'); if (process.env.NODE_ENV !== 'production' && fs.existsSync('.git')) { require('child_process').execSync('npx husky install', { stdio: 'inherit' }) }\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.87.1",
