@@ -18,8 +18,66 @@ const supabase = createClient(
 export default function App({ Component, pageProps }) {
   const router = useRouter();
 
-  // La gestion du magic link est maintenant dans login.js uniquement
-  // Cet effect n'est plus nécessaire car login.js gère directement la redirection
+  // Listener global pour tous les changements d'état auth Supabase
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[AUTH] Event:', event, 'Session:', !!session);
+
+      // Si connexion réussie (magic link ou autre)
+      if (event === 'SIGNED_IN' && session?.user) {
+        try {
+          // Charger le profile
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (error) {
+            console.error('[AUTH] Erreur chargement profile:', error);
+            return;
+          }
+
+          console.log('[AUTH] Profile chargé:', profile?.role);
+
+          // Redirection automatique pour admin_jtec
+          if (profile?.role === 'admin_jtec') {
+            console.log('[AUTH] Redirection vers /admin/jetc');
+            router.replace('/admin/jetc');
+            return;
+          }
+
+          // Redirection selon le rôle pour les autres
+          if (profile?.role) {
+            const roleRoutes = {
+              'locataire': '/locataire/tickets',
+              'regie': '/regie/dashboard',
+              'entreprise': '/entreprise/missions',
+              'technicien': '/technicien/missions'
+            };
+
+            const targetRoute = roleRoutes[profile.role];
+            if (targetRoute && router.pathname === '/login') {
+              router.replace(targetRoute);
+            }
+          }
+        } catch (err) {
+          console.error('[AUTH] Erreur lors de la gestion de la connexion:', err);
+        }
+      }
+
+      // Si déconnexion
+      if (event === 'SIGNED_OUT') {
+        console.log('[AUTH] Déconnexion détectée');
+        router.replace('/login');
+      }
+    });
+
+    // Nettoyage
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, [router]);
 
   return (
     <DemoModeProvider>
