@@ -62,18 +62,23 @@ export default function Login() {
   // Gérer le retour du magic link
   useEffect(() => {
     const handleMagicLinkCallback = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
 
-      if (session && !error) {
-        try {
+        if (session?.user && !error) {
           // Récupérer le profile
-          const { data: profile } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
 
-          if (profile) {
+          if (profileError) {
+            console.error("Erreur récupération profile:", profileError);
+            return;
+          }
+
+          if (profile?.role) {
             // Sauvegarder la session
             saveSession({
               token: session.access_token,
@@ -86,12 +91,18 @@ export default function Login() {
             // Transition demo si nécessaire
             transitionDemoToProd(profile);
 
-            // Redirection selon le rôle
+            // Redirection immédiate pour admin
+            if (profile.role === 'admin_jtec') {
+              router.replace('/admin/jetc');
+              return;
+            }
+
+            // Redirection selon le rôle pour les autres
             redirectByRole(profile.role);
           }
-        } catch (err) {
-          console.error("Erreur lors de la récupération du profile:", err);
         }
+      } catch (err) {
+        console.error("Erreur handleMagicLinkCallback:", err);
       }
     };
 

@@ -20,37 +20,64 @@ export default function AdminJetcPage() {
   const [filter, setFilter] = useState("pending"); // pending, approved, rejected, all
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     checkAdminAccess();
   }, []);
 
   useEffect(() => {
-    if (profile && profile.role === "admin_jtec") {
+    // NE charger les requêtes QUE si le profile est chargé ET validé
+    if (authChecked && profile?.role === "admin_jtec") {
       loadRequests();
     }
-  }, [profile, filter]);
+  }, [profile, filter, authChecked]);
 
   const checkAdminAccess = async () => {
     try {
-      const profileData = await getProfile();
+      // Vérifier d'abord la session Supabase
+      const { data: { session } } = await supabase.auth.getSession();
       
-      if (!profileData || profileData.role !== "admin_jtec") {
+      if (!session?.user) {
+        router.replace("/login");
+        return;
+      }
+
+      // Récupérer le profile depuis Supabase directement
+      const { data: profileData, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      if (error || !profileData) {
+        console.error("Erreur récupération profile:", error);
+        router.replace("/login");
+        return;
+      }
+      
+      if (profileData.role !== "admin_jtec") {
         alert("Accès refusé. Cette page est réservée aux administrateurs JETC.");
-        router.push("/");
+        router.replace("/");
         return;
       }
 
       setProfile(profileData);
+      setAuthChecked(true);
     } catch (error) {
       console.error("Erreur vérification accès:", error);
-      router.push("/login");
+      router.replace("/login");
     } finally {
       setLoading(false);
     }
   };
 
   const loadRequests = async () => {
+    // Guard: ne rien charger si le profile n'est pas validé
+    if (!profile?.id || !authChecked) {
+      return;
+    }
+
     try {
       let query = supabase
         .from("adhesion_requests_summary")
@@ -72,6 +99,12 @@ export default function AdminJetcPage() {
   };
 
   const handleValidate = async (requestId) => {
+    // Guard: vérifier que profile est chargé
+    if (!profile?.id) {
+      alert("Erreur: session non chargée. Veuillez recharger la page.");
+      return;
+    }
+
     if (!confirm("Confirmer la validation de cette demande ? Les accès seront créés.")) {
       return;
     }
@@ -104,6 +137,12 @@ export default function AdminJetcPage() {
   };
 
   const handleReject = async (requestId) => {
+    // Guard: vérifier que profile est chargé
+    if (!profile?.id) {
+      alert("Erreur: session non chargée. Veuillez recharger la page.");
+      return;
+    }
+
     const reason = prompt("Raison du rejet (optionnel) :");
     if (reason === null) return; // Cancel
 

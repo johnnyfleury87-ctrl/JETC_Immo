@@ -18,25 +18,8 @@ const supabase = createClient(
 export default function App({ Component, pageProps }) {
   const router = useRouter();
 
-  useEffect(() => {
-    const handleMagicLinkReturn = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-
-        if (profile?.role === 'admin_jtec' && router.pathname !== '/admin/jetc') {
-          router.replace('/admin/jetc');
-        }
-      }
-    };
-
-    handleMagicLinkReturn();
-  }, [router.pathname]);
+  // La gestion du magic link est maintenant dans login.js uniquement
+  // Cet effect n'est plus nécessaire car login.js gère directement la redirection
 
   return (
     <DemoModeProvider>
