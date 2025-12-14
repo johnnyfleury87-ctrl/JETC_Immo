@@ -24,6 +24,7 @@ export default function AdminJetcPage() {
 
   useEffect(() => {
     checkAdminAccess();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -31,6 +32,7 @@ export default function AdminJetcPage() {
     if (authChecked && profile?.role === "admin_jtec") {
       loadRequests();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, filter, authChecked]);
 
   const checkAdminAccess = async () => {

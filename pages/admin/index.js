@@ -37,12 +37,14 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     checkAdminAccess();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (authChecked && profile?.role === "admin_jtec") {
       loadStats();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authChecked, profile]);
 
   const checkAdminAccess = async () => {

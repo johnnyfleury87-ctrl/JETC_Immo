@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import Layout from "../components/Layout";
 import { login, redirectByRole } from "../lib/auth";
 import { saveSession, saveProfile } from "../lib/session";
