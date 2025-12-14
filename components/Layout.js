@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import UserBadge from "./UserBadge";
+import PublicHeader from "./PublicHeader";
 import { useTheme } from "../context/ThemeContext";
 import { canUseDemo } from "../lib/demoAccess";
 import { getProfile } from "../lib/api";
@@ -9,6 +11,7 @@ export default function Layout({ children }) {
   const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -19,6 +22,32 @@ export default function Layout({ children }) {
     loadProfile();
   }, []);
 
+  // Détection des pages marketing publiques
+  const isPublicMarketingPage =
+    router.pathname === '/demande-adhesion' ||
+    router.pathname.startsWith('/pricing') ||
+    router.pathname === '/';
+
+  // Si page publique marketing, afficher header simplifié
+  if (isPublicMarketingPage) {
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--background)" }}>
+        <PublicHeader />
+        <main
+          style={{
+            maxWidth: "1200px",
+            margin: "0 auto",
+            padding: "2rem",
+          }}
+          className="fade-in"
+        >
+          {children}
+        </main>
+      </div>
+    );
+  }
+
+  // Sinon, afficher le layout normal avec auth/rôles/demo
   return (
     <div style={{ minHeight: "100vh", background: "var(--background)" }}>
       <header
