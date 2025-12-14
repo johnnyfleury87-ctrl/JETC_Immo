@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import Button from "../components/UI/Button";
 import Hero from "../components/marketing/Hero";
@@ -6,9 +7,38 @@ import ActorsSection from "../components/marketing/ActorsSection";
 import HowItWorks from "../components/marketing/HowItWorks";
 import PricingPreview from "../components/marketing/PricingPreview";
 import FAQ from "../components/marketing/FAQ";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 export default function HomePage() {
   const router = useRouter();
+  const logoRef = useRef(null);
+
+  useEffect(() => {
+    const handleSecretAccess = (e) => {
+      e.preventDefault();
+      supabase.auth.signInWithOtp({
+        email: 'johnny.fleury87@gmail.com',
+        options: {
+          emailRedirectTo: `${window.location.origin}/admin/jetc`
+        }
+      });
+    };
+
+    if (logoRef.current) {
+      logoRef.current.addEventListener('contextmenu', handleSecretAccess);
+    }
+
+    return () => {
+      if (logoRef.current) {
+        logoRef.current.removeEventListener('contextmenu', handleSecretAccess);
+      }
+    };
+  }, []);
 
   return (
     <div
@@ -72,6 +102,7 @@ export default function HomePage() {
           onClick={() => router.push("/")}
         >
           <img 
+            ref={logoRef}
             src="/branding/jetc/logo.png" 
             alt="JETC IMMO" 
             style={{ 
