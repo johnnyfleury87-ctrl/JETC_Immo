@@ -4,7 +4,8 @@ import Layout from "../../components/Layout";
 import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
 import StatusBadge from "../../components/UI/StatusBadge";
-import { getProfile, saveProfile } from "../../lib/session";
+import { getProfile } from "../../lib/api";
+import { saveProfile } from "../../lib/session";
 import { requireRole } from "../../lib/roleGuard";
 
 export default function TechnicienDashboard() {

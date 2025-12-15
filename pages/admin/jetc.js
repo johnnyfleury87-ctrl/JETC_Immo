@@ -4,7 +4,6 @@ import Layout from "../../components/Layout";
 import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
 import StatusBadge from "../../components/UI/StatusBadge";
-import { getProfile } from "../../lib/api";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
