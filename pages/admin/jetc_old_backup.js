@@ -5,56 +5,87 @@ import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
 import StatusBadge from "../../components/UI/StatusBadge";
 import { supabase } from "../../lib/supabase";
-import { useAuth } from "../../context/AuthContext";
 
 /**
  * Page Admin JETC - Gestion des demandes d'adhésion
  * 
- * ARCHITECTURE CENTRALISÉE :
- * - Profile chargé par AuthContext (source unique)
- * - Page NE FAIT AUCUN APPEL auth/profile
- * - Logique simplifiée : loading → redirect → render
+ * LOGIQUE D'AUTORISATION UNIQUE :
+ * - Source de vérité : public.profiles.role === 'admin_jtec'
+ * - 3 états possibles : loading, forbidden (redirect), admin (UI)
+ * - Aucun blocage infini autorisé
  */
 export default function AdminJetcPage() {
   const router = useRouter();
-  const { profile, loading, role } = useAuth(); // Source de vérité unique
   
-  // États locaux (données métier uniquement)
+  // États
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
   const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState("pending");
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
   // ========================================
-  // GARDE D'ACCÈS (délégué à AuthContext)
+  // AUTORISATION (exécution unique)
   // ========================================
   useEffect(() => {
-    // Attendre que loading soit fini
-    if (loading) return;
+    async function checkAuth() {
+      try {
+        // 1. Vérifier session Supabase
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session) {
+          console.warn('[Admin] Session invalide');
+          router.replace("/login");
+          return;
+        }
 
-    // Si pas de profile, redirect login
-    if (!profile) {
-      console.warn('[Admin] Pas de profile → redirect /login');
-      router.replace("/login");
-      return;
+        // 2. Récupérer profile depuis public.profiles
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        // 3. Gérer erreur explicitement (jamais de null silencieux)
+        if (profileError) {
+          console.error('[Admin] Erreur récupération profile:', profileError.message);
+          router.replace("/login");
+          return;
+        }
+
+        // 4. Vérifier autorisation admin
+        if (!profileData || profileData.role !== "admin_jtec") {
+          console.warn('[Admin] Accès refusé, role:', profileData?.role);
+          router.replace("/login");
+          return;
+        }
+
+        // 5. Autorisation OK - Charger le profile
+        setProfile(profileData);
+        setLoading(false);
+        
+        // Cache pour Layout (optionnel)
+        try {
+          sessionStorage.setItem('jetc_profile', JSON.stringify(profileData));
+        } catch (e) {
+          // Ignore sessionStorage errors
+        }
+        
+      } catch (error) {
+        console.error('[Admin] Exception:', error);
+        router.replace("/login");
+      }
     }
 
-    // Si pas admin_jtec, redirect login
-    if (role !== "admin_jtec") {
-      console.warn('[Admin] Role invalide:', role, '→ redirect /login');
-      router.replace("/login");
-      return;
-    }
-
-    console.log('[Admin] Autorisation OK, role:', role);
-  }, [loading, profile, role, router]);
+    checkAuth();
+  }, []); // Exécution unique - AUCUNE dépendance
 
   // ========================================
   // CHARGEMENT DES DEMANDES
   // ========================================
   useEffect(() => {
-    // Ne charger que si profile OK et role admin
-    if (!profile || role !== "admin_jtec") return;
+    if (!profile) return;
 
     async function loadRequests() {
       try {
@@ -81,7 +112,7 @@ export default function AdminJetcPage() {
     }
 
     loadRequests();
-  }, [profile, role, filter]);
+  }, [profile, filter]);
 
   // ========================================
   // ACTIONS
@@ -170,10 +201,10 @@ export default function AdminJetcPage() {
   };
 
   // ========================================
-  // RENDER (états simples)
+  // RENDER (3 états possibles)
   // ========================================
   
-  // État 1: Loading (AuthContext vérifie auth)
+  // État 1: Loading (vérification auth en cours)
   if (loading) {
     return (
       <Layout>
@@ -184,12 +215,14 @@ export default function AdminJetcPage() {
     );
   }
 
-  // État 2: Pas de profile ou role invalide (redirect en cours via useEffect)
-  if (!profile || role !== "admin_jtec") {
+  // État 2: Erreur critique (ne devrait jamais arriver)
+  if (!profile) {
     return (
       <Layout>
         <div style={{ padding: "2rem", textAlign: "center" }}>
-          <p>Vérification des accès...</p>
+          <p style={{ color: "#ef4444" }}>
+            Erreur de chargement. Veuillez vous reconnecter.
+          </p>
         </div>
       </Layout>
     );

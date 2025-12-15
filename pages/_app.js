@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { ThemeProvider } from "../context/ThemeContext";
 import { DemoModeProvider } from "../context/DemoModeContext";
+import { AuthProvider } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import "../styles/global.css";
 import "../styles/animations.css";
@@ -80,10 +81,12 @@ export default function App({ Component, pageProps }) {
   }, []); // VIDE : s'exécute UNE SEULE FOIS
 
   return (
-    <DemoModeProvider>
-      <ThemeProvider>
-        <Component {...pageProps} />
-      </ThemeProvider>
-    </DemoModeProvider>
+    <AuthProvider>
+      <DemoModeProvider>
+        <ThemeProvider>
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </DemoModeProvider>
+    </AuthProvider>
   );
 }

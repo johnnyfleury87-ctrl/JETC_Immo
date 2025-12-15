@@ -4,39 +4,13 @@ import { useRouter } from "next/router";
 import UserBadge from "./UserBadge";
 import PublicHeader from "./PublicHeader";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 import { canUseDemo } from "../lib/demoAccess";
-import { getProfile } from "../lib/api";
 
 export default function Layout({ children }) {
   const { theme, setTheme } = useTheme();
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { profile, loading } = useAuth(); // Source de vérité unique
   const router = useRouter();
-
-  // IMPORTANT: Le chargement du profile est désormais géré par chaque page
-  // (ex: pages/admin/jetc.js). Layout ne charge plus le profile pour éviter
-  // les conflits et les double-chargements.
-  
-  useEffect(() => {
-    // Pour les pages qui ont besoin du profile dans Layout (header/nav),
-    // récupérer depuis sessionStorage (mis à jour par les pages)
-    const loadProfileFromSession = () => {
-      if (typeof window === 'undefined') return; // SSR guard
-      
-      try {
-        const cached = sessionStorage.getItem('jetc_profile');
-        if (cached) {
-          setProfile(JSON.parse(cached));
-        }
-      } catch (error) {
-        console.warn('[Layout] Impossible de charger profile depuis session:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    loadProfileFromSession();
-  }, []);
 
   // Détection des pages marketing publiques
   const isPublicMarketingPage =
