@@ -44,6 +44,16 @@ export default function AdminDashboard() {
 
   const checkAdminAccess = async () => {
     try {
+      // 🔓 MODE DEBUG BYPASS
+      const debugMode = typeof window !== 'undefined' && localStorage.getItem('jetc_admin_debug') === 'true';
+      if (debugMode) {
+        console.warn('[Admin Dashboard] 🔓 MODE DEBUG - Bypass auth');
+        setProfile({ id: 'debug', role: 'admin_jtec', email: 'debug@jetc.fr' });
+        setAuthChecked(true);
+        setLoading(false); // ✅ Débloquer immédiatement
+        return;
+      }
+
       // Vérifier la session Supabase
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -76,7 +86,7 @@ export default function AdminDashboard() {
 
       setProfile(profileData);
       setAuthChecked(true);
-      // Note: setLoading(false) sera appelé par loadStats() après chargement des données
+      setLoading(false); // ✅ FIX: Débloquer dès que profile OK
     } catch (error) {
       console.error("Erreur vérification accès:", error);
       router.replace("/login");
@@ -87,9 +97,11 @@ export default function AdminDashboard() {
   const loadStats = async () => {
     // Guard: ne rien charger si le profile n'est pas validé
     if (!profile?.id || !authChecked) {
+      console.warn('[loadStats] Conditions non remplies:', { profile: !!profile, authChecked });
       return;
     }
 
+    console.log('[loadStats] Démarrage chargement stats...');
     try {
       // Chargement des KPIs
       const [
