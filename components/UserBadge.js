@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getProfileLocal } from "../lib/session";
+import { useAuth } from "../context/AuthContext";
 import { apiFetch } from "../lib/api";
 
 // Fonction helper pour afficher les rôles en français
@@ -14,11 +14,16 @@ function getRoleLabel(role) {
 }
 
 export default function UserBadge() {
-  const profile = getProfileLocal();
+  const { profile, loading: authLoading } = useAuth(); // ✅ Source unique de vérité
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // ✅ Attendre que AuthContext finisse de charger
+    if (authLoading) {
+      return;
+    }
+
     const checkSubscription = async () => {
       // GUARD: Ne rien faire si pas de profile ou profile incomplet
       if (!profile || !profile.id || !profile.role) {
@@ -59,8 +64,14 @@ export default function UserBadge() {
     };
 
     checkSubscription();
-  }, [profile?.id, profile?.role]);
+  }, [authLoading, profile?.id, profile?.role]);
 
+  // ✅ Pendant le loading AuthContext, ne rien afficher
+  if (authLoading) {
+    return null;
+  }
+
+  // ✅ Si pas de profile après loading, ne rien afficher
   if (!profile) {
     return null;
   }

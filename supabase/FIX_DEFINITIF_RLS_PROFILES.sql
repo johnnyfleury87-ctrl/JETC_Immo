@@ -10,16 +10,20 @@
 ALTER TABLE profiles DISABLE ROW LEVEL SECURITY;
 
 -- ÉTAPE 2 : SUPPRIMER TOUTES LES POLICIES EXISTANTES
+-- (Supprimer TOUTES les policies, anciennes et nouvelles)
 DROP POLICY IF EXISTS "users_view_own_profile" ON profiles;
 DROP POLICY IF EXISTS "admin_jtec_view_all_profiles" ON profiles;
 DROP POLICY IF EXISTS "admin_jtec_select_all" ON profiles;
+DROP POLICY IF EXISTS "admin_select_all" ON profiles;
 DROP POLICY IF EXISTS "regie_view_own_members" ON profiles;
 DROP POLICY IF EXISTS "entreprise_view_own_technicians" ON profiles;
 DROP POLICY IF EXISTS "users_insert_own_profile" ON profiles;
 DROP POLICY IF EXISTS "admin_jtec_insert_profiles" ON profiles;
 DROP POLICY IF EXISTS "users_update_own_profile" ON profiles;
 DROP POLICY IF EXISTS "admin_jtec_update_profiles" ON profiles;
+DROP POLICY IF EXISTS "admin_update_all" ON profiles;
 DROP POLICY IF EXISTS "admin_jtec_delete_profiles" ON profiles;
+DROP POLICY IF EXISTS "admin_delete_all" ON profiles;
 
 -- Vérifier que toutes les policies sont supprimées
 DO $$
