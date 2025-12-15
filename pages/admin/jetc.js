@@ -178,6 +178,28 @@ export default function AdminJetcPage() {
     );
   }
 
+  // Guard: Si pas de profile après loading, ne rien rendre
+  if (!loading && !profile) {
+    return (
+      <Layout>
+        <div style={{ padding: "2rem", textAlign: "center" }}>
+          <p>Erreur: Profil non chargé. Veuillez vous reconnecter.</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Guard: Si pas authChecked, ne rien rendre
+  if (!authChecked) {
+    return (
+      <Layout>
+        <div style={{ padding: "2rem", textAlign: "center" }}>
+          <p>Vérification en cours...</p>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div style={{ padding: "2rem", minHeight: "80vh" }}>
@@ -241,13 +263,13 @@ export default function AdminJetcPage() {
                   {requests.map((req) => (
                     <tr key={req.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
                       <td style={{ padding: "1rem" }}>
-                        {new Date(req.created_at).toLocaleDateString("fr-CH")}
+                        {req.created_at ? new Date(req.created_at).toLocaleDateString("fr-CH") : '-'}
                       </td>
                       <td style={{ padding: "1rem", fontWeight: "600" }}>
-                        {req.regie_name}
+                        {req.regie_name || '-'}
                       </td>
                       <td style={{ padding: "1rem" }}>
-                        {req.city}, {req.country}
+                        {req.city || '-'}, {req.country || '-'}
                       </td>
                       <td style={{ padding: "1rem" }}>
                         <span
@@ -270,18 +292,18 @@ export default function AdminJetcPage() {
                                 : "#92400e",
                           }}
                         >
-                          {req.plan_requested}
+                          {req.plan_requested || 'N/A'}
                         </span>
                       </td>
                       <td style={{ padding: "1rem", fontSize: "0.9rem" }}>
-                        <div>{req.owner_name}</div>
+                        <div>{req.owner_name || '-'}</div>
                         <div style={{ color: "#64748b", fontSize: "0.85rem" }}>
-                          {req.owner_email}
+                          {req.owner_email || '-'}
                         </div>
                       </td>
                       <td style={{ padding: "1rem" }}>
                         <span style={{ fontWeight: req.over_logements_limit ? "700" : "normal", color: req.over_logements_limit ? "#ef4444" : "inherit" }}>
-                          {req.logements_estimes}
+                          {req.logements_estimes || '0'}
                         </span>
                         {req.over_logements_limit && <span style={{ color: "#ef4444", marginLeft: "0.25rem" }}>⚠️</span>}
                       </td>
@@ -381,30 +403,30 @@ export default function AdminJetcPage() {
                 <h2 style={{ marginBottom: "1.5rem" }}>Détails de la demande</h2>
 
                 <div style={{ marginBottom: "1rem" }}>
-                  <strong>Régie:</strong> {selectedRequest.regie_name}
+                  <strong>Régie:</strong> {selectedRequest.regie_name || '-'}
                 </div>
                 <div style={{ marginBottom: "1rem" }}>
-                  <strong>Ville:</strong> {selectedRequest.city}, {selectedRequest.country}
+                  <strong>Ville:</strong> {selectedRequest.city || '-'}, {selectedRequest.country || '-'}
                 </div>
                 <div style={{ marginBottom: "1rem" }}>
-                  <strong>Plan demandé:</strong> {selectedRequest.plan_requested} ({selectedRequest.plan_prix} CHF/mois)
+                  <strong>Plan demandé:</strong> {selectedRequest.plan_requested || '-'} ({selectedRequest.plan_prix || '0'} CHF/mois)
                 </div>
                 <div style={{ marginBottom: "1rem" }}>
-                  <strong>Logements estimés:</strong> {selectedRequest.logements_estimes}
+                  <strong>Logements estimés:</strong> {selectedRequest.logements_estimes || '0'}
                   {selectedRequest.over_logements_limit && (
                     <span style={{ color: "#ef4444", marginLeft: "0.5rem" }}>
-                      (dépasse limite plan: {selectedRequest.plan_max_logements})
+                      (dépasse limite plan: {selectedRequest.plan_max_logements || 'N/A'})
                     </span>
                   )}
                 </div>
                 <div style={{ marginBottom: "1rem" }}>
-                  <strong>Contact principal:</strong> {selectedRequest.owner_name}
+                  <strong>Contact principal:</strong> {selectedRequest.owner_name || '-'}
                 </div>
                 <div style={{ marginBottom: "1rem" }}>
-                  <strong>Email:</strong> {selectedRequest.owner_email}
+                  <strong>Email:</strong> {selectedRequest.owner_email || '-'}
                 </div>
                 <div style={{ marginBottom: "1rem" }}>
-                  <strong>Téléphone:</strong> {selectedRequest.owner_phone}
+                  <strong>Téléphone:</strong> {selectedRequest.owner_phone || '-'}
                 </div>
                 <div style={{ marginBottom: "1rem" }}>
                   <strong>Statut:</strong>{" "}
@@ -416,16 +438,24 @@ export default function AdminJetcPage() {
                         ? "termine"
                         : "annule"
                     }
-                    text={selectedRequest.status}
+                    text={
+                      selectedRequest.status === "pending"
+                        ? "En attente"
+                        : selectedRequest.status === "approved"
+                        ? "Validée"
+                        : selectedRequest.status === "rejected"
+                        ? "Rejetée"
+                        : String(selectedRequest.status || 'Inconnu')
+                    }
                   />
                 </div>
                 {selectedRequest.rejection_reason && (
                   <div style={{ marginBottom: "1rem", padding: "1rem", background: "#fef2f2", borderRadius: "6px" }}>
                     <strong style={{ color: "#ef4444" }}>Raison du rejet:</strong>
-                    <p style={{ margin: "0.5rem 0 0 0" }}>{selectedRequest.rejection_reason}</p>
+                    <p style={{ margin: "0.5rem 0 0 0" }}>{String(selectedRequest.rejection_reason)}</p>
                   </div>
                 )}
-                {selectedRequest.validated_by_name && (
+                {selectedRequest.validated_by_name && selectedRequest.validated_at && (
                   <div style={{ marginBottom: "1rem", fontSize: "0.9rem", color: "#64748b" }}>
                     Traité par {selectedRequest.validated_by_name} le{" "}
                     {new Date(selectedRequest.validated_at).toLocaleString("fr-CH")}

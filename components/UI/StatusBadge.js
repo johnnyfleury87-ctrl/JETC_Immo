@@ -1,4 +1,4 @@
-export default function StatusBadge({ status }) {
+export default function StatusBadge({ status, text }) {
   // Normaliser le statut pour correspondre aux classes CSS
   const statusClass = `status-${status}`;
 
@@ -9,11 +9,13 @@ export default function StatusBadge({ status }) {
     accepte: "Accepté",
     planifiee: "Planifiée",
     en_cours: "En cours",
+    en_attente: "En attente",
     termine: "Terminé",
     annule: "Annulé",
   };
 
-  const label = statusLabels[status] || status;
+  // Utiliser text si fourni, sinon mapper status, sinon status brut
+  const label = text || statusLabels[status] || status || '';
 
   return <span className={statusClass}>{label}</span>;
 }

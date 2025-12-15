@@ -149,6 +149,19 @@ export default function AdminDashboard() {
     );
   }
 
+  // Guard: Si pas de profile après loading
+  if (!profile) {
+    return (
+      <Layout>
+        <Card>
+          <p style={{ textAlign: "center", padding: "2rem", color: "#ef4444" }}>
+            Erreur: Profil non chargé. Veuillez vous reconnecter.
+          </p>
+        </Card>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <Card>
@@ -171,7 +184,7 @@ export default function AdminDashboard() {
               textAlign: "center",
             }}
           >
-            <h2 style={{ fontSize: "2.5rem", margin: 0 }}>{stats.regies}</h2>
+            <h2 style={{ fontSize: "2.5rem", margin: 0 }}>{stats.regies || 0}</h2>
             <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>🏢 Régies</p>
           </Card>
 
@@ -184,7 +197,7 @@ export default function AdminDashboard() {
             }}
           >
             <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
-              {stats.entreprises}
+              {stats.entreprises || 0}
             </h2>
             <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
               🔧 Entreprises
@@ -199,6 +212,57 @@ export default function AdminDashboard() {
               textAlign: "center",
             }}
           >
+            <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
+              {stats.locataires || 0}
+            </h2>
+            <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
+              👥 Locataires
+            </p>
+          </Card>
+
+          <Card
+            className="hover-glow"
+            style={{
+              background: "linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)",
+              color: "white",
+              textAlign: "center",
+            }}
+          >
+            <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
+              {stats.techniciens || 0}
+            </h2>
+            <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
+              🔨 Techniciens
+            </p>
+          </Card>
+
+          <Card
+            className="hover-glow"
+            style={{
+              background: "linear-gradient(135deg, #F44336 0%, #D32F2F 100%)",
+              color: "white",
+              textAlign: "center",
+            }}
+          >
+            <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
+              {stats.ticketsActifs || 0}
+            </h2>
+            <p style={{ margin: "0.5rem 0 0 0", opacity: 0.9 }}>
+              🎫 Tickets Actifs
+            </p>
+          </Card>
+
+          <Card
+            className="hover-glow"
+            style={{
+              background: "linear-gradient(135deg, #00BCD4 0%, #0097A7 100%)",
+              color: "white",
+              textAlign: "center",
+            }}
+          >
+            <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
+              {stats.missionsEnCours || 0}
+            </h2>
             <h2 style={{ fontSize: "2.5rem", margin: 0 }}>
               {stats.locataires}
             </h2>
