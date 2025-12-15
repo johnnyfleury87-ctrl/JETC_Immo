@@ -18,16 +18,28 @@ export default function UserBadge() {
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {    const checkSubscription = async () => {
+  useEffect(() => {
+    const checkSubscription = async () => {
+      // GUARD: Ne rien faire si pas de profile ou profile incomplet
+      if (!profile || !profile.id || !profile.role) {
+        setLoading(false);
+        return;
+      }
+
+      // GUARD: Admin JETC n'a pas d'abonnement
+      if (profile.role === "admin_jtec") {
+        setSubscriptionStatus(null);
+        setLoading(false);
+        return;
+      }
+
       // Vérifier uniquement pour les rôles régie et entreprise
-      if (
-        profile &&
-        (profile.role === "regie" || profile.role === "entreprise")
-      ) {
+      if (profile.role === "regie" || profile.role === "entreprise") {
         try {
           const subData = await apiFetch("/billing/subscription");
           setSubscriptionStatus(subData?.statut === "actif" ? "pro" : "demo");
-        } catch {
+        } catch (error) {
+          console.warn('[UserBadge] Erreur récupération abonnement:', error.message);
           // Pas d'abonnement = mode DEMO
           setSubscriptionStatus("demo");
         }
@@ -38,10 +50,8 @@ export default function UserBadge() {
       setLoading(false);
     };
 
-    if (profile) {
-      checkSubscription();
-    }
-  }, [profile?.id]);
+    checkSubscription();
+  }, [profile?.id, profile?.role]);
 
   if (!profile) {
     return null;
