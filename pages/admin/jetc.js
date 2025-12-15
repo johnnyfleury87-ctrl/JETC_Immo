@@ -9,72 +9,50 @@ import { supabase } from "../../lib/supabase";
 export default function AdminJetcPage() {
   const router = useRouter();
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [requests, setRequests] = useState([]);
-  const [filter, setFilter] = useState("pending"); // pending, approved, rejected, all
+  const [filter, setFilter] = useState("pending");
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
-    checkAdminAccess();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    let mounted = true;
 
-  useEffect(() => {
-    // NE charger les requêtes QUE si le profile est chargé ET validé
-    if (authChecked && profile?.role === "admin_jtec") {
-      loadRequests();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile, filter, authChecked]);
-
-  const checkAdminAccess = async () => {
-    try {
-      // Vérifier d'abord la session Supabase
+    async function init() {
+      // 1. Vérifier session
       const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.user) {
+      if (!session) {
         router.replace("/login");
         return;
       }
 
-      // Récupérer le profile depuis Supabase directement
-      const { data: profileData, error } = await supabase
+      // 2. Récupérer profile
+      const { data: profileData } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .single();
 
-      if (error || !profileData) {
-        console.error("Erreur récupération profile:", error);
+      if (!profileData || profileData.role !== "admin_jtec") {
         router.replace("/login");
         return;
       }
-      
-      if (profileData.role !== "admin_jtec") {
-        alert("Accès refusé. Cette page est réservée aux administrateurs JETC.");
-        router.replace("/");
-        return;
+
+      if (mounted) {
+        setProfile(profileData);
       }
-
-      setProfile(profileData);
-      setAuthChecked(true);
-      setLoading(false);
-    } catch (error) {
-      console.error("Erreur vérification accès:", error);
-      router.replace("/login");
-      setLoading(false);
-    }
-  };
-
-  const loadRequests = async () => {
-    // Guard: ne rien charger si le profile n'est pas validé
-    if (!profile?.id || !authChecked) {
-      return;
     }
 
-    try {
+    init();
+
+    return () => {
+      mounted = false;
+    };
+  }, [router]);
+
+  useEffect(() => {
+    if (!profile) return;
+
+    async function fetchRequests() {
       let query = supabase
         .from("adhesion_requests_summary")
         .select("*")
@@ -84,18 +62,14 @@ export default function AdminJetcPage() {
         query = query.eq("status", filter);
       }
 
-      const { data, error } = await query;
-
-      if (error) throw error;
-
+      const { data } = await query;
       setRequests(data || []);
-    } catch (error) {
-      console.error("Erreur chargement demandes:", error);
     }
-  };
+
+    fetchRequests();
+  }, [profile, filter]);
 
   const handleValidate = async (requestId) => {
-    // Guard: vérifier que profile est chargé
     if (!profile?.id) {
       alert("Erreur: session non chargée. Veuillez recharger la page.");
       return;
@@ -122,7 +96,14 @@ export default function AdminJetcPage() {
       }
 
       alert("✅ Demande validée avec succès ! Email envoyé au client.");
-      loadRequests();
+      
+      // Recharger les données
+      const { data } = await supabase
+        .from('adhesion_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+      setRequests(data || []);
+      
       setSelectedRequest(null);
     } catch (error) {
       console.error("Erreur validation:", error);
@@ -158,7 +139,14 @@ export default function AdminJetcPage() {
       }
 
       alert("✅ Demande rejetée. Email envoyé au client.");
-      loadRequests();
+      
+      // Recharger les données
+      const { data } = await supabase
+        .from('adhesion_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+      setRequests(data || []);
+      
       setSelectedRequest(null);
     } catch (error) {
       console.error("Erreur rejet:", error);
@@ -168,23 +156,12 @@ export default function AdminJetcPage() {
     }
   };
 
-  // Guard: Afficher loader pendant toute la vérification (auth + profile)
-  if (loading) {
-    return (
-      <Layout>
-        <div style={{ padding: "2rem", textAlign: "center" }}>
-          <p>Vérification des accès...</p>
-        </div>
-      </Layout>
-    );
-  }
-
-  // Guard: Si pas de profile après loading, erreur
+  // Guard: attendre que profile soit chargé
   if (!profile) {
     return (
       <Layout>
         <div style={{ padding: "2rem", textAlign: "center" }}>
-          <p style={{ color: "#ef4444" }}>Erreur: Profil non chargé. Veuillez vous reconnecter.</p>
+          <p>Chargement...</p>
         </div>
       </Layout>
     );
