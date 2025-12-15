@@ -75,26 +75,25 @@ export default function UserBadge() {
         {displayName}
       </span>
 
-      {!loading &&
-        (profile.role === "regie" || profile.role === "entreprise") && (
-          <span
-            style={{
-              background: isDemoActive
-                ? "var(--orange)"
-                : isProMode
-                  ? "var(--green)"
-                  : "transparent",
-              color: "white",
-              padding: "0.35rem 0.75rem",
-              borderRadius: "6px",
-              fontSize: "0.85rem",
-              fontWeight: "700",
-              boxShadow: "var(--shadow)",
-            }}
-          >
-            {isDemoActive ? "🆓 DEMO" : isProMode ? "⭐ PRO" : ""}
-          </span>
-        )}
+      {!loading && (profile.role === "regie" || profile.role === "entreprise") ? (
+        <span
+          style={{
+            background: isDemoActive
+              ? "var(--orange)"
+              : isProMode
+                ? "var(--green)"
+                : "transparent",
+            color: "white",
+            padding: "0.35rem 0.75rem",
+            borderRadius: "6px",
+            fontSize: "0.85rem",
+            fontWeight: "700",
+            boxShadow: "var(--shadow)",
+          }}
+        >
+          {isDemoActive ? "🆓 DEMO" : isProMode ? "⭐ PRO" : ""}
+        </span>
+      ) : null}
     </div>
   );
 }

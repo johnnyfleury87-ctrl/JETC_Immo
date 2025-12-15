@@ -118,7 +118,7 @@ export default function Hero() {
           }}
         >
           {/* Bouton principal : Demande d'adhésion */}
-          {!loading && !profile && (
+          {!loading && !profile ? (
             <Button
               onClick={() => router.push("/demande-adhesion")}
               style={{
@@ -134,10 +134,10 @@ export default function Hero() {
             >
               🚀 Commencer maintenant
             </Button>
-          )}
+          ) : null}
 
           {/* Bouton DEMO visible uniquement pour visiteurs non connectés */}
-          {!loading && canUseDemo(profile) && (
+          {!loading && canUseDemo(profile) ? (
             <Button
               onClick={handleDemoStart}
               style={{
@@ -153,7 +153,7 @@ export default function Hero() {
             >
               🎭 Essayer le DEMO
             </Button>
-          )}
+          ) : null}
 
           <Button
             onClick={() => router.push("/pricing")}
