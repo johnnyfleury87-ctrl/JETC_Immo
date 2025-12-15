@@ -6,18 +6,8 @@ import Button from "../../components/UI/Button";
 import StatusBadge from "../../components/UI/StatusBadge";
 import { supabase } from "../../lib/supabase";
 
-/**
- * Page Admin JETC - Gestion des demandes d'adhésion
- * 
- * LOGIQUE D'AUTORISATION UNIQUE :
- * - Source de vérité : public.profiles.role === 'admin_jtec'
- * - 3 états possibles : loading, forbidden (redirect), admin (UI)
- * - Aucun blocage infini autorisé
- */
 export default function AdminJetcPage() {
   const router = useRouter();
-  
-  // États
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [requests, setRequests] = useState([]);
@@ -25,69 +15,88 @@ export default function AdminJetcPage() {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // ========================================
-  // AUTORISATION (exécution unique)
-  // ========================================
   useEffect(() => {
-    async function checkAuth() {
+    async function initAuth() {
+      console.log('[ADMIN INIT] Démarrage vérification auth');
+      
       try {
-        // 1. Vérifier session Supabase
+        // 1. Vérifier session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (sessionError || !session) {
-          console.warn('[Admin] Session invalide');
+        console.log('[ADMIN SESSION]', { 
+          hasSession: !!session, 
+          userId: session?.user?.id,
+          error: sessionError 
+        });
+        
+        if (!session || sessionError) {
+          console.log('[ADMIN REDIRECT] Session invalide → /login');
           router.replace("/login");
           return;
         }
 
-        // 2. Récupérer profile depuis public.profiles
+        // 2. Récupérer profile
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
 
-        // 3. Gérer erreur explicitement (jamais de null silencieux)
+        console.log('[ADMIN PROFILE]', { 
+          hasProfile: !!profileData,
+          role: profileData?.role,
+          email: profileData?.email,
+          error: profileError
+        });
+
+        // 3. Gérer erreur Supabase explicitement
         if (profileError) {
-          console.error('[Admin] Erreur récupération profile:', profileError.message);
+          console.error('[ADMIN ERROR] Erreur récupération profile:', profileError);
           router.replace("/login");
           return;
         }
 
-        // 4. Vérifier autorisation admin
+        // 4. Vérifier rôle admin
         if (!profileData || profileData.role !== "admin_jtec") {
-          console.warn('[Admin] Accès refusé, role:', profileData?.role);
+          console.log('[ADMIN REDIRECT] Rôle invalide → /login', {
+            hasProfile: !!profileData,
+            role: profileData?.role
+          });
           router.replace("/login");
           return;
         }
 
-        // 5. Autorisation OK - Charger le profile
+        // 5. Succès - Charger le profile
+        console.log('[ADMIN SUCCESS] Profile admin valide, chargement terminé');
         setProfile(profileData);
         setLoading(false);
         
-        // Cache pour Layout (optionnel)
+        // 6. Cacher le profile pour Layout (navigation/header)
         try {
           sessionStorage.setItem('jetc_profile', JSON.stringify(profileData));
-        } catch (e) {
-          // Ignore sessionStorage errors
+        } catch (error) {
+          console.warn('[ADMIN] Impossible de cacher profile:', error);
         }
         
       } catch (error) {
-        console.error('[Admin] Exception:', error);
+        console.error('[ADMIN EXCEPTION] Erreur inattendue:', error);
         router.replace("/login");
       }
     }
 
-    checkAuth();
-  }, []); // Exécution unique - AUCUNE dépendance
+    initAuth();
+  }, []); // AUCUNE dépendance - exécution unique
 
-  // ========================================
-  // CHARGEMENT DES DEMANDES
-  // ========================================
+
   useEffect(() => {
-    if (!profile) return;
+    if (!profile) {
+      console.log('[ADMIN REQUESTS] Profile non chargé, skip fetchRequests');
+      return;
+    }
 
-    async function loadRequests() {
+    console.log('[ADMIN REQUESTS] Chargement des demandes, filter =', filter);
+
+    async function fetchRequests() {
       try {
         let query = supabase
           .from("adhesion_requests_summary")
@@ -101,35 +110,34 @@ export default function AdminJetcPage() {
         const { data, error } = await query;
         
         if (error) {
-          console.error('[Admin] Erreur chargement demandes:', error);
+          console.error('[ADMIN REQUESTS ERROR]', error);
           return;
         }
         
+        console.log('[ADMIN REQUESTS]', { count: data?.length || 0 });
         setRequests(data || []);
       } catch (error) {
-        console.error('[Admin] Exception chargement demandes:', error);
+        console.error('[ADMIN REQUESTS EXCEPTION]', error);
       }
     }
 
-    loadRequests();
+    fetchRequests();
   }, [profile, filter]);
 
-  // ========================================
-  // ACTIONS
-  // ========================================
   const handleValidate = async (requestId) => {
     if (!profile?.id) {
-      alert("Erreur: profil non chargé");
+      alert("Erreur: session non chargée. Veuillez recharger la page.");
       return;
     }
 
-    if (!confirm("Confirmer la validation de cette demande ?")) {
+    if (!confirm("Confirmer la validation de cette demande ? Les accès seront créés.")) {
       return;
     }
 
     setActionLoading(true);
 
     try {
+      // Appeler l'API backend pour valider
       const response = await fetch("/api/admin/validate-adhesion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -142,31 +150,33 @@ export default function AdminJetcPage() {
         throw new Error(result.error || "Erreur validation");
       }
 
-      alert("✅ Demande validée avec succès !");
+      alert("✅ Demande validée avec succès ! Email envoyé au client.");
       
-      // Recharger
+      // Recharger les données
       const { data } = await supabase
-        .from('adhesion_requests_summary')
+        .from('adhesion_requests')
         .select('*')
         .order('created_at', { ascending: false });
       setRequests(data || []);
       
+      setSelectedRequest(null);
     } catch (error) {
-      console.error('[Admin] Erreur validation:', error);
-      alert("❌ Erreur : " + error.message);
+      console.error("Erreur validation:", error);
+      alert("❌ Erreur lors de la validation : " + error.message);
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleReject = async (requestId) => {
+    // Guard: vérifier que profile est chargé
     if (!profile?.id) {
-      alert("Erreur: profil non chargé");
+      alert("Erreur: session non chargée. Veuillez recharger la page.");
       return;
     }
 
     const reason = prompt("Raison du rejet (optionnel) :");
-    if (reason === null) return;
+    if (reason === null) return; // Cancel
 
     setActionLoading(true);
 
@@ -183,29 +193,31 @@ export default function AdminJetcPage() {
         throw new Error(result.error || "Erreur rejet");
       }
 
-      alert("✅ Demande rejetée.");
+      alert("✅ Demande rejetée. Email envoyé au client.");
       
-      // Recharger
+      // Recharger les données
       const { data } = await supabase
-        .from('adhesion_requests_summary')
+        .from('adhesion_requests')
         .select('*')
         .order('created_at', { ascending: false });
       setRequests(data || []);
       
+      setSelectedRequest(null);
     } catch (error) {
-      console.error('[Admin] Erreur rejet:', error);
-      alert("❌ Erreur : " + error.message);
+      console.error("Erreur rejet:", error);
+      alert("❌ Erreur lors du rejet : " + error.message);
     } finally {
       setActionLoading(false);
     }
   };
 
   // ========================================
-  // RENDER (3 états possibles)
+  // RENDER GUARDS (états explicites)
   // ========================================
-  
-  // État 1: Loading (vérification auth en cours)
+
+  // Guard 1: Afficher loader pendant la vérification auth
   if (loading) {
+    console.log('[ADMIN RENDER] État: loading=true, affichage loader');
     return (
       <Layout>
         <div style={{ padding: "2rem", textAlign: "center" }}>
@@ -215,36 +227,41 @@ export default function AdminJetcPage() {
     );
   }
 
-  // État 2: Erreur critique (ne devrait jamais arriver)
+  // Guard 2: Si loading=false mais profile=null, erreur critique (ne devrait jamais arriver)
   if (!profile) {
+    console.error('[ADMIN RENDER CRITICAL] État incohérent: loading=false mais profile=null');
     return (
       <Layout>
         <div style={{ padding: "2rem", textAlign: "center" }}>
           <p style={{ color: "#ef4444" }}>
-            Erreur de chargement. Veuillez vous reconnecter.
+            Erreur de chargement du profil. Veuillez vous reconnecter.
           </p>
         </div>
       </Layout>
     );
   }
 
-  // État 3: Admin autorisé - Afficher UI
+  // Guard 3: Affichage normal (loading=false, profile chargé)
+  console.log('[ADMIN RENDER] Vue admin, profile:', { 
+    email: profile.email, 
+    role: profile.role 
+  });
+
   return (
     <Layout>
       <div style={{ padding: "2rem", minHeight: "80vh" }}>
         <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-          
           {/* Header */}
           <div style={{ marginBottom: "2rem" }}>
             <h1 style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>
               👨‍💼 Administration JETC
             </h1>
             <p style={{ color: "#64748b" }}>
-              Gestion des demandes d'adhésion - Connecté en tant que <strong>{profile.email}</strong>
+              Gestion des demandes d'adhésion - Connecté en tant que <strong>{profile?.email}</strong>
             </p>
           </div>
 
-          {/* Filtres */}
+          {/* Filters */}
           <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem", flexWrap: "wrap" }}>
             {[
               { value: "pending", label: "En attente", color: "#f59e0b" },
@@ -267,7 +284,7 @@ export default function AdminJetcPage() {
             ))}
           </div>
 
-          {/* Liste */}
+          {/* Table des demandes */}
           {requests.length === 0 ? (
             <Card style={{ padding: "3rem", textAlign: "center" }}>
               <p style={{ fontSize: "1.2rem", color: "#64748b" }}>
@@ -276,14 +293,7 @@ export default function AdminJetcPage() {
             </Card>
           ) : (
             <div style={{ overflowX: "auto" }}>
-              <table style={{ 
-                width: "100%", 
-                borderCollapse: "collapse", 
-                background: "white", 
-                borderRadius: "8px", 
-                overflow: "hidden", 
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)" 
-              }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", background: "white", borderRadius: "8px", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
                 <thead style={{ background: "#f8fafc" }}>
                   <tr>
                     <th style={{ padding: "1rem", textAlign: "left", borderBottom: "2px solid #e2e8f0" }}>Date</th>
@@ -300,7 +310,7 @@ export default function AdminJetcPage() {
                   {requests.map((req) => (
                     <tr key={req.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
                       <td style={{ padding: "1rem" }}>
-                        {req.created_at ? new Date(req.created_at).toLocaleDateString("fr-FR") : '-'}
+                        {req.created_at ? new Date(req.created_at).toLocaleDateString("fr-CH") : '-'}
                       </td>
                       <td style={{ padding: "1rem", fontWeight: "600" }}>
                         {req.regie_name || '-'}
@@ -309,14 +319,26 @@ export default function AdminJetcPage() {
                         {req.city || '-'}, {req.country || '-'}
                       </td>
                       <td style={{ padding: "1rem" }}>
-                        <span style={{
-                          padding: "0.25rem 0.75rem",
-                          borderRadius: "12px",
-                          fontSize: "0.85rem",
-                          fontWeight: "600",
-                          background: req.plan_requested === "Essentiel" ? "#d1fae5" : req.plan_requested === "Pro" ? "#dbeafe" : "#fef3c7",
-                          color: req.plan_requested === "Essentiel" ? "#065f46" : req.plan_requested === "Pro" ? "#1e40af" : "#92400e",
-                        }}>
+                        <span
+                          style={{
+                            padding: "0.25rem 0.75rem",
+                            borderRadius: "12px",
+                            fontSize: "0.85rem",
+                            fontWeight: "600",
+                            background:
+                              req.plan_requested === "Essentiel"
+                                ? "#d1fae5"
+                                : req.plan_requested === "Pro"
+                                ? "#dbeafe"
+                                : "#fef3c7",
+                            color:
+                              req.plan_requested === "Essentiel"
+                                ? "#065f46"
+                                : req.plan_requested === "Pro"
+                                ? "#1e40af"
+                                : "#92400e",
+                          }}
+                        >
                           {req.plan_requested || 'N/A'}
                         </span>
                       </td>
@@ -327,18 +349,31 @@ export default function AdminJetcPage() {
                         </div>
                       </td>
                       <td style={{ padding: "1rem" }}>
-                        <span style={{ 
-                          fontWeight: req.over_logements_limit ? "700" : "normal", 
-                          color: req.over_logements_limit ? "#ef4444" : "inherit" 
-                        }}>
+                        <span style={{ fontWeight: req.over_logements_limit ? "700" : "normal", color: req.over_logements_limit ? "#ef4444" : "inherit" }}>
                           {req.logements_estimes || '0'}
                         </span>
                         {req.over_logements_limit ? <span style={{ color: "#ef4444", marginLeft: "0.25rem" }}>⚠️</span> : null}
                       </td>
                       <td style={{ padding: "1rem" }}>
                         <StatusBadge
-                          status={req.status === "pending" ? "en_attente" : req.status === "approved" ? "termine" : req.status === "rejected" ? "annule" : "en_cours"}
-                          text={req.status === "pending" ? "En attente" : req.status === "approved" ? "Validée" : req.status === "rejected" ? "Rejetée" : req.status}
+                          status={
+                            req.status === "pending"
+                              ? "en_attente"
+                              : req.status === "approved"
+                              ? "termine"
+                              : req.status === "rejected"
+                              ? "annule"
+                              : "en_cours"
+                          }
+                          text={
+                            req.status === "pending"
+                              ? "En attente"
+                              : req.status === "approved"
+                              ? "Validée"
+                              : req.status === "rejected"
+                              ? "Rejetée"
+                              : req.status
+                          }
                         />
                       </td>
                       <td style={{ padding: "1rem", textAlign: "center" }}>
@@ -427,12 +462,12 @@ export default function AdminJetcPage() {
                   <strong>Logements estimés:</strong> {selectedRequest.logements_estimes || '0'}
                   {selectedRequest.over_logements_limit ? (
                     <span style={{ color: "#ef4444", marginLeft: "0.5rem" }}>
-                      (dépasse limite: {selectedRequest.plan_max_logements || 'N/A'})
+                      (dépasse limite plan: {selectedRequest.plan_max_logements || 'N/A'})
                     </span>
                   ) : null}
                 </div>
                 <div style={{ marginBottom: "1rem" }}>
-                  <strong>Contact:</strong> {selectedRequest.owner_name || '-'}
+                  <strong>Contact principal:</strong> {selectedRequest.owner_name || '-'}
                 </div>
                 <div style={{ marginBottom: "1rem" }}>
                   <strong>Email:</strong> {selectedRequest.owner_email || '-'}
@@ -443,8 +478,22 @@ export default function AdminJetcPage() {
                 <div style={{ marginBottom: "1rem" }}>
                   <strong>Statut:</strong>{" "}
                   <StatusBadge
-                    status={selectedRequest.status === "pending" ? "en_attente" : selectedRequest.status === "approved" ? "termine" : "annule"}
-                    text={selectedRequest.status === "pending" ? "En attente" : selectedRequest.status === "approved" ? "Validée" : selectedRequest.status === "rejected" ? "Rejetée" : String(selectedRequest.status || 'Inconnu')}
+                    status={
+                      selectedRequest.status === "pending"
+                        ? "en_attente"
+                        : selectedRequest.status === "approved"
+                        ? "termine"
+                        : "annule"
+                    }
+                    text={
+                      selectedRequest.status === "pending"
+                        ? "En attente"
+                        : selectedRequest.status === "approved"
+                        ? "Validée"
+                        : selectedRequest.status === "rejected"
+                        ? "Rejetée"
+                        : String(selectedRequest.status || 'Inconnu')
+                    }
                   />
                 </div>
                 {selectedRequest.rejection_reason ? (
@@ -456,7 +505,7 @@ export default function AdminJetcPage() {
                 {selectedRequest.validated_by_name && selectedRequest.validated_at ? (
                   <div style={{ marginBottom: "1rem", fontSize: "0.9rem", color: "#64748b" }}>
                     Traité par {selectedRequest.validated_by_name} le{" "}
-                    {new Date(selectedRequest.validated_at).toLocaleString("fr-FR")}
+                    {new Date(selectedRequest.validated_at).toLocaleString("fr-CH")}
                   </div>
                 ) : null}
 
