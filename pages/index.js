@@ -202,6 +202,56 @@ export default function HomePage() {
       {/* FAQ */}
       <FAQ />
 
+      {/* BOUTON ADMIN - ACCÈS DIRECT */}
+      <section
+        style={{
+          padding: "3rem 2rem",
+          background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+          <h2
+            style={{
+              fontSize: "2rem",
+              fontWeight: "700",
+              marginBottom: "1.5rem",
+              color: "#ffffff",
+            }}
+          >
+            🔐 Espace Administration
+          </h2>
+          <p style={{ color: "#94a3b8", marginBottom: "2rem", fontSize: "1.1rem" }}>
+            Accès au tableau de bord administrateur
+          </p>
+          <Button
+            onClick={() => router.push('/admin')}
+            style={{
+              background: "linear-gradient(135deg, #9333ea 0%, #7e22ce 100%)",
+              color: "white",
+              padding: "1rem 3rem",
+              fontSize: "1.2rem",
+              fontWeight: "600",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              boxShadow: "0 4px 20px rgba(147, 51, 234, 0.4)",
+              transition: "all 0.3s ease",
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 6px 30px rgba(147, 51, 234, 0.6)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 20px rgba(147, 51, 234, 0.4)";
+            }}
+          >
+            Admin Dashboard
+          </Button>
+        </div>
+      </section>
+
       {/* Section Partenariat */}
       <section
         style={{

@@ -9,9 +9,6 @@ import { supabase } from "../../lib/supabase";
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState(null);
-  const [authChecked, setAuthChecked] = useState(false);
   const [stats, setStats] = useState({
     regies: 0,
     entreprises: 0,
@@ -29,79 +26,13 @@ export default function AdminDashboard() {
   const [topRegies, setTopRegies] = useState([]);
   const [ticketsParMois, setTicketsParMois] = useState([]);
   const [missionsParMois, setMissionsParMois] = useState([]);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
-    checkAdminAccess();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    loadStats();
   }, []);
 
-  useEffect(() => {
-    if (authChecked && profile?.role === "admin_jtec") {
-      loadStats();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authChecked, profile]);
-
-  const checkAdminAccess = async () => {
-    try {
-      // 🔓 MODE DEBUG BYPASS
-      const debugMode = typeof window !== 'undefined' && localStorage.getItem('jetc_admin_debug') === 'true';
-      if (debugMode) {
-        console.warn('[Admin Dashboard] 🔓 MODE DEBUG - Bypass auth');
-        setProfile({ id: 'debug', role: 'admin_jtec', email: 'debug@jetc.fr' });
-        setAuthChecked(true);
-        setLoading(false); // ✅ Débloquer immédiatement
-        return;
-      }
-
-      // Vérifier la session Supabase
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.user) {
-        router.replace("/login");
-        setLoading(false);
-        return;
-      }
-
-      // Récupérer le profile
-      const { data: profileData, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-      if (error || !profileData) {
-        console.error("Erreur récupération profile:", error);
-        router.replace("/login");
-        setLoading(false);
-        return;
-      }
-      
-      if (profileData.role !== "admin_jtec") {
-        alert("Accès refusé. Cette page est réservée aux administrateurs JETC.");
-        router.replace("/");
-        setLoading(false);
-        return;
-      }
-
-      setProfile(profileData);
-      setAuthChecked(true);
-      setLoading(false); // ✅ FIX: Débloquer dès que profile OK
-    } catch (error) {
-      console.error("Erreur vérification accès:", error);
-      router.replace("/login");
-      setLoading(false);
-    }
-  };
-
   const loadStats = async () => {
-    // Guard: ne rien charger si le profile n'est pas validé
-    if (!profile?.id || !authChecked) {
-      console.warn('[loadStats] Conditions non remplies:', { profile: !!profile, authChecked });
-      return;
-    }
-
-    console.log('[loadStats] Démarrage chargement stats...');
     try {
       // Chargement des KPIs
       const [
@@ -149,40 +80,25 @@ export default function AdminDashboard() {
         setTopRegies(topRegiesData.regies || []);
         setTicketsParMois(ticketsAnalyticsData.data || []);
         setMissionsParMois(missionsAnalyticsData.data || []);
+        setDataLoaded(true);
       } catch (error) {
         console.error("Erreur chargement dashboard admin", error);
-      } finally {
-        setLoading(false);
+        // ✅ Afficher le dashboard même en cas d'erreur
+        setDataLoaded(true);
       }
   };
 
-  if (loading) {
-    return (
-      <Layout>
-        <Card>
-          <p style={{ textAlign: "center", padding: "2rem" }}>Chargement...</p>
-        </Card>
-      </Layout>
-    );
-  }
-
-  // Guard: Si pas de profile après loading
-  if (!profile) {
-    return (
-      <Layout>
-        <Card>
-          <p style={{ textAlign: "center", padding: "2rem", color: "#ef4444" }}>
-            Erreur: Profil non chargé. Veuillez vous reconnecter.
-          </p>
-        </Card>
-      </Layout>
-    );
-  }
-
+  // ✅ TOUJOURS AFFICHER LE DASHBOARD
   return (
     <Layout>
       <Card>
-        <h1 className="page-title">🎯 Dashboard JTEC</h1>
+        <h1 className="page-title">🎯 ADMIN DASHBOARD</h1>
+        
+        {!dataLoaded && (
+          <p style={{ textAlign: "center", padding: "1rem", color: "#666" }}>
+            Chargement des données...
+          </p>
+        )}
 
         {/* KPIs Grid */}
         <div
