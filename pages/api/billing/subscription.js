@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const authHeader = req.headers.authorization;
     
     if (!authHeader) {
-      console.warn('[API /billing/subscription] Pas de token auth');
+      console.warn('[API /billing/subscription] Pas de header Authorization');
       return res.status(401).json({ 
         error: 'Non authentifié',
         status: 'unauthenticated'
@@ -33,17 +33,32 @@ export default async function handler(req, res) {
     // 2. Extraire le token
     const token = authHeader.replace('Bearer ', '');
     
-    // 3. Vérifier le token avec Supabase
+    // 🔍 DEBUG TEMPORAIRE : Logger les infos du token
+    console.log('[API /billing/subscription] Token reçu:');
+    console.log('  - Longueur:', token.length);
+    console.log('  - Parties JWT:', token.split('.').length, '(doit être 3)');
+    console.log('  - Début:', token.substring(0, 20) + '...');
+    
+    // 3. Vérifier le token avec Supabase (PAS de vérification manuelle)
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
-      console.warn('[API /billing/subscription] Token invalide:', authError?.message);
+      console.error('[API /billing/subscription] ❌ Token invalide');
+      console.error('  - Error:', authError?.message);
+      console.error('  - Status:', authError?.status);
       return res.status(401).json({ 
-        error: 'Token invalide',
-        status: 'unauthenticated'
+        error: 'Token invalide: ' + (authError?.message || 'user null'),
+        status: 'unauthenticated',
+        debug: {
+          tokenLength: token.length,
+          tokenParts: token.split('.').length,
+          errorMessage: authError?.message
+        }
       });
     }
-
+    
+    console.log('[API /billing/subscription] ✅ Token valide, user:', user.id);
+    
     // 4. Récupérer l'abonnement depuis la table subscriptions (si elle existe)
     // ATTENTION : Si la table n'existe pas encore, on retourne "none"
     const { data: subscription, error: subError } = await supabase
