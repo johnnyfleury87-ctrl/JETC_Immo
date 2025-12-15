@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { useRouter } from "next/router";
 import { ThemeProvider } from "../context/ThemeContext";
 import { DemoModeProvider } from "../context/DemoModeContext";
 import { supabase } from "../lib/supabase";
@@ -11,7 +10,6 @@ import "../styles/theme-jardin.css";
 import "../styles/theme-zen.css";
 
 export default function App({ Component, pageProps }) {
-  const router = useRouter();
 
   // Listener global pour tous les changements d'état auth Supabase
   // S'exécute UNE SEULE FOIS au montage du composant
