@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { getProfileLocal } from "../lib/session";
 import { apiFetch } from "../lib/api";
-import { logFetchDetails } from "../lib/diagnostic";
 
 // Fonction helper pour afficher les rôles en français
 function getRoleLabel(role) {
@@ -36,39 +35,20 @@ export default function UserBadge() {
 
       // Vérifier uniquement pour les rôles régie et entreprise
       if (profile.role === "regie" || profile.role === "entreprise") {
+        // ✅ TRY/CATCH TOTAL : JAMAIS crasher
         try {
-          console.log('[UserBadge] Tentative récupération abonnement');
-          
-          // Fetch avec diagnostic
-          const fetchPromise = apiFetch("/billing/subscription");
-          const subData = await (process.env.NODE_ENV === 'development' 
-            ? logFetchDetails('/billing/subscription', fetchPromise) 
-            : fetchPromise
-          ).then(() => fetchPromise);
-          
-          console.log('[UserBadge] Abonnement récupéré:', subData);
+          const subData = await apiFetch("/api/billing/subscription");
           
           // Vérifier que la réponse est valide
-          if (subData && typeof subData === 'object') {
-            setSubscriptionStatus(subData?.statut === "actif" ? "pro" : "demo");
+          if (subData && typeof subData === 'object' && subData.statut) {
+            setSubscriptionStatus(subData.statut === "actif" ? "pro" : "demo");
           } else {
-            console.warn('[UserBadge] Réponse billing invalide:', subData);
+            // Fallback silencieux
             setSubscriptionStatus("demo");
           }
         } catch (error) {
-          console.warn('[UserBadge] Erreur billing/subscription:', error.message);
-          
-          // Diagnostic détaillé en dev
-          if (process.env.NODE_ENV === 'development') {
-            console.group('🔍 [UserBadge] Détails erreur billing');
-            console.log('Type:', error.constructor.name);
-            console.log('Message:', error.message);
-            console.log('Status:', error.status || 'N/A');
-            console.log('Stack:', error.stack);
-            console.groupEnd();
-          }
-          
-          // API non disponible = mode DEMO par défaut (pas de blocage)
+          // ✅ ERREUR SILENCIEUSE : ne jamais bloquer le rendu
+          console.warn('[UserBadge] Billing API indisponible, mode demo');
           setSubscriptionStatus("demo");
         }
       } else {
