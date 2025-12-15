@@ -37,7 +37,7 @@ export default function UserBadge() {
       // Vérifier uniquement pour les rôles régie et entreprise
       if (profile.role === "regie" || profile.role === "entreprise") {
         try {
-          console.log('[UserBadge] Tentative récupération abonnement pour:', profile.email);
+          console.log('[UserBadge] Tentative récupération abonnement');
           
           // Fetch avec diagnostic
           const fetchPromise = apiFetch("/billing/subscription");

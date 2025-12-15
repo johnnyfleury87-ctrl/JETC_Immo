@@ -39,7 +39,7 @@ export function AuthProvider({ children }) {
         
         // Log succès avec diagnostic
         logProfileLoad(profileData, null);
-        console.log('[AuthProvider] ✅ Profile chargé:', profileData.email, 'role:', profileData.role);
+        console.log('[AuthProvider] ✅ Profile chargé, role:', profileData.role);
         
         setProfile(profileData);
         
