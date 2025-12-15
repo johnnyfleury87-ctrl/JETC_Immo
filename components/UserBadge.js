@@ -36,11 +36,13 @@ export default function UserBadge() {
       // Vérifier uniquement pour les rôles régie et entreprise
       if (profile.role === "regie" || profile.role === "entreprise") {
         try {
+          console.log('[UserBadge] Tentative récupération abonnement');
           const subData = await apiFetch("/billing/subscription");
+          console.log('[UserBadge] Abonnement récupéré:', subData);
           setSubscriptionStatus(subData?.statut === "actif" ? "pro" : "demo");
         } catch (error) {
-          console.warn('[UserBadge] Erreur récupération abonnement:', error.message);
-          // Pas d'abonnement = mode DEMO
+          console.warn('[UserBadge] API billing/subscription indisponible (404 toléré):', error.message);
+          // API non disponible = mode DEMO par défaut (pas de blocage)
           setSubscriptionStatus("demo");
         }
       } else {
@@ -57,10 +59,12 @@ export default function UserBadge() {
     return null;
   }
 
+  // Vérifications pour éviter undefined dans les conditions
   const isDemoActive = subscriptionStatus === "demo";
   const isProMode = subscriptionStatus === "pro";
+  const showBadge = !loading && (profile.role === "regie" || profile.role === "entreprise");
 
-  const displayName = `${profile.prenom} ${profile.nom}`;
+  const displayName = `${profile.prenom || ''} ${profile.nom || ''}`.trim() || 'Utilisateur';
 
   return (
     <div
@@ -75,7 +79,7 @@ export default function UserBadge() {
         {displayName}
       </span>
 
-      {!loading && (profile.role === "regie" || profile.role === "entreprise") ? (
+      {showBadge ? (
         <span
           style={{
             background: isDemoActive

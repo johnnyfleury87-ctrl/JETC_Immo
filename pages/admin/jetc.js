@@ -18,39 +18,69 @@ export default function AdminJetcPage() {
     let mounted = true;
 
     async function init() {
+      console.log('[ADMIN INIT] Démarrage vérification');
+      
       // 1. Vérifier session
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log('[ADMIN SESSION]', { 
+        hasSession: !!session, 
+        userId: session?.user?.id,
+        error: sessionError 
+      });
+      
       if (!session) {
+        console.log('[ADMIN REDIRECT] Pas de session → /login');
         router.replace("/login");
         return;
       }
 
       // 2. Récupérer profile
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .single();
 
+      console.log('[ADMIN PROFILE]', { 
+        hasProfile: !!profileData,
+        role: profileData?.role,
+        email: profileData?.email,
+        error: profileError
+      });
+
       if (!profileData || profileData.role !== "admin_jtec") {
+        console.log('[ADMIN REDIRECT] Profile invalide ou pas admin_jtec → /login', {
+          hasProfile: !!profileData,
+          role: profileData?.role
+        });
         router.replace("/login");
         return;
       }
 
       if (mounted) {
+        console.log('[ADMIN SUCCESS] Profile valide, setState(profile)');
         setProfile(profileData);
+      } else {
+        console.log('[ADMIN UNMOUNTED] Composant démonté avant setState');
       }
     }
 
     init();
 
     return () => {
+      console.log('[ADMIN CLEANUP] Composant démonté');
       mounted = false;
     };
-  }, [router]);
+  }, []); // PAS de router ici
+
 
   useEffect(() => {
-    if (!profile) return;
+    if (!profile) {
+      console.log('[ADMIN REQUESTS] Pas de profile, skip fetchRequests');
+      return;
+    }
+
+    console.log('[ADMIN REQUESTS] Chargement des demandes, filter =', filter);
 
     async function fetchRequests() {
       let query = supabase
@@ -62,7 +92,11 @@ export default function AdminJetcPage() {
         query = query.eq("status", filter);
       }
 
-      const { data } = await query;
+      const { data, error } = await query;
+      console.log('[ADMIN REQUESTS]', { 
+        count: data?.length || 0, 
+        error 
+      });
       setRequests(data || []);
     }
 
@@ -158,6 +192,7 @@ export default function AdminJetcPage() {
 
   // Guard: attendre que profile soit chargé
   if (!profile) {
+    console.log('[ADMIN RENDER] Blocage: profile === null, affichage "Chargement..."');
     return (
       <Layout>
         <div style={{ padding: "2rem", textAlign: "center" }}>
@@ -166,6 +201,11 @@ export default function AdminJetcPage() {
       </Layout>
     );
   }
+
+  console.log('[ADMIN RENDER] Profile chargé, affichage vue admin', { 
+    email: profile.email, 
+    role: profile.role 
+  });
 
   return (
     <Layout>

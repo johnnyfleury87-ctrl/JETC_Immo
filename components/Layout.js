@@ -14,8 +14,14 @@ export default function Layout({ children }) {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('[LAYOUT INIT] Chargement du profile');
     const loadProfile = async () => {
       const user = await getProfile();
+      console.log('[LAYOUT PROFILE]', { 
+        hasUser: !!user, 
+        role: user?.role,
+        email: user?.email 
+      });
       setProfile(user);
       setLoading(false);
     };
