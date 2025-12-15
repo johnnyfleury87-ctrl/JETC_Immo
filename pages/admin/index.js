@@ -49,6 +49,7 @@ export default function AdminDashboard() {
       
       if (!session?.user) {
         router.replace("/login");
+        setLoading(false);
         return;
       }
 
@@ -62,20 +63,24 @@ export default function AdminDashboard() {
       if (error || !profileData) {
         console.error("Erreur récupération profile:", error);
         router.replace("/login");
+        setLoading(false);
         return;
       }
       
       if (profileData.role !== "admin_jtec") {
         alert("Accès refusé. Cette page est réservée aux administrateurs JETC.");
         router.replace("/");
+        setLoading(false);
         return;
       }
 
       setProfile(profileData);
       setAuthChecked(true);
+      // Note: setLoading(false) sera appelé par loadStats() après chargement des données
     } catch (error) {
       console.error("Erreur vérification accès:", error);
       router.replace("/login");
+      setLoading(false);
     }
   };
 

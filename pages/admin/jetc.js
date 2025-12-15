@@ -60,10 +60,10 @@ export default function AdminJetcPage() {
 
       setProfile(profileData);
       setAuthChecked(true);
+      setLoading(false);
     } catch (error) {
       console.error("Erreur vérification accès:", error);
       router.replace("/login");
-    } finally {
       setLoading(false);
     }
   };
@@ -168,6 +168,7 @@ export default function AdminJetcPage() {
     }
   };
 
+  // Guard: Afficher loader pendant toute la vérification (auth + profile)
   if (loading) {
     return (
       <Layout>
@@ -178,23 +179,12 @@ export default function AdminJetcPage() {
     );
   }
 
-  // Guard: Si pas de profile après loading, ne rien rendre
-  if (!loading && !profile) {
+  // Guard: Si pas de profile après loading, erreur
+  if (!profile) {
     return (
       <Layout>
         <div style={{ padding: "2rem", textAlign: "center" }}>
-          <p>Erreur: Profil non chargé. Veuillez vous reconnecter.</p>
-        </div>
-      </Layout>
-    );
-  }
-
-  // Guard: Si pas authChecked, ne rien rendre
-  if (!authChecked) {
-    return (
-      <Layout>
-        <div style={{ padding: "2rem", textAlign: "center" }}>
-          <p>Vérification en cours...</p>
+          <p style={{ color: "#ef4444" }}>Erreur: Profil non chargé. Veuillez vous reconnecter.</p>
         </div>
       </Layout>
     );
