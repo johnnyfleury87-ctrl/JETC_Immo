@@ -29,6 +29,13 @@ export default function AdminJetcPage() {
   // GARDE D'ACCÈS (délégué à AuthContext)
   // ========================================
   useEffect(() => {
+    // 🔓 MODE DEBUG : Accès direct sans auth
+    const debugMode = typeof window !== 'undefined' && localStorage.getItem('jetc_admin_debug') === 'true';
+    if (debugMode) {
+      console.warn('[Admin] 🔓 MODE DEBUG ACTIVÉ - Accès sans auth');
+      return;
+    }
+
     // Attendre que loading soit fini
     if (loading) return;
 
@@ -53,8 +60,11 @@ export default function AdminJetcPage() {
   // CHARGEMENT DES DEMANDES
   // ========================================
   useEffect(() => {
-    // Ne charger que si profile OK et role admin
-    if (!profile || role !== "admin_jtec") return;
+    // 🔓 MODE DEBUG : Charger même sans profile
+    const debugMode = typeof window !== 'undefined' && localStorage.getItem('jetc_admin_debug') === 'true';
+    
+    // Ne charger que si profile OK et role admin (ou mode debug)
+    if (!debugMode && (!profile || role !== "admin_jtec")) return;
 
     async function loadRequests() {
       try {

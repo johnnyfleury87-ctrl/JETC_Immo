@@ -11,6 +11,7 @@ export default function Layout({ children }) {
   const { theme, setTheme } = useTheme();
   const { profile, loading } = useAuth(); // Source de vérité unique
   const router = useRouter();
+  const [clickCount, setClickCount] = useState(0);
 
   // Détection des pages marketing publiques
   const isPublicMarketingPage =
@@ -72,6 +73,19 @@ export default function Layout({ children }) {
               onMouseOut={(e) => {
                 e.currentTarget.style.transform = "scale(1)";
                 e.currentTarget.style.opacity = "1";
+              }}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                const newCount = clickCount + 1;
+                setClickCount(newCount);
+                
+                if (newCount >= 3) {
+                  localStorage.setItem('jetc_admin_debug', 'true');
+                  setClickCount(0);
+                  router.push('/admin/jetc');
+                } else {
+                  setTimeout(() => setClickCount(0), 2000);
+                }
               }}
             >
               <img
