@@ -13,19 +13,29 @@ export default function Layout({ children }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // IMPORTANT: Le chargement du profile est désormais géré par chaque page
+  // (ex: pages/admin/jetc.js). Layout ne charge plus le profile pour éviter
+  // les conflits et les double-chargements.
+  
   useEffect(() => {
-    console.log('[LAYOUT INIT] Chargement du profile');
-    const loadProfile = async () => {
-      const user = await getProfile();
-      console.log('[LAYOUT PROFILE]', { 
-        hasUser: !!user, 
-        role: user?.role,
-        email: user?.email 
-      });
-      setProfile(user);
-      setLoading(false);
+    // Pour les pages qui ont besoin du profile dans Layout (header/nav),
+    // récupérer depuis sessionStorage (mis à jour par les pages)
+    const loadProfileFromSession = () => {
+      if (typeof window === 'undefined') return; // SSR guard
+      
+      try {
+        const cached = sessionStorage.getItem('jetc_profile');
+        if (cached) {
+          setProfile(JSON.parse(cached));
+        }
+      } catch (error) {
+        console.warn('[Layout] Impossible de charger profile depuis session:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-    loadProfile();
+    
+    loadProfileFromSession();
   }, []);
 
   // Détection des pages marketing publiques

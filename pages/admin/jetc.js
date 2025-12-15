@@ -8,6 +8,7 @@ import { supabase } from "../../lib/supabase";
 
 export default function AdminJetcPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState("pending");
@@ -15,89 +16,109 @@ export default function AdminJetcPage() {
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
-
-    async function init() {
-      console.log('[ADMIN INIT] Démarrage vérification');
+    async function initAuth() {
+      console.log('[ADMIN INIT] Démarrage vérification auth');
       
-      // 1. Vérifier session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      console.log('[ADMIN SESSION]', { 
-        hasSession: !!session, 
-        userId: session?.user?.id,
-        error: sessionError 
-      });
-      
-      if (!session) {
-        console.log('[ADMIN REDIRECT] Pas de session → /login');
-        router.replace("/login");
-        return;
-      }
-
-      // 2. Récupérer profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-      console.log('[ADMIN PROFILE]', { 
-        hasProfile: !!profileData,
-        role: profileData?.role,
-        email: profileData?.email,
-        error: profileError
-      });
-
-      if (!profileData || profileData.role !== "admin_jtec") {
-        console.log('[ADMIN REDIRECT] Profile invalide ou pas admin_jtec → /login', {
-          hasProfile: !!profileData,
-          role: profileData?.role
+      try {
+        // 1. Vérifier session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        console.log('[ADMIN SESSION]', { 
+          hasSession: !!session, 
+          userId: session?.user?.id,
+          error: sessionError 
         });
-        router.replace("/login");
-        return;
-      }
+        
+        if (!session || sessionError) {
+          console.log('[ADMIN REDIRECT] Session invalide → /login');
+          router.replace("/login");
+          return;
+        }
 
-      if (mounted) {
-        console.log('[ADMIN SUCCESS] Profile valide, setState(profile)');
+        // 2. Récupérer profile
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        console.log('[ADMIN PROFILE]', { 
+          hasProfile: !!profileData,
+          role: profileData?.role,
+          email: profileData?.email,
+          error: profileError
+        });
+
+        // 3. Gérer erreur Supabase explicitement
+        if (profileError) {
+          console.error('[ADMIN ERROR] Erreur récupération profile:', profileError);
+          router.replace("/login");
+          return;
+        }
+
+        // 4. Vérifier rôle admin
+        if (!profileData || profileData.role !== "admin_jtec") {
+          console.log('[ADMIN REDIRECT] Rôle invalide → /login', {
+            hasProfile: !!profileData,
+            role: profileData?.role
+          });
+          router.replace("/login");
+          return;
+        }
+
+        // 5. Succès - Charger le profile
+        console.log('[ADMIN SUCCESS] Profile admin valide, chargement terminé');
         setProfile(profileData);
-      } else {
-        console.log('[ADMIN UNMOUNTED] Composant démonté avant setState');
+        setLoading(false);
+        
+        // 6. Cacher le profile pour Layout (navigation/header)
+        try {
+          sessionStorage.setItem('jetc_profile', JSON.stringify(profileData));
+        } catch (error) {
+          console.warn('[ADMIN] Impossible de cacher profile:', error);
+        }
+        
+      } catch (error) {
+        console.error('[ADMIN EXCEPTION] Erreur inattendue:', error);
+        router.replace("/login");
       }
     }
 
-    init();
-
-    return () => {
-      console.log('[ADMIN CLEANUP] Composant démonté');
-      mounted = false;
-    };
-  }, []); // PAS de router ici
+    initAuth();
+  }, []); // AUCUNE dépendance - exécution unique
 
 
   useEffect(() => {
     if (!profile) {
-      console.log('[ADMIN REQUESTS] Pas de profile, skip fetchRequests');
+      console.log('[ADMIN REQUESTS] Profile non chargé, skip fetchRequests');
       return;
     }
 
     console.log('[ADMIN REQUESTS] Chargement des demandes, filter =', filter);
 
     async function fetchRequests() {
-      let query = supabase
-        .from("adhesion_requests_summary")
-        .select("*")
-        .order("created_at", { ascending: false });
+      try {
+        let query = supabase
+          .from("adhesion_requests_summary")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-      if (filter !== "all") {
-        query = query.eq("status", filter);
+        if (filter !== "all") {
+          query = query.eq("status", filter);
+        }
+
+        const { data, error } = await query;
+        
+        if (error) {
+          console.error('[ADMIN REQUESTS ERROR]', error);
+          return;
+        }
+        
+        console.log('[ADMIN REQUESTS]', { count: data?.length || 0 });
+        setRequests(data || []);
+      } catch (error) {
+        console.error('[ADMIN REQUESTS EXCEPTION]', error);
       }
-
-      const { data, error } = await query;
-      console.log('[ADMIN REQUESTS]', { 
-        count: data?.length || 0, 
-        error 
-      });
-      setRequests(data || []);
     }
 
     fetchRequests();
@@ -190,9 +211,13 @@ export default function AdminJetcPage() {
     }
   };
 
-  // Guard: attendre que profile soit chargé
-  if (!profile) {
-    console.log('[ADMIN RENDER] Blocage: profile === null, affichage "Chargement..."');
+  // ========================================
+  // RENDER GUARDS (états explicites)
+  // ========================================
+
+  // Guard 1: Afficher loader pendant la vérification auth
+  if (loading) {
+    console.log('[ADMIN RENDER] État: loading=true, affichage loader');
     return (
       <Layout>
         <div style={{ padding: "2rem", textAlign: "center" }}>
@@ -202,7 +227,22 @@ export default function AdminJetcPage() {
     );
   }
 
-  console.log('[ADMIN RENDER] Profile chargé, affichage vue admin', { 
+  // Guard 2: Si loading=false mais profile=null, erreur critique (ne devrait jamais arriver)
+  if (!profile) {
+    console.error('[ADMIN RENDER CRITICAL] État incohérent: loading=false mais profile=null');
+    return (
+      <Layout>
+        <div style={{ padding: "2rem", textAlign: "center" }}>
+          <p style={{ color: "#ef4444" }}>
+            Erreur de chargement du profil. Veuillez vous reconnecter.
+          </p>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Guard 3: Affichage normal (loading=false, profile chargé)
+  console.log('[ADMIN RENDER] Vue admin, profile:', { 
     email: profile.email, 
     role: profile.role 
   });
