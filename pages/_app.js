@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { ThemeProvider } from "../context/ThemeContext";
 import { DemoModeProvider } from "../context/DemoModeContext";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
 import "../styles/global.css";
 import "../styles/animations.css";
 import "../styles/marketing.css";
@@ -10,16 +10,14 @@ import "../styles/theme-speciale.css";
 import "../styles/theme-jardin.css";
 import "../styles/theme-zen.css";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
-
 export default function App({ Component, pageProps }) {
   const router = useRouter();
 
   // Listener global pour tous les changements d'état auth Supabase
+  // S'exécute UNE SEULE FOIS au montage du composant
   useEffect(() => {
+    console.log('[AUTH] Initialisation listener Supabase auth');
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('[AUTH] Event:', event, 'Session:', !!session);
 
@@ -43,7 +41,7 @@ export default function App({ Component, pageProps }) {
           // Redirection automatique pour admin_jtec
           if (profile?.role === 'admin_jtec') {
             console.log('[AUTH] Redirection vers /admin/jetc');
-            router.replace('/admin/jetc');
+            window.location.href = '/admin/jetc'; // Hard redirect pour éviter les boucles
             return;
           }
 
@@ -57,8 +55,11 @@ export default function App({ Component, pageProps }) {
             };
 
             const targetRoute = roleRoutes[profile.role];
-            if (targetRoute && router.pathname === '/login') {
-              router.replace(targetRoute);
+            const currentPath = window.location.pathname;
+            
+            // Rediriger uniquement si on est sur /login ou /
+            if (targetRoute && (currentPath === '/login' || currentPath === '/')) {
+              window.location.href = targetRoute; // Hard redirect
             }
           }
         } catch (err) {
@@ -69,15 +70,16 @@ export default function App({ Component, pageProps }) {
       // Si déconnexion
       if (event === 'SIGNED_OUT') {
         console.log('[AUTH] Déconnexion détectée');
-        router.replace('/login');
+        window.location.href = '/login'; // Hard redirect
       }
     });
 
-    // Nettoyage
+    // Nettoyage : désabonner lors du démontage
     return () => {
+      console.log('[AUTH] Nettoyage listener Supabase');
       subscription?.unsubscribe();
     };
-  }, [router]);
+  }, []); // VIDE : s'exécute UNE SEULE FOIS
 
   return (
     <DemoModeProvider>

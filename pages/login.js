@@ -6,12 +6,7 @@ import { login, redirectByRole } from "../lib/auth";
 import { saveSession, saveProfile } from "../lib/session";
 import { getProfile } from "../lib/api";
 import { transitionDemoToProd } from "../lib/demoAccess";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { supabase } from "../lib/supabase";
 
 export default function Login() {
   const router = useRouter();

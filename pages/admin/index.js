@@ -5,12 +5,7 @@ import Card from "../../components/UI/Card";
 import TicketsPerMonth from "../../components/charts/TicketsPerMonth";
 import MissionsPerMonth from "../../components/charts/MissionsPerMonth";
 import { apiFetch } from "../../lib/api";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { supabase } from "../../lib/supabase";
 
 export default function AdminDashboard() {
   const router = useRouter();

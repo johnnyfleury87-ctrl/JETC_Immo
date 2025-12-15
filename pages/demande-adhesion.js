@@ -3,13 +3,9 @@ import { useRouter } from "next/router";
 import Layout from "../components/Layout";
 import Button from "../components/UI/Button";
 import Card from "../components/UI/Card";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
 
-// Client Supabase (public, sans auth requise)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+// Client Supabase singleton
 
 export default function DemandeAdhesionPage() {
   const router = useRouter();

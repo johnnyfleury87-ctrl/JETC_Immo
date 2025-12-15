@@ -7,12 +7,7 @@ import ActorsSection from "../components/marketing/ActorsSection";
 import HowItWorks from "../components/marketing/HowItWorks";
 import PricingPreview from "../components/marketing/PricingPreview";
 import FAQ from "../components/marketing/FAQ";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { supabase } from "../lib/supabase";
 
 export default function HomePage() {
   const router = useRouter();
