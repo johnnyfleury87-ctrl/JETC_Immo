@@ -200,7 +200,7 @@ export default function Layout({ children }) {
           }}
         >
           {/* Connexion et Inscription : visibles uniquement si non-connecté */}
-          {!loading && !profile && (
+          {!loading && !profile ? (
             <>
               <Link
                 href="/login"
@@ -229,10 +229,10 @@ export default function Layout({ children }) {
                 📝 Inscription
               </Link>
             </>
-          )}
+          ) : null}
           
           {/* Bouton MODE DEMO visible uniquement pour visiteurs non connectés */}
-          {!loading && canUseDemo(profile) && (
+          {!loading && canUseDemo(profile) ? (
             <Link
               href="/demo-hub"
               style={{
@@ -248,7 +248,7 @@ export default function Layout({ children }) {
             >
               🎭 Mode démo
             </Link>
-          )}
+          ) : null}
           
           <Link
             href="/locataire/tickets"

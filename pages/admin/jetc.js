@@ -295,7 +295,7 @@ export default function AdminJetcPage() {
                         <span style={{ fontWeight: req.over_logements_limit ? "700" : "normal", color: req.over_logements_limit ? "#ef4444" : "inherit" }}>
                           {req.logements_estimes || '0'}
                         </span>
-                        {req.over_logements_limit && <span style={{ color: "#ef4444", marginLeft: "0.25rem" }}>⚠️</span>}
+                        {req.over_logements_limit ? <span style={{ color: "#ef4444", marginLeft: "0.25rem" }}>⚠️</span> : null}
                       </td>
                       <td style={{ padding: "1rem" }}>
                         <StatusBadge
@@ -369,7 +369,7 @@ export default function AdminJetcPage() {
           )}
 
           {/* Modal détails */}
-          {selectedRequest && (
+          {selectedRequest ? (
             <div
               style={{
                 position: "fixed",
@@ -403,11 +403,11 @@ export default function AdminJetcPage() {
                 </div>
                 <div style={{ marginBottom: "1rem" }}>
                   <strong>Logements estimés:</strong> {selectedRequest.logements_estimes || '0'}
-                  {selectedRequest.over_logements_limit && (
+                  {selectedRequest.over_logements_limit ? (
                     <span style={{ color: "#ef4444", marginLeft: "0.5rem" }}>
                       (dépasse limite plan: {selectedRequest.plan_max_logements || 'N/A'})
                     </span>
-                  )}
+                  ) : null}
                 </div>
                 <div style={{ marginBottom: "1rem" }}>
                   <strong>Contact principal:</strong> {selectedRequest.owner_name || '-'}
@@ -439,25 +439,25 @@ export default function AdminJetcPage() {
                     }
                   />
                 </div>
-                {selectedRequest.rejection_reason && (
+                {selectedRequest.rejection_reason ? (
                   <div style={{ marginBottom: "1rem", padding: "1rem", background: "#fef2f2", borderRadius: "6px" }}>
                     <strong style={{ color: "#ef4444" }}>Raison du rejet:</strong>
                     <p style={{ margin: "0.5rem 0 0 0" }}>{String(selectedRequest.rejection_reason)}</p>
                   </div>
-                )}
-                {selectedRequest.validated_by_name && selectedRequest.validated_at && (
+                ) : null}
+                {selectedRequest.validated_by_name && selectedRequest.validated_at ? (
                   <div style={{ marginBottom: "1rem", fontSize: "0.9rem", color: "#64748b" }}>
                     Traité par {selectedRequest.validated_by_name} le{" "}
                     {new Date(selectedRequest.validated_at).toLocaleString("fr-CH")}
                   </div>
-                )}
+                ) : null}
 
                 <div style={{ marginTop: "2rem", display: "flex", justifyContent: "flex-end" }}>
                   <Button onClick={() => setSelectedRequest(null)}>Fermer</Button>
                 </div>
               </Card>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </Layout>
