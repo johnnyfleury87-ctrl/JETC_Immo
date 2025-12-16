@@ -33,15 +33,14 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function checkAdminAndLoadStats() {
       try {
-        // Note: Les steps 1-3 sont déjà loggés dans sendAdminMagicLink
-        // Les steps 4-8 sont déjà loggés dans /auth/callback
-        // Ici on n'a plus besoin de logger, juste vérifier l'accès
+        console.log("[ADMIN] Admin page /admin loaded - verifying access...");
 
         // Vérification du rôle admin via Supabase
+        console.log("[ADMIN] Calling checkAdminRole()...");
         const { isAdmin, profile, error } = await checkAdminRole();
 
         if (error) {
-          console.warn("[ADMIN][BLOCKED] No session");
+          console.error("[ADMIN][BLOCKED] No session", { error });
           setAccessDenied(true);
           setDenialReason("Session invalide ou expirée");
           setLoading(false);
@@ -50,8 +49,9 @@ export default function AdminDashboard() {
         }
 
         if (!isAdmin) {
-          console.warn("[ADMIN][BLOCKED] Role is not admin", { 
-            role: profile?.role || "unknown" 
+          console.error("[ADMIN][BLOCKED] Role is not admin", { 
+            role: profile?.role || "unknown",
+            expected: "admin_jtec"
           });
           setAccessDenied(true);
           setDenialReason(`Rôle requis: admin_jtec (actuel: ${profile?.role || "aucun"})`);
@@ -60,11 +60,19 @@ export default function AdminDashboard() {
           return;
         }
 
+        console.log("[ADMIN] ✅ Role check passed - user is admin_jtec", {
+          email: profile.email,
+          role: profile.role
+        });
+
         // Vérification supplémentaire via API backend
+        console.log("[ADMIN] Verifying with backend /me...");
         const profileData = await apiFetch("/me");
+        
         if (profileData.role !== "admin_jtec") {
-          console.warn("[ADMIN][BLOCKED] Backend role verification failed", { 
-            backendRole: profileData.role 
+          console.error("[ADMIN][BLOCKED] Backend role verification failed", { 
+            backendRole: profileData.role,
+            expected: "admin_jtec"
           });
           setAccessDenied(true);
           setDenialReason("Rôle admin non confirmé par le backend");
@@ -72,6 +80,9 @@ export default function AdminDashboard() {
           setTimeout(() => router.push("/login"), 3000);
           return;
         }
+        
+        console.log("[ADMIN] ✅ Backend verification passed");
+        console.log("[ADMIN] 🎉 Full admin access granted - loading dashboard...");
 
         // Chargement des KPIs
         const [

@@ -10,32 +10,58 @@ export default function AuthCallback() {
   useEffect(() => {
     async function handleCallback() {
       try {
-        console.log("[ADMIN] Step 4 - Auth event", { 
-          url: window.location.href,
-          params: router.query 
+        // STEP 4: Détecter callback Magic Link
+        console.log("[ADMIN][STEP 4] Magic link callback detected");
+        console.log("[ADMIN][STEP 4] Full URL:", window.location.href);
+        
+        // STEP 5: Parser les params URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        
+        console.log("[ADMIN][STEP 5] URL params parsed", {
+          queryParams: Object.fromEntries(urlParams),
+          hashParams: Object.fromEntries(hashParams),
+          routerQuery: router.query
         });
 
-        // Supabase gère automatiquement l'échange du code
-        // Il suffit de récupérer la session
+        // AUTH: Récupération session Supabase
+        console.log("[AUTH] getSession start");
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-        if (sessionError || !session) {
-          console.error("[ADMIN][ERROR] Session retrieval failed", { 
-            error: sessionError?.message,
-            hasSession: !!session
+        
+        if (sessionError) {
+          console.error("[AUTH] getSession result = FAIL", { 
+            error: sessionError.message,
+            code: sessionError.code,
+            status: sessionError.status
           });
-          setError(sessionError?.message || "Aucune session trouvée");
+          setError(sessionError.message);
           setStatus("Échec de l'authentification");
           setTimeout(() => router.push("/login"), 3000);
           return;
         }
-
-        console.log("[ADMIN] Step 5 - Session detected", { 
+        
+        if (!session) {
+          console.error("[AUTH] getSession result = FAIL (no session)");
+          setError("Aucune session trouvée");
+          setStatus("Échec de l'authentification");
+          setTimeout(() => router.push("/login"), 3000);
+          return;
+        }
+        
+        console.log("[AUTH] getSession result = OK");
+        console.log("[AUTH] user.id =", session.user.id);
+        console.log("[AUTH] user.email =", session.user.email);
+        console.log("[AUTH] Session details:", {
           userId: session.user.id,
-          email: session.user.email 
+          email: session.user.email,
+          role: session.user.role,
+          aud: session.user.aud,
+          expiresAt: new Date(session.expires_at * 1000).toISOString()
         });
 
-        // Fetch profile pour vérifier le rôle
+        // STEP 6: Chargement profil
+        console.log("[ADMIN][STEP 6] Loading profile for user.id", session.user.id);
+        
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("id, email, role")
@@ -45,7 +71,9 @@ export default function AuthCallback() {
         if (profileError) {
           console.error("[ADMIN][ERROR] Profile fetch failed", { 
             error: profileError.message,
-            code: profileError.code 
+            code: profileError.code,
+            details: profileError.details,
+            hint: profileError.hint
           });
           setError(profileError.message);
           setStatus("Erreur lors de la récupération du profil");
@@ -53,22 +81,28 @@ export default function AuthCallback() {
           return;
         }
 
-        console.log("[ADMIN] Step 6 - Profile loaded", { 
-          role: profile.role,
-          email: profile.email 
-        });
+        // STEP 7: Profil chargé
+        console.log("[ADMIN][STEP 7] Profile loaded", profile);
+        
+        // STEP 8: Vérification rôle
+        console.log("[ADMIN][STEP 8] role =", profile.role);
+        console.log("[ADMIN][STEP 8] Expected: admin_jtec");
+        console.log("[ADMIN][STEP 8] Match:", profile.role === "admin_jtec");
 
         const next = router.query.next || "/";
 
+        // STEP 9: Décision finale
         if (profile.role === "admin_jtec") {
-          console.log("[ADMIN] Step 7 - ADMIN ROLE OK");
-          console.log("[ADMIN] Step 8 - Redirecting to /admin");
+          console.log("[ADMIN][STEP 9] Access granted → redirect /admin");
           setStatus(`Accès admin autorisé. Redirection vers ${next}...`);
-          setTimeout(() => router.push(next), 1000);
+          setTimeout(() => {
+            console.log("[ADMIN][STEP 9] Executing redirect to:", next);
+            router.push(next);
+          }, 1000);
         } else {
-          console.warn("[ADMIN][BLOCKED] Role is not admin", { 
-            role: profile.role,
-            expected: "admin_jtec" 
+          console.warn("[ADMIN][BLOCKED] Role not admin → redirect /login", { 
+            actualRole: profile.role,
+            expectedRole: "admin_jtec"
           });
           setError(`Accès refusé. Rôle requis: admin_jtec (actuel: ${profile.role})`);
           setStatus("Accès refusé");

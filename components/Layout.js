@@ -23,15 +23,20 @@ export default function Layout({ children }) {
   const handleAdminRightClick = async (e) => {
     e.preventDefault();
     
+    console.log("[ADMIN][STEP 1] Right click detected");
+    
     let email = profile?.email;
     
     if (!email) {
       email = prompt("Email admin pour Magic Link:");
       if (!email) {
         alert("Email requis pour l'authentification admin");
+        console.error("[ADMIN][ERROR] No email provided");
         return;
       }
     }
+    
+    console.log("[ADMIN][STEP 2] Requesting magic link for admin email", { email });
     
     const result = await sendAdminMagicLink(email);
     
