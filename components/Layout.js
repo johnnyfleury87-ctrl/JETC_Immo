@@ -4,6 +4,7 @@ import UserBadge from "./UserBadge";
 import { useTheme } from "../context/ThemeContext";
 import { canUseDemo } from "../lib/demoAccess";
 import { getProfile } from "../lib/auth";
+import { sendAdminMagicLink } from "../lib/adminAuth";
 
 export default function Layout({ children }) {
   const { theme, setTheme } = useTheme();
@@ -18,6 +19,28 @@ export default function Layout({ children }) {
     };
     loadProfile();
   }, []);
+
+  const handleAdminRightClick = async (e) => {
+    e.preventDefault();
+    
+    let email = profile?.email;
+    
+    if (!email) {
+      email = prompt("Email admin pour Magic Link:");
+      if (!email) {
+        alert("Email requis pour l'authentification admin");
+        return;
+      }
+    }
+    
+    const result = await sendAdminMagicLink(email);
+    
+    if (result.success) {
+      alert(`Magic Link envoyé à ${email}. Vérifiez votre boîte mail.`);
+    } else {
+      alert(`Erreur: ${result.error}`);
+    }
+  };
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--background)" }}>

@@ -5,10 +5,13 @@ import Card from "../../components/UI/Card";
 import TicketsPerMonth from "../../components/charts/TicketsPerMonth";
 import MissionsPerMonth from "../../components/charts/MissionsPerMonth";
 import { apiFetch } from "../../lib/api";
+import { checkAdminRole, adminLog } from "../../lib/adminAuth";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
+  const [denialReason, setDenialReason] = useState("");
   const [stats, setStats] = useState({
     regies: 0,
     entreprises: 0,
@@ -30,10 +33,46 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function checkAdminAndLoadStats() {
       try {
-        // Vérification du rôle admin
+        adminLog(9, "Admin page loaded");
+
+        // Vérification du rôle admin via Supabase
+        const { isAdmin, profile, error } = await checkAdminRole();
+
+        if (error) {
+          adminLog(9, "Admin check FAIL - No session", { error });
+          setAccessDenied(true);
+          setDenialReason("Session invalide ou expirée");
+          setLoading(false);
+          setTimeout(() => router.push("/login"), 3000);
+          return;
+        }
+
+        if (!isAdmin) {
+          adminLog(9, "Admin check FAIL - Role not admin", { 
+            role: profile?.role || "unknown" 
+          });
+          setAccessDenied(true);
+          setDenialReason(`Rôle requis: admin_jtec (actuel: ${profile?.role || "aucun"})`);
+          setLoading(false);
+          setTimeout(() => router.push("/"), 3000);
+          return;
+        }
+
+        adminLog(10, "Admin access granted", { 
+          email: profile.email,
+          role: profile.role 
+        });
+
+        // Vérification supplémentaire via API backend
         const profileData = await apiFetch("/me");
         if (profileData.role !== "admin_jtec") {
-          router.push("/login");
+          adminLog(10, "Backend verification FAIL", { 
+            backendRole: profileData.role 
+          });
+          setAccessDenied(true);
+          setDenialReason("Rôle admin non confirmé par le backend");
+          setLoading(false);
+          setTimeout(() => router.push("/login"), 3000);
           return;
         }
 
@@ -93,6 +132,54 @@ export default function AdminDashboard() {
 
     checkAdminAndLoadStats();
   }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <Card>
+          <p style={{ textAlign: "center", padding: "2rem" }}>
+            Vérification des accès admin...
+          </p>
+        </Card>
+      </Layout>
+    );
+  }
+
+  if (accessDenied) {
+    return (
+      <Layout>
+        <Card>
+          <div style={{ textAlign: "center", padding: "3rem" }}>
+            <h1 style={{ color: "#c00", marginBottom: "1rem" }}>
+              ❌ Accès refusé
+            </h1>
+            <p style={{ color: "#666", fontSize: "1.1rem", marginBottom: "2rem" }}>
+              {denialReason}
+            </p>
+            <div
+              style={{
+                background: "#fef2f2",
+                border: "1px solid #fecaca",
+                borderRadius: "8px",
+                padding: "1rem",
+                marginBottom: "2rem",
+              }}
+            >
+              <p style={{ margin: 0, color: "#991b1b", fontSize: "0.9rem" }}>
+                <strong>Rôle requis:</strong> admin_jtec
+              </p>
+            </div>
+            <p style={{ fontSize: "0.85rem", color: "#999" }}>
+              Redirection automatique dans 3 secondes...
+            </p>
+            <p style={{ fontSize: "0.85rem", color: "#999", marginTop: "1rem" }}>
+              🔍 Consultez la console pour les logs détaillés ([ADMIN-AUTH])
+            </p>
+          </div>
+        </Card>
+      </Layout>
+    );
+  }
 
   if (loading) {
     return (
