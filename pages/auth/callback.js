@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../../src/lib/supabaseClient";
-import { adminLog } from "../../lib/adminAuth";
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -11,7 +10,7 @@ export default function AuthCallback() {
   useEffect(() => {
     async function handleCallback() {
       try {
-        adminLog(5, "Callback loaded", { 
+        console.log("[ADMIN] Step 4 - Auth event", { 
           url: window.location.href,
           params: router.query 
         });
@@ -20,27 +19,18 @@ export default function AuthCallback() {
         // Il suffit de récupérer la session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-        if (sessionError) {
-          adminLog(6, "Session FAIL", { 
-            error: sessionError.message,
-            code: sessionError.code,
-            status: sessionError.status 
+        if (sessionError || !session) {
+          console.error("[ADMIN][ERROR] Session retrieval failed", { 
+            error: sessionError?.message,
+            hasSession: !!session
           });
-          setError(sessionError.message);
+          setError(sessionError?.message || "Aucune session trouvée");
           setStatus("Échec de l'authentification");
           setTimeout(() => router.push("/login"), 3000);
           return;
         }
 
-        if (!session) {
-          adminLog(6, "Session FAIL - No session found");
-          setError("Aucune session trouvée");
-          setStatus("Échec de l'authentification");
-          setTimeout(() => router.push("/login"), 3000);
-          return;
-        }
-
-        adminLog(6, "Session OK", { 
+        console.log("[ADMIN] Step 5 - Session detected", { 
           userId: session.user.id,
           email: session.user.email 
         });
@@ -53,7 +43,7 @@ export default function AuthCallback() {
           .single();
 
         if (profileError) {
-          adminLog(7, "Profile fetch FAIL", { 
+          console.error("[ADMIN][ERROR] Profile fetch failed", { 
             error: profileError.message,
             code: profileError.code 
           });
@@ -63,7 +53,7 @@ export default function AuthCallback() {
           return;
         }
 
-        adminLog(7, "Profile fetch OK", { 
+        console.log("[ADMIN] Step 6 - Profile loaded", { 
           role: profile.role,
           email: profile.email 
         });
@@ -71,11 +61,12 @@ export default function AuthCallback() {
         const next = router.query.next || "/";
 
         if (profile.role === "admin_jtec") {
-          adminLog(8, "Role OK -> redirect", { destination: next });
+          console.log("[ADMIN] Step 7 - ADMIN ROLE OK");
+          console.log("[ADMIN] Step 8 - Redirecting to /admin");
           setStatus(`Accès admin autorisé. Redirection vers ${next}...`);
           setTimeout(() => router.push(next), 1000);
         } else {
-          adminLog(8, "Role NOT admin -> redirect denied", { 
+          console.warn("[ADMIN][BLOCKED] Role is not admin", { 
             role: profile.role,
             expected: "admin_jtec" 
           });
@@ -84,7 +75,7 @@ export default function AuthCallback() {
           setTimeout(() => router.push("/"), 3000);
         }
       } catch (err) {
-        adminLog("ERROR", "Unexpected error in callback", {
+        console.error("[ADMIN][ERROR] Unexpected error in callback", {
           message: err.message,
           stack: err.stack,
         });

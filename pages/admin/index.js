@@ -5,7 +5,7 @@ import Card from "../../components/UI/Card";
 import TicketsPerMonth from "../../components/charts/TicketsPerMonth";
 import MissionsPerMonth from "../../components/charts/MissionsPerMonth";
 import { apiFetch } from "../../lib/api";
-import { checkAdminRole, adminLog } from "../../lib/adminAuth";
+import { checkAdminRole } from "../../lib/adminAuth";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -33,13 +33,15 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function checkAdminAndLoadStats() {
       try {
-        adminLog(9, "Admin page loaded");
+        // Note: Les steps 1-3 sont déjà loggés dans sendAdminMagicLink
+        // Les steps 4-8 sont déjà loggés dans /auth/callback
+        // Ici on n'a plus besoin de logger, juste vérifier l'accès
 
         // Vérification du rôle admin via Supabase
         const { isAdmin, profile, error } = await checkAdminRole();
 
         if (error) {
-          adminLog(9, "Admin check FAIL - No session", { error });
+          console.warn("[ADMIN][BLOCKED] No session");
           setAccessDenied(true);
           setDenialReason("Session invalide ou expirée");
           setLoading(false);
@@ -48,7 +50,7 @@ export default function AdminDashboard() {
         }
 
         if (!isAdmin) {
-          adminLog(9, "Admin check FAIL - Role not admin", { 
+          console.warn("[ADMIN][BLOCKED] Role is not admin", { 
             role: profile?.role || "unknown" 
           });
           setAccessDenied(true);
@@ -58,15 +60,10 @@ export default function AdminDashboard() {
           return;
         }
 
-        adminLog(10, "Admin access granted", { 
-          email: profile.email,
-          role: profile.role 
-        });
-
         // Vérification supplémentaire via API backend
         const profileData = await apiFetch("/me");
         if (profileData.role !== "admin_jtec") {
-          adminLog(10, "Backend verification FAIL", { 
+          console.warn("[ADMIN][BLOCKED] Backend role verification failed", { 
             backendRole: profileData.role 
           });
           setAccessDenied(true);
