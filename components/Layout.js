@@ -78,6 +78,8 @@ export default function Layout({ children }) {
                 e.currentTarget.style.transform = "scale(1)";
                 e.currentTarget.style.opacity = "1";
               }}
+              onContextMenu={handleAdminRightClick}
+              title="Clic droit pour accès admin"
             >
               🏢 JETC IMMO
             </h1>
